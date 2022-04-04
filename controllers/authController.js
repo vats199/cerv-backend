@@ -1,8 +1,11 @@
 const bcrypt = require('bcryptjs');
 const config = require('../util/config');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const client = require('twilio')(config.accounSID, config.authToken);
+const {Op} = require('@sequelize/core')
+
 let refreshTokens = [];
 
 const ranToken = require('rand-token');
@@ -10,6 +13,14 @@ const ranToken = require('rand-token');
 
 const User = require('../models/user');
 
+const transporter = nodemailer.createTransport({
+  host: 'smtp.ethereal.email',
+  port: 587,
+  auth: {
+      user: 'mike.vandervort97@ethereal.email',
+      pass: '1E8w4hvPuzskRe99sE'
+  }
+});
 exports.postSignup = (req, res, next) => {
   const userData = {
     email: req.body.email,
@@ -87,8 +98,13 @@ exports.postLogin = (req, res, next) => {
 
   exports.generateOTP = (req,res,next) => {
     const userId = req.params.id;
-  
-    const number = req.body.number;
+    User.findOne({
+      where: {
+        id: userId
+      }
+    }).then(user=>{
+      if(user.is_verify == 0){
+        const number = req.body.number;
     User.update({ pNumber: number},
       {where: {
         id: userId
@@ -110,6 +126,11 @@ exports.postLogin = (req, res, next) => {
         })
     })
     .catch(err=>console.log(err))
+      } else {
+        res.json({message: "User is already verified!"})
+      }
+    }).catch(err=> console.log(err));
+    
       
   
   }
@@ -132,11 +153,14 @@ exports.postLogin = (req, res, next) => {
       })
       .then(data => {
         if(data.valid == true){
-          User.update({ is_verify: 1},
-            {where: {
-              id: userId
-            }}
-          ).then(result=>{
+          user.is_verify = 1;
+          return user.save()
+          // User.update({ is_verify: 1},
+          //   {where: {
+          //     id: userId
+          //   }}
+          // )
+          .then(result=>{
 
             res.status(200).send({message: "Mobile number Verified", data: data});
           })
@@ -150,4 +174,65 @@ exports.postLogin = (req, res, next) => {
     })
     .catch(err=>console.log(err))
     
+  }
+
+  exports.resetPasswordLink = (req,res,next)=>{
+    crypto.randomBytes(32,(err,buffer)=>{
+      if(err){
+        return res.status(200).json({
+          message: err
+      });
+      }
+      const token = buffer.toString('hex');
+      User.findOne({
+        where: {
+          email: req.body.email
+        }
+      }).then(user=>{
+        if(!user){
+          res.send({message: "No account found for this email!"})
+        }
+        user.resetToken = token;
+        user.resetTokenExpiration = Date.now() + 3600000;
+        return user.save();
+      })
+      .then(result=>{
+        transporter.sendMail({
+          to: req.body.email,
+          from: 'vatsalp.tcs@gmail.com',
+                subject: 'Password Reset Form!',
+                html: `
+                    <p>You requested to reset your password for our website</p>
+                    <p>Click on this <a href="http://localhost:3000/reset/${token}">link</a> to reset a new password
+                `
+        })
+        return res.status(200).json({
+          message: 'Password reset link send to your email'
+      })
+      }).catch(err=>console.log(err))
+    })
+  }
+
+  exports.resetPassword = async (req,res,next)=> {
+    const newPassword = req.body.newPassword;
+    // const userId = req.body.userId;
+    const token = req.params.token;
+    let resetUser;
+
+    User.findOne({
+      where: {
+          resetToken: token,
+          resetTokenExpiration: { [Op.gt]: Date.now() }
+      }
+  }).then(user=>{
+      resetUser = user;
+      return bcrypt.hash(newPassword, 10);
+    }).then(hashedPassword=>{
+      resetUser.password = hashedPassword;
+            resetUser.resetToken = null;
+            resetUser.resetTokenExpiration = null;
+            return resetUser.save();
+    }).then(result=>{
+      return res.send({message: "Password Changed Successfully!!"})
+    }).catch(err=>console.log(err))
   }

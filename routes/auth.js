@@ -50,7 +50,8 @@ router.post('/login', authController.postLogin);
 
 router.post('/generateOTP/:id', authController.generateOTP);
 router.post('/verifyOTP/:id', authController.verifyOTP);
-
+router.post('/reset',authController.resetPasswordLink);
+router.post('/resetPassword/:token',authController.resetPassword);
 // router.use(require('../util/check'))
 
 
