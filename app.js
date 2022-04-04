@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 
 const cors = require('cors');
 
+const User = require('./models/user');
+const Store = require('./models/store');
+
 const app = express();
 const config = require('./util/config');
 app.use(bodyParser.json());
@@ -26,6 +29,9 @@ const Auth = require('./routes/auth');
 app.use('/users', Auth)
 
 const db = require('./util/database');
+
+Store.belongsTo(User);
+
 db.sequelize
   // .sync({force: true})
   .sync()

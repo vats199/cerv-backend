@@ -44,7 +44,8 @@ module.exports = db.sequelize.define('user' , {
         allowNull: false
     },
     password: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false
     },
     name: {
         type: Sequelize.STRING
