@@ -12,6 +12,7 @@ const ranToken = require('rand-token');
 
 
 const User = require('../models/user');
+const Store = require('../models/store')
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.ethereal.email',
@@ -236,3 +237,98 @@ exports.postLogin = (req, res, next) => {
       return res.send({message: "Password Changed Successfully!!"})
     }).catch(err=>console.log(err))
   }
+
+
+  exports.changePassword = (req, res, body) => {
+    const email = req.body.email,
+        currentPassword = req.body.currentPassword,
+        newPassword = req.body.newPassword;
+
+    User.findOne({
+        where: {
+            email: email
+        }
+    })
+        .then(user => {
+            if (!user) {
+                return res.status(404).json({ errorMessage: 'User not Found!' });
+            }
+            resetUser = user;
+            return bcrypt.compare(currentPassword, user.password);
+        })
+        .then(isEqual => {
+            if (!isEqual) {
+                return res.status(403).json({ errorMessage: 'Invalid password' });
+            }
+            return bcrypt.hash(newPassword, 12);
+        })
+        .then(hashedPassword => {
+            resetUser.password = hashedPassword;
+            return resetUser.save();
+        })
+        .then(result => {
+            return res.status(200).json({
+                message: 'Password changed successfully..',
+                data: {
+                    id: resetUser.id,
+                    name: resetUser.name,
+                    email: resetUser.email
+                }
+            })
+        })
+        .catch(err => {
+            console.log(err);
+            res.json({
+                errorMessage: 'Some thing gose wrong!'
+            });
+        })
+}
+
+
+exports.postStore = (req,res,next)=>{
+
+  const userId = req.params.id;
+
+  User.findOne({
+    where: {
+      id: userId
+    }
+  }).then(user=>{
+    if(user.role==0){
+            const storeData = {
+              license_num: req.body.license_num,
+              license_image: req.body.license_image,
+              address: req.body.address,
+              bio: req.body.bio,
+              order_type: req.body.order_type,
+              userId: userId
+          }
+          Store.findOne({
+              where: {
+                  license_num: req.body.license_num
+              }
+          })
+          .then(store=>{
+              if(!store){
+                  Store.create(storeData)
+                      .then(user => {
+                                res.json({message: 'Store Registered'})
+                              })
+                      .catch(err => {
+                                  res.send('ERROR: ' + err)
+                                })
+              } else {
+                  res.json({ error: "STORE ALREADY EXISTS" })
+                }
+          })
+          .catch(err => {
+              res.send('ERROR: ' + err)
+            })
+    }else {
+      res.json({ error: "USER IS NOT A CATERER!" })
+    }
+  }).catch(err => {
+    res.send('ERROR: ' + err)
+  })
+
+}
