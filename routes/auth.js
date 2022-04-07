@@ -10,7 +10,7 @@ const authController = require("../controllers/authController");
 router.post('/refresh', (req,res)=>{
     const refreshToken = req.body.token;
     const refreshTokens = authController.refreshTokens;
-    if(!refreshToken || !refreshTokens.includes(refreshToken)){
+    if(!refreshToken || !(refreshToken in refreshTokens)){
         return res.status(403).json({message: "User not Authenticated!"})
     }
     jwt.verify(refreshToken, "somesupersuperrefreshsecret", (err,user)=>{

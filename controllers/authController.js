@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const {Op} = require('@sequelize/core')
 
-let refreshTokens = [];
+let refreshTokens = {};
 
 const ranToken = require('rand-token');
 
