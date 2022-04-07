@@ -6,7 +6,7 @@ const config = require('./config')
 //   // decode token
 //   if (token) {
 //     // verifies secret and checks exp
-//     jwt.verify(token, process.envsecret, function(err, decoded) {
+//     jwt.verify(token, process.env.secret, function(err, decoded) {
 //         if (err) {
 //             return res.status(401).json({"error": true, "message": 'Unauthorized access.' });
 //         }

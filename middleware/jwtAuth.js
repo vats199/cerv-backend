@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
     let token = req.get('Authorization');
     token = token.split(' ')[1];
 
-    jwt.verify(token, process.envsecret ,(err,user)=>{
+    jwt.verify(token, process.env.secret ,(err,user)=>{
         if(!err){
             // console.log(user.loadedUser.id);
             req.user = user.loadedUser;

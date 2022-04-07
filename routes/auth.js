@@ -17,8 +17,8 @@ router.post('/refresh', (req,res)=>{
         if(!err){
             const token = jwt.sign(
                 {user: user.loadedUser},
-                process.envsecret,
-                { expiresIn: process.envjwtExpiration }
+                process.env.secret,
+                { expiresIn: process.env.jwtExpiration }
               );
               return res.status(201).json({token});
         } else{

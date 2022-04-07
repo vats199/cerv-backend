@@ -3,7 +3,7 @@ const config = require('../util/config');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
-const client = require('twilio')(process.envaccounSID, process.envauthToken);
+const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const {Op} = require('@sequelize/core')
 
 let refreshTokens = [];
@@ -75,13 +75,13 @@ exports.postLogin = (req, res, next) => {
       }
       const token = jwt.sign(
         {loadedUser},
-        process.envsecret,
-        { expiresIn: process.envjwtExpiration }
+        process.env.secret,
+        { expiresIn: process.env.jwtExpiration }
       );
       const refreshToken = jwt.sign(
         {loadedUser},
         "somesupersuperrefreshsecret",
-        { expiresIn: process.envjwtRefreshExpiration }
+        { expiresIn: process.env.jwtRefreshExpiration }
       );
       refreshTokens.push(refreshToken); 
       // const response = { message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken }
@@ -110,7 +110,7 @@ exports.postLogin = (req, res, next) => {
     ).then(result=>{
     client
         .verify
-        .services(process.envserviceID)
+        .services(process.env.serviceID)
         .verifications
         .create({
           to: `${number}`,
@@ -143,7 +143,7 @@ exports.postLogin = (req, res, next) => {
       number = user.pNumber;
       client
       .verify
-      .services(process.envserviceID)
+      .services(process.env.serviceID)
       .verificationChecks
       .create({
         to: `${number}`,
