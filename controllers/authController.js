@@ -170,19 +170,11 @@ exports.postLogin = (req, res, next) => {
         to: `${country_code}${number}`,
         code: req.body.code 
       })
-      .then(data => {
+      .then(async data => {
         if(data.valid == true){
           user.is_verify = 1;
-          return user.save()
-          // User.update({ is_verify: 1},
-          //   {where: {
-          //     id: userId
-          //   }}
-          // )
-          .then(result=>{
-
-            res.status(200).send({message: "Mobile number Verified", data: data});
-          })
+          const result = await user.save();
+          res.status(200).send({ message: "Mobile number Verified", data: data });
         } else{
           res.status(400).send({message: "Invalid OTP entered!"})
         }
