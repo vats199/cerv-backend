@@ -1,5 +1,4 @@
 module.exports = {
-    PORT: 3000,
     MYSQL_USER: "root",
     MYSQL_PASSWORD: "Password",
     MYSQL_DATABASE: "cerv",

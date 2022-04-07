@@ -15,7 +15,7 @@ const app = express();
 const config = require('./util/config');
 app.use(bodyParser.json());
 app.use(cors());
-const PORT = config.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use((req, res, next) => {

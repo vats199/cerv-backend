@@ -2,7 +2,7 @@ const {Sequelize} = require('sequelize');
 const config = require('../util/config');
 const db = {};
 
-const sequelize = new Sequelize(config.MYSQL_DATABASE, config.MYSQL_USER, config.MYSQL_PASSWORD, {
+const sequelize = new Sequelize(process.envMYSQL_DATABASE, process.envMYSQL_USER, process.envMYSQL_PASSWORD, {
     dialect: 'mysql',
     host: 'localhost',
     operatorAliases: false,
