@@ -160,13 +160,14 @@ exports.postLogin = (req, res, next) => {
         id: userId
       }
     }).then(user=> {
-      number = user.country_code + user.phone_number;
+      const country_code = user.country_code
+      const number = req.body.phone_number;
       client
       .verify
       .services(process.env.serviceID)
       .verificationChecks
       .create({
-        to: `${number}`,
+        to: `${country_code}${number}`,
         code: req.body.code 
       })
       .then(data => {
