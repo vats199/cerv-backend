@@ -54,7 +54,10 @@ module.exports = db.sequelize.define('user' , {
         type: Sequelize.STRING(100),
         defaultValue: null
     },
-    pNumber: {
+    country_code: {
+        type: Sequelize.STRING
+    },
+    phone_number: {
         type: Sequelize.STRING
     },
     is_verify: {

@@ -41,7 +41,7 @@ exports.postSignup = (req, res, next) => {
           userData.password = hash
           User.create(userData)
             .then(user => {
-              res.json({ status: user.email + ' REGISTERED' })
+              res.status(200).json({ message:'Registeration Successfull!' , userData: user})
             })
             .catch(err => {
               res.send('ERROR: ' + err)
@@ -102,8 +102,9 @@ exports.postLogin = (req, res, next) => {
     User.findByPk(userId)
     .then(user=>{
       if(user.is_verify == 0){
+        const country_code = req.body.countryCode
         const number = req.body.number;
-    User.update({ pNumber: number},
+    User.update({ phone_number: number, country_code: country_code},
       {where: {
         id: userId
       }}
@@ -113,7 +114,7 @@ exports.postLogin = (req, res, next) => {
         .services(process.env.serviceID)
         .verifications
         .create({
-          to: `${number}`,
+          to: `${country_code}${number}`,
           channel: req.body.channel 
         })
         .then(data => {
