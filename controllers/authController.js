@@ -83,9 +83,9 @@ exports.postLogin = (req, res, next) => {
         "somesupersuperrefreshsecret",
         { expiresIn: process.env.jwtRefreshExpiration }
       );
-      refreshTokens.push(refreshToken); 
+      // refreshTokens.push(refreshToken); 
       // const response = { message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken }
-      // refreshTokens[refreshToken] = response;
+      refreshTokens[refreshToken] = {token: token, refreshToken: refreshToken};
       return res.status(200).json({message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken})
         // res.status(200).json(response);
     })
