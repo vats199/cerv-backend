@@ -321,8 +321,8 @@ exports.postStore = (req,res,next)=>{
           .then(store=>{
               if(!store){
                   Store.create(storeData)
-                      .then(user => {
-                                res.json({message: 'Store Registered'})
+                      .then(storeData => {
+                                res.status(200).json({message: 'Store Registered', data: storeData})
                               })
                       .catch(err => {
                                   res.send('ERROR: ' + err)
