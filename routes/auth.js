@@ -7,25 +7,7 @@ const config = require('../util/config');
 router.use(cors());
 const authController = require("../controllers/authController");
 
-router.post('/refresh', (req,res)=>{
-    const refreshToken = req.body.token;
-    const refreshTokens = authController.refreshTokens;
-    if(!refreshToken || !(refreshToken in refreshTokens)){
-        return res.status(403).json({message: "User not Authenticated!"})
-    }
-    jwt.verify(refreshToken, "somesupersuperrefreshsecret", (err,user)=>{
-        if(!err){
-            const token = jwt.sign(
-                {user: user.loadedUser},
-                process.env.secret,
-                { expiresIn: process.env.jwtExpiration }
-              );
-              return res.status(201).json({token});
-        } else{
-            return res.status(403).json({message: "User not Authenticated!"})
-        }
-    })
-})
+router.post('/refresh', authController.refresh)
 
 router.post('/protected', jwtAuth , (req,res)=>{
     res.send("Inside Protected Route!")

@@ -133,6 +133,25 @@ exports.postLogin = (req, res, next) => {
       
   
   }
+
+  exports.refresh = (req,res,next)=>{
+    const refreshToken = req.body.token;
+    if(!refreshToken || !(refreshToken in refreshTokens)){
+        return res.status(403).json({message: "User not Authenticated!"})
+    }
+    jwt.verify(refreshToken, "somesupersuperrefreshsecret", (err,user)=>{
+        if(!err){
+            const token = jwt.sign(
+                {user: user.loadedUser},
+                process.env.secret,
+                { expiresIn: process.env.jwtExpiration }
+              );
+              return res.status(201).json({token});
+        } else{
+            return res.status(403).json({message: "User not Authenticated!"})
+        }
+    })
+  }
   
   exports.verifyOTP = (req,res,next) => {
     const userId = req.params.id
