@@ -160,7 +160,7 @@ exports.postLogin = (req, res, next) => {
         id: userId
       }
     }).then(user=> {
-      number = user.pNumber;
+      number = user.country_code + user.phone_number;
       client
       .verify
       .services(process.env.serviceID)
