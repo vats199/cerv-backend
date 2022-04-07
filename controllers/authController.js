@@ -161,7 +161,7 @@ exports.postLogin = (req, res, next) => {
       }
     }).then(user=> {
       const country_code = user.country_code
-      const number = req.body.phone_number;
+      const number = user.phone_number;
       client
       .verify
       .services(process.env.serviceID)
