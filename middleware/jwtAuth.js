@@ -1,34 +1,16 @@
-// const jwt = require('jsonwebtoken');
-// const config = require('../util/config');
-// const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const config = require('../util/config')
+module.exports = (req, res, next) => {
+    let token = req.get('Authorization');
+    token = token.split(' ')[1];
 
-// const { TokenExpiredError } = jwt;
-
-// const catchError = (err, res) => {
-//     if (err instanceof TokenExpiredError) {
-//       return res.status(401).send({ message: "Unauthorized! Access Token was expired!" });
-//     }
-  
-//     return res.sendStatus(401).send({ message: "Unauthorized!" });
-//   }
-  
-//   const verifyToken = (req, res, next) => {
-//     let token = req.headers["x-access-token"];
-  
-//     if (!token) {
-//       return res.status(403).send({ message: "No token provided!" });
-//     }
-  
-//     jwt.verify(token, config.secret, (err, decoded) => {
-//       if (err) {
-//         return catchError(err, res);
-//       }
-//       req.userId = decoded.id;
-//       next();
-//     });
-//   };
-
-//   const jwtAuth = {
-//     verifyToken: verifyToken
-//   };
-//   module.exports = jwtAuth;
+    jwt.verify(token, config.secret ,(err,user)=>{
+        if(!err){
+            // console.log(user.loadedUser.id);
+            req.user = user.loadedUser;
+            next();
+        } else{
+            return res.status(403).json({message: "User not Authenticated"})
+        }
+    })
+}

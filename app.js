@@ -7,6 +7,9 @@ const cors = require('cors');
 const User = require('./models/user');
 const Store = require('./models/store');
 const Driver = require('./models/driver');
+const Item = require('./models/item');
+const Category = require('./models/category');
+
 
 const app = express();
 const config = require('./util/config');
@@ -26,17 +29,24 @@ app.use((req, res, next) => {
   });
 
 const Auth = require('./routes/auth');
+const itemRoutes = require('./routes/item');
 
-app.use('/users', Auth)
+app.use('/users', Auth);
+app.use('/caterer', itemRoutes);
+
 
 const db = require('./util/database');
 
 Store.belongsTo(User);
 Driver.belongsTo(Store);
+Category.belongsTo(User);
+Item.belongsTo(User);
+Item.belongsTo(Category);
+
 
 db.sequelize
-  .sync({force: true})
-  // .sync()
+  // .sync({force: true})
+  .sync()
   .then(_database => {
     console.log('Database Connected Successfully.')
   })

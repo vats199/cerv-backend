@@ -86,7 +86,7 @@ exports.postLogin = (req, res, next) => {
       refreshTokens.push(refreshToken); 
       // const response = { message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken }
       // refreshTokens[refreshToken] = response;
-      return res.status(200).json({message: 'Logged-in Successfully', User: loadedUser , token: token, refreshToken: refreshToken})
+      return res.status(200).json({message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken})
         // res.status(200).json(response);
     })
     .catch(err => {
@@ -99,11 +99,8 @@ exports.postLogin = (req, res, next) => {
 
   exports.generateOTP = (req,res,next) => {
     const userId = req.params.id;
-    User.findOne({
-      where: {
-        id: userId
-      }
-    }).then(user=>{
+    User.findByPk(userId)
+    .then(user=>{
       if(user.is_verify == 0){
         const number = req.body.number;
     User.update({ pNumber: number},
@@ -291,7 +288,7 @@ exports.postStore = (req,res,next)=>{
 
   User.findOne({
     where: {
-      id: userId
+      id: userId 
     }
   }).then(user=>{
     if(user.role==0){

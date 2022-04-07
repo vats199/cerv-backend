@@ -1,25 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const cors = require('cors');
+const jwtAuth = require('../middleware/jwtAuth')
 const jwt = require('jsonwebtoken');
-// const config = require('../util/config');
+const config = require('../util/config');
 router.use(cors());
 const authController = require("../controllers/authController");
-
-function authUser(req, res, next) {
-    let token = req.get('Authorization');
-    token = token.split(' ')[1];
-
-    jwt.verify(token, config.secret ,(err,user)=>{
-        if(!err){
-            console.log(user);
-            req.user = user;
-            next();
-        } else{
-            return res.status(403).json({message: "User not Authenticated"})
-        }
-    })
-}
 
 router.post('/refresh', (req,res)=>{
     const refreshToken = req.body.token;
@@ -41,7 +27,7 @@ router.post('/refresh', (req,res)=>{
     })
 })
 
-router.post('/protected', authUser , (req,res)=>{
+router.post('/protected', jwtAuth , (req,res)=>{
     res.send("Inside Protected Route!")
 })
 
