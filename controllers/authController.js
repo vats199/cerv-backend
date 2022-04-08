@@ -30,7 +30,7 @@ exports.postSignup = (req, res, next) => {
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: req.body.image
+    image: req.file.path
   }
   User.findOne({
     where: {
@@ -340,7 +340,8 @@ exports.postStore = (req,res,next)=>{
               address: req.body.address,
               bio: req.body.bio,
               order_type: req.body.order_type,
-              userId: userId
+              userId: userId,
+              name: user.name
           }
           Store.findOne({
               where: {

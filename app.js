@@ -1,7 +1,7 @@
 const express = require('express');
-
+const path = require('path')
 const bodyParser = require('body-parser');
-
+const multer = require('multer');
 const cors = require('cors');
 
 const User = require('./models/user');
@@ -12,9 +12,34 @@ const Category = require('./models/category');
 
 
 const app = express();
+
+const fileStorage = multer.diskStorage({
+  destination: (req,file,cb) => {
+      cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+      cb(null, new Date().toISOString() + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req,file,cb) => {
+  if( file.mimetype == 'image/png' || 
+      file.mimetype == 'image/jpeg' || 
+      file.mimetype == 'image/jpg') {
+          cb(null, true);
+      } else {
+          cb(null, false);
+      }
+}
+
 const config = require('./util/config');
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }))
 
@@ -30,10 +55,11 @@ app.use((req, res, next) => {
 
 const Auth = require('./routes/auth');
 const itemRoutes = require('./routes/item');
+const customerRoutes = require('./routes/customer');
 
 app.use('/users', Auth);
 app.use('/caterer', itemRoutes);
-
+app.use('/', customerRoutes);
 
 const db = require('./util/database');
 
