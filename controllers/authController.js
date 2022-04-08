@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const config = require('../util/config');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.mjsecret);
 const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const {Op} = require('@sequelize/core')
@@ -14,14 +15,15 @@ const ranToken = require('rand-token');
 const User = require('../models/user');
 const Store = require('../models/store')
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
-  auth: {
-      user: 'mike.vandervort97@ethereal.email',
-      pass: '1E8w4hvPuzskRe99sE'
-  }
-});
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp.ethereal.email',
+//   port: 587,
+//   auth: {
+//       user: 'mike.vandervort97@ethereal.email',
+//       pass: '1E8w4hvPuzskRe99sE'
+//   }
+// });
+
 exports.postSignup = (req, res, next) => {
   const userData = {
     email: req.body.email,
@@ -208,18 +210,45 @@ exports.postLogin = (req, res, next) => {
         return user.save();
       })
       .then(result=>{
-        transporter.sendMail({
-          to: req.body.email,
-          from: 'vatsalp.tcs@gmail.com',
-                subject: 'Password Reset Form!',
-                html: `
-                    <p>You requested to reset your password for our website</p>
-                    <p>Click on this <a href="http://localhost:3000/reset/${token}">link</a> to reset a new password
-                `
-        })
-        return res.status(200).json({
-          message: 'Password reset link send to your email'
-      })
+        // transporter.sendMail({
+        //   to: req.body.email,
+        //   from: 'vatsalp.tcs@gmail.com',
+        //         subject: 'Password Reset Form!',
+        //         html: `
+        //             <p>You requested to reset your password for our website</p>
+        //             <p>Click on this <a href="http://localhost:3000/reset/${token}">link</a> to reset a new password
+        //         `
+        // })
+
+        const request = mailjet
+                              .post("send", {'version': 'v3.1'})
+                              .request({
+                                "Messages":[
+                                  {
+                                    "From": {
+                                      "Email": "vatsalp.tcs@gmail.com",
+                                      "Name": "Vatsal"
+                                    },
+                                    "To": [
+                                      {
+                                        "Email": req.body.email
+                                      }
+                                    ],
+                                    "Subject": "Greetings from CERV.",
+                                    "HTMLPart": `
+                                                <p>You requested to reset your password for our website</p>
+                                                <p>Click on this <a href="https://cerv-api.herokuapp.com/users/resetPassword/${token}">link</a> to reset a new password
+                                              `,
+                                    "CustomID": "AppGettingStartedTest"
+                                  }
+                                ]
+                              })
+                            request.then(result=>{
+                              return res.status(200).json({
+                                message: 'Password reset link send to your email'
+                            })
+                            }).catch(err=>console.log(err))
+        
       }).catch(err=>console.log(err))
     })
   }

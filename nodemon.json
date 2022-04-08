@@ -8,6 +8,8 @@
         "jwtRefreshExpiration": "1y",   
         "serviceID": "VAc4d2c4e7423fe8eeb64a259467b8f890",
         "accounSID": "AC5872b6586e629f141e3a151c8362c961",
-        "authToken": "331b318914f09fd2cfa72c944882b28c"
+        "authToken": "331b318914f09fd2cfa72c944882b28c",
+        "mjapi": "4d33a2ffa76d40298bffc4b3094cb6f4",
+        "mjsecret": "cae54fea55c05c83b63b8f19c4a3fa63"
     }
 }
