@@ -9,6 +9,7 @@ const Store = require('./models/store');
 const Driver = require('./models/driver');
 const Item = require('./models/item');
 const Category = require('./models/category');
+const Address = require('./models/address');
 
 
 const app = express();
@@ -68,6 +69,7 @@ Driver.belongsTo(Store);
 Category.belongsTo(User);
 Item.belongsTo(User);
 Item.belongsTo(Category);
+Address.belongsTo(User)
 
 
 db.sequelize
