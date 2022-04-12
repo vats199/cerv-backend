@@ -21,6 +21,7 @@ router.post('/verifyOTP/:id', authController.verifyOTP);
 router.post('/reset',authController.resetPasswordLink);
 router.post('/resetPassword/:token',authController.resetPassword);
 router.post('/storeDetails/:id', authController.postStore);
+router.post('/logout',jwtAuth, authController.logout)
 // router.use(require('../util/check'))
 
 

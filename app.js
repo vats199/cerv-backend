@@ -10,6 +10,8 @@ const Driver = require('./models/driver');
 const Item = require('./models/item');
 const Category = require('./models/category');
 const Address = require('./models/address');
+const Feedback = require('./models/feedback');
+const Token = require('./models/token');
 
 
 const app = express();
@@ -69,7 +71,10 @@ Driver.belongsTo(Store);
 Category.belongsTo(User);
 Item.belongsTo(User);
 Item.belongsTo(Category);
-Address.belongsTo(User)
+Address.belongsTo(User);
+Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
+Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+Token.belongsTo(User);
 
 
 db.sequelize
