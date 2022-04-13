@@ -13,5 +13,6 @@ router.get('/profile',jwtAuth, customerController.getProfile);
 router.put('/edit-profile',jwtAuth, customerController.editInfo);
 router.post('/add-address',jwtAuth,customerController.postAddress);
 router.put('/edit-address/:id',jwtAuth, customerController.editAddress);
+router.get('/search/:key', customerController.search)
 
 module.exports = router;

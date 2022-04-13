@@ -4,6 +4,8 @@ const Item = require('../models/item');
 const Address = require('../models/address')
 const Category = require('../models/category');
 const Feedback = require('../models/feedback');
+const Sequelize = require('sequelize');
+const { Op } = Sequelize.Op;
 
 const fs = require('fs')
 const path = require('path');
@@ -171,6 +173,49 @@ exports.postReview = async (req,res,next) => {
   }
 }
 
+const search = async (req,res,next)=>{
+  const { term } = req.query;
+  const key = req.params.key; 
+  // key->1   categories
+  // key->2   items
+  // key->3   caterers
+try{
+  if(key === 1){
+    const totalResults = await Category.count({where: {title: { [Op.like]: '%'+ term + '%' }}})
+    const results = await Category.findAll({where: {title: { [Op.like]: '%'+ term + '%' }}});
+
+    return res.status(200).json({message: 'Fetched Categories Successfully!', 
+                                              results: results,
+                                              totalCaterers: totalResults, status: 1})
+  }
+
+
+  if(key === 2){
+    const totalResults = await Item.count({where: {title: { [Op.like]: '%'+ term + '%' }}})
+    const results = await Item.findAll({where: {title: { [Op.like]: '%'+ term + '%' }}});
+
+    return res.status(200).json({message: 'Fetched Items Successfully!', 
+                                              results: results,
+                                              totalItems: totalResults, status: 1})
+  }
+
+
+  if(key === 3){
+    const totalResults = await Store.count({where: {name: { [Op.like]: '%'+ term + '%' }}})
+    const results = await Store.findAll({where: {name: { [Op.like]: '%'+ term + '%' }}});
+
+    return res.status(200).json({message: 'Fetched Caterers Successfully!', 
+                                              results: results,
+                                              totalCaterers: totalResults, status: 1})
+  }
+} catch(err){
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  next(err);
+}
+
+}
 
 
 

@@ -16,8 +16,8 @@ router.post('/protected', jwtAuth , (req,res)=>{
 router.post('/register', authController.postSignup);
 router.post('/login', authController.postLogin);
 
-router.post('/generateOTP/:id', authController.generateOTP);
-router.post('/verifyOTP/:id', authController.verifyOTP);
+router.post('/generateOTP', authController.generateOTP);
+router.post('/verifyOTP', authController.verifyOTP);
 router.post('/reset',authController.resetPasswordLink);
 router.post('/resetPassword/:token',authController.resetPassword);
 router.post('/storeDetails/:id', authController.postStore);
