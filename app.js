@@ -88,8 +88,8 @@ Banner.belongsTo(User);
 
 
 db.sequelize
-  // .sync({force: true})
-  .sync()
+  .sync({force: true})
+  // .sync()
   .then(_database => {
     console.log('Database Connected Successfully.')
   })
