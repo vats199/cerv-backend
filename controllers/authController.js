@@ -6,6 +6,7 @@ const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.m
 const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const { Op } = require('@sequelize/core')
+const path = require('path')
 
 let refreshTokens = {};
 

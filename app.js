@@ -12,6 +12,7 @@ const Category = require('./models/category');
 const Address = require('./models/address');
 const Feedback = require('./models/feedback');
 const Token = require('./models/token');
+const Banner = require('./models/banner');
 
 
 const app = express();
@@ -83,6 +84,7 @@ Address.belongsTo(User);
 Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Token.belongsTo(User);
+Banner.belongsTo(User);
 
 
 db.sequelize

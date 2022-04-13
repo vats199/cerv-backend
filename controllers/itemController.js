@@ -2,6 +2,8 @@ const User = require('../models/user');
 const Store = require('../models/store')
 const Item = require('../models/item');
 const Category = require('../models/category');
+const Banner = require('../models/banner');
+
 const fs = require('fs')
 const path = require('path')
 
@@ -88,6 +90,20 @@ exports.editItem = (req,res,next)=>{
                 return res.status(403).json({error: "User is not Authorized!", status: 0})
             }
          }).catch(err=>console.log(err))
+}
+
+exports.postBanner = (req,res,next)=>{
+    const userId = req.user.id;
+    const data = {
+        image: req.file.path,
+        userId: userId
+    }
+    Banner.create(data)
+        .then(result=>{
+            return res.status(200).json({message:"Banner created Successfully!", data: result, status: 1})
+        })
+        .catch(err=>console.log(err))
+
 }
 
 
