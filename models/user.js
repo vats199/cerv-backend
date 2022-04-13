@@ -51,7 +51,7 @@ module.exports = db.sequelize.define('user' , {
         type: Sequelize.STRING
     },
     image: {
-        type: Sequelize.STRING(100),
+        type: Sequelize.TEXT,
         defaultValue: null
     },
     country_code: {
