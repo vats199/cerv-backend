@@ -47,18 +47,18 @@ exports.postSignup = (req, res, next) => {
           userData.password = hash
           User.create(userData)
             .then(user => {
-              res.status(200).json({ message: 'Registeration Successfull!', userData: user })
+              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
             })
             .catch(err => {
-              res.send('ERROR: ' + err)
+              return res.json({error: err, status: 0})
             })
         })
       } else {
-        res.json({ error: "USER ALREADY EXISTS" })
+        return res.json({ error: "USER ALREADY EXISTS", status: 0 })
       }
     })
     .catch(err => {
-      res.send('ERROR: ' + err)
+      return res.json({error: err, status: 0})
     })
 }
 
@@ -70,14 +70,14 @@ exports.postLogin = async (req, res, next) => {
   })
     .then(user => {
       if (!user) {
-        res.status(400).json({ error: 'User does not exist!' })
+        return res.status(400).json({ error: 'User does not exist!', status: 0 })
       }
       loadedUser = user;
       return bcrypt.compare(req.body.password, user.password)
     })
     .then(async isEqual => {
       if (!isEqual) {
-        res.status(400).json({ error: 'Invalid Password!' })
+        return res.status(400).json({ error: 'Invalid Password!', status: 0 })
       }
       const token = jwt.sign(
         { loadedUser },
@@ -107,7 +107,8 @@ exports.postLogin = async (req, res, next) => {
             message: 'Logged-in Successfully',
             user: loadedUser,
             token: token,
-            refreshToken: refreshToken
+            refreshToken: refreshToken, 
+            status: 1
           })
         } else {
           const data = {
@@ -122,7 +123,7 @@ exports.postLogin = async (req, res, next) => {
             message: 'Logged-in Successfully',
             user: loadedUser,
             token: token,
-            refreshToken: refreshToken
+            refreshToken: refreshToken, status: 1
           })
         }
       } catch (err) {
@@ -148,7 +149,7 @@ exports.logout = async (req, res, next) => {
   
     if (getToken) {
       if(getToken.token == null){
-        return res.json({message: "User already Logged-out!"})
+        return res.json({error: "User already Logged-out!", status: 0})
       } else{
         
         getToken.token = null;
@@ -156,10 +157,10 @@ exports.logout = async (req, res, next) => {
         getToken.expiry = null;
     
         await getToken.save();
-        return res.status(200).json({ message: 'Logged-out Successfully' })
+        return res.status(200).json({ message: 'Logged-out Successfully', status: 1})
       }
     } else {
-      return res.json({message: "Log-out Failed!"})
+      return res.json({error: "Log-out Failed!", status: 0})
     }
   } catch(err){
     if (!err.statusCode) {
@@ -183,7 +184,7 @@ exports.generateOTP = async (req, res, next) => {
                             to: `${country_code}${number}`,
                             channel: req.body.channel
                           })
-    return res.status(200).json({ message: "OTP sent Successfuly"});
+    return res.status(200).json({ message: "OTP sent Successfuly", status: 1});
   }
   catch(err){
     if (!err.statusCode) {
@@ -208,9 +209,9 @@ exports.verifyOTP = async (req, res, next) => {
                             })
     if(otp.valid == true){
       
-      return res.status(200).json({ message: "Mobile Number verified!"});
+      return res.status(200).json({ message: "Mobile Number verified!", status: 1});
     }else {
-      return res.status(400).json({ message: "Invalid OTP entered!" })
+      return res.status(400).json({ error: "Invalid OTP entered!", status: 0 })
     }
   }
   catch(err){
@@ -225,7 +226,7 @@ exports.verifyOTP = async (req, res, next) => {
 exports.refresh = (req, res, next) => {
   const refreshToken = req.body.token;
   if (!refreshToken || !(refreshToken in refreshTokens)) {
-    return res.status(403).json({ message: "User not Authenticated!" })
+    return res.status(403).json({ error: "User not Authenticated!", status: 0 })
   }
   jwt.verify(refreshToken, "somesupersuperrefreshsecret", (err, user) => {
     if (!err) {
@@ -234,9 +235,9 @@ exports.refresh = (req, res, next) => {
         process.env.secret,
         { expiresIn: process.env.jwtExpiration }
       );
-      return res.status(201).json({ token });
+      return res.status(201).json({ token, status: 1 });
     } else {
-      return res.status(403).json({ message: "User not Authenticated!" })
+      return res.status(403).json({ error: "User not Authenticated!", status: 0 })
     }
   })
 }
@@ -246,7 +247,7 @@ exports.resetPasswordLink = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
       return res.status(200).json({
-        message: err
+        error: err, status: 0
       });
     }
     const token = buffer.toString('hex');
@@ -256,7 +257,7 @@ exports.resetPasswordLink = (req, res, next) => {
       }
     }).then(user => {
       if (!user) {
-        res.send({ message: "No account found for this email!" })
+        return res.send({ error: "No account found for this email!", status: 0 })
       }
       user.resetToken = token;
       user.resetTokenExpiration = Date.now() + 3600000;
@@ -298,7 +299,7 @@ exports.resetPasswordLink = (req, res, next) => {
           })
         request.then(result => {
           return res.status(200).json({
-            message: 'Password reset link send to your email'
+            message: 'Password reset link send to your email', status: 1
           })
         }).catch(err => console.log(err))
 
@@ -326,7 +327,7 @@ exports.resetPassword = async (req, res, next) => {
     resetUser.resetTokenExpiration = null;
     return resetUser.save();
   }).then(result => {
-    return res.send({ message: "Password Changed Successfully!!" })
+    return res.json({ message: "Password Changed Successfully!!", status: 1 })
   }).catch(err => console.log(err))
 }
 
@@ -343,14 +344,14 @@ exports.changePassword = (req, res, body) => {
   })
     .then(user => {
       if (!user) {
-        return res.status(404).json({ errorMessage: 'User not Found!' });
+        return res.status(404).json({ error: 'User not Found!', status: 0 });
       }
       resetUser = user;
       return bcrypt.compare(currentPassword, user.password);
     })
     .then(isEqual => {
       if (!isEqual) {
-        return res.status(403).json({ errorMessage: 'Invalid password' });
+        return res.status(403).json({ error: 'Invalid password', status: 0 });
       }
       return bcrypt.hash(newPassword, 12);
     })
@@ -365,13 +366,13 @@ exports.changePassword = (req, res, body) => {
           id: resetUser.id,
           name: resetUser.name,
           email: resetUser.email
-        }
+        }, status: 1
       })
     })
     .catch(err => {
       console.log(err);
-      res.json({
-        errorMessage: 'Some thing gose wrong!'
+      return res.json({
+        error: 'Some thing goes wrong!', status: 0
       });
     })
 }
@@ -405,23 +406,23 @@ exports.postStore = (req, res, next) => {
           if (!store) {
             Store.create(storeData)
               .then(storeData => {
-                res.status(200).json({ message: 'Store Registered', data: storeData })
+                return res.status(200).json({ message: 'Store Registered', data: storeData, status: 1 })
               })
               .catch(err => {
-                res.send('ERROR: ' + err)
+                return res.json({error: err, status: 0})
               })
           } else {
-            res.json({ error: "STORE ALREADY EXISTS" })
+            return res.json({ error: "STORE ALREADY EXISTS", status: 0 })
           }
         })
         .catch(err => {
-          res.send('ERROR: ' + err)
+          return res.json({error: err, status: 0})
         })
     } else {
-      res.json({ error: "USER IS NOT A CATERER!" })
+      return res.json({ error: "USER IS NOT A CATERER!", status: 0 })
     }
   }).catch(err => {
-    res.send('ERROR: ' + err)
+    return res.json({error: err, status: 0})
   })
 
 }

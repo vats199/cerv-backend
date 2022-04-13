@@ -21,16 +21,16 @@ exports.postCategory = (req,res,next) => {
                 userId: req.user.id
             })
                       .then(category => {
-                                res.status(200).json({message: 'Category Stored!', data: category})
+                                return res.status(200).json({message: 'Category Stored!', data: category, status: 1})
                               })
                       .catch(err => {
-                                  res.send('ERROR: ' + err)
+                        return res.json({error: err, status: 0})
                                 })
         }else {
-            res.json({ error: "CATEGORY ALREADY EXISTS" })
+            return res.json({ error: "CATEGORY ALREADY EXISTS", status: 0 })
           }
     }).catch(err => {
-        res.send('ERROR: ' + err)
+        return res.json({error: err, status: 0})
       })
     
 }
@@ -47,8 +47,8 @@ exports.postItems = (req,res,next)=>{
         }
     }).then(cat=>{
         if(!cat){
-            res.json({ error: `No Category exists for the given name!
-                               Enter Valid Category Name!` })
+            return res.json({ error: `No Category exists for the given name!
+                               Enter Valid Category Name!`, status: 0 })
         }else{
             Item.create({
                 title: title,
@@ -58,10 +58,10 @@ exports.postItems = (req,res,next)=>{
                 userId: req.user.id,
                 categoryId: cat.id
             }).then(item => {
-                res.status(200).json({message: 'Item Stored!', data: item})
+                return res.status(200).json({message: 'Item Stored!', data: item, status: 1})
               })
               .catch(err => {
-                  res.send('ERROR: ' + err)
+                return res.json({error: err, status: 0})
                 })
         }
     })
@@ -83,9 +83,9 @@ exports.editItem = (req,res,next)=>{
                 item.categoryId = categoryId;
                 item.price = price;
                 item.save();
-                return res.status(200).json({message:"Updated item successfully!", data: item})
+                return res.status(200).json({message:"Updated item successfully!", data: item, status: 1})
             }else{
-                return res.status(403).json({message: "User is not Authorized!"})
+                return res.status(403).json({error: "User is not Authorized!", status: 0})
             }
          }).catch(err=>console.log(err))
 }

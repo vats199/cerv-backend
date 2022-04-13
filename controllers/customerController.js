@@ -14,9 +14,9 @@ exports.getCaterers = async (req,res,next) => {
         const totalCaterers = await Store.count()
         const caterers = await Store.findAll()
         // const details = await Store.findAll( {where: { userId: caterers._id }})
-                res.status(200).json({message: 'Fetched Caterers Successfully!', 
-                                   caterer: caterers,
-                                   totalCaterers: totalCaterers})
+                return res.status(200).json({message: 'Fetched Caterers Successfully!', 
+                                              caterer: caterers,
+                                              totalCaterers: totalCaterers, status: 1})
         } catch(err) {
             if (!err.statusCode) {
                 err.statusCode = 500;
@@ -37,7 +37,7 @@ exports.getCaterer = async (req,res,next)=>{
         throw error;
       }
 //   const items = await 
-      res.status(200).json({ message: 'Caterer fetched', data: caterer })
+     return res.status(200).json({ message: 'Caterer fetched', data: caterer, status: 1 })
 } catch(err) {
   if (!err.statusCode) {
     err.statusCode = 500;
@@ -61,7 +61,7 @@ exports.getProfile = async (req,res,next)=>{
         countryCode: user.country_code,
         phoneNumber: user.phone_number
       }
-      return res.status(200).json({message: "Found Profile!", data: profileData})
+      return res.status(200).json({message: "Found Profile!", data: profileData, status: 1})
     }
 
   }catch(err){
@@ -93,7 +93,7 @@ exports.editInfo = async (req,res,next)=>{
      user.image = image
      user.email = email;
      const result = await user.save();
-     return res.status(200).json({message:"Profile Updated!", data: result});
+     return res.status(200).json({message:"Profile Updated!", data: result, status: 1});
     }
 
   }catch(err){
@@ -115,7 +115,7 @@ exports.postAddress = async (req,res,next)=>{
       address: address,
       userId: userId
     })
-    return res.status(200).json({message:"Address Added!", data: add});
+    return res.status(200).json({message:"Address Added!", data: add, status: 1});
 
   }catch(err){
     if (!err.statusCode) {
@@ -138,9 +138,9 @@ exports.editAddress = async (req,res,next)=>{
       address.title = title;
       address.address = add;
       const result = await address.save();
-      return res.status(200).json({message:"Address Updated!", data: result});
+      return res.status(200).json({message:"Address Updated!", data: result, status: 1});
     } else {
-      return res.status(404).json({message: "No address found for the given id!"})
+      return res.status(404).json({error: "No address found for the given id!", status: 0})
     }
   }
   catch(err){
@@ -161,7 +161,7 @@ exports.postReview = async (req,res,next) => {
       userId: userId,
       catererId: catererId
     })
-    return res.status(200).json({message: "Feedback Submitted!", data: rev})
+    return res.status(200).json({message: "Feedback Submitted!", data: rev, status: 1})
   }
   catch(err){
     if (!err.statusCode) {

@@ -10,7 +10,7 @@ const authController = require("../controllers/authController");
 router.post('/refresh', authController.refresh)
 
 router.post('/protected', jwtAuth , (req,res)=>{
-    res.send("Inside Protected Route!")
+    return res.send("Inside Protected Route!")
 })
 
 router.post('/register', authController.postSignup);

@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
             req.token = user.token;
             next();
         } else{
-            return res.status(403).json({message: "User not Authenticated"})
+            return res.status(403).json({error: "User not Authenticated", status: 0})
         }
     })
 }
