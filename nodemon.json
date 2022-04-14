@@ -10,6 +10,9 @@
         "accounSID": "AC5872b6586e629f141e3a151c8362c961",
         "authToken": "331b318914f09fd2cfa72c944882b28c",
         "mjapi": "4d33a2ffa76d40298bffc4b3094cb6f4",
-        "mjsecret": "cae54fea55c05c83b63b8f19c4a3fa63"
+        "mjsecret": "cae54fea55c05c83b63b8f19c4a3fa63",
+        "cloudname": "dpg6l4x4g",
+        "cloudAPI": "715972829629645",
+        "cloudSecret": "fNEV-cUdX-8z3OxDldB6b7_0w1Q"
     }
 }

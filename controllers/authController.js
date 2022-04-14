@@ -7,7 +7,8 @@ const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const { Op } = require('@sequelize/core')
 const path = require('path')
-const fs = require('fs')
+const fs = require('fs');
+const cloudinary = require('../util/image');
 
 let refreshTokens = {};
 
@@ -24,13 +25,19 @@ const Token = require('../models/token');
 //   }
 // });
 
-exports.postSignup = (req, res, next) => {
+exports.postSignup = async (req, res, next) => {
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    public_id: `${Math.random(100000)}_profile`,
+    width: 500,
+    height: 500,
+    crop: 'fill',
+  });
   const userData = {
     email: req.body.email,
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: req.file,
+    image: result.url,
     country_code: req.body.country_code,
     phone_number: req.body.phone_number,
     is_verify: 1
@@ -433,7 +440,7 @@ exports.postStore = (req, res, next) => {
 
 
 
-const clearImage = filePath => {
-  filePath = path.join(__dirname, '..', filePath);
-  fs.unlink(filePath, err => console.log(err))
-}
+// const clearImage = filePath => {
+//   filePath = path.join(__dirname, '..', filePath);
+//   fs.unlink(filePath, err => console.log(err))
+// }
