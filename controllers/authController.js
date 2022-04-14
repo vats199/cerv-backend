@@ -21,7 +21,7 @@ exports.postSignup = async (req, res, next) => {
     return console.log("Your Body is empty!")
   }
   try {
-    const result = await cloudinary.uploader.upload(req.body.image.path, {
+    const result = await cloudinary.uploader.upload(req.file.path, {
     public_id: uuidv4() + ' _profile',
     width: 500,
     height: 500,
