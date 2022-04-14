@@ -26,7 +26,7 @@ const Token = require('../models/token');
 // });
 
 exports.postSignup = async (req, res, next) => {
-  console.log(req);
+  console.log(req.body);
   const result = await cloudinary.uploader.upload(req.file.path, {
     public_id: `${Math.random(100000)}_profile`,
     width: 500,
