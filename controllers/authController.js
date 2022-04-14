@@ -31,12 +31,15 @@ exports.postSignup = async (req, res, next) => {
   if(req.body === {}){
     return console.log("Your Body is empty!")
   }
-  const result = await cloudinary.uploader.upload(req.file.path, {
+  try {const result = await cloudinary.uploader.upload(req.file.path, {
     public_id: uuidv4() + ' _profile',
     width: 500,
     height: 500,
     crop: 'fill',
   });
+}catch (err){
+  console.log(err);
+}
   const userData = {
     email: req.body.email,
     password: req.body.password,
