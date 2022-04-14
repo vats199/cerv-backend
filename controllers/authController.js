@@ -35,7 +35,7 @@ exports.postSignup = (req, res, next) => {
     phone_number: req.body.number,
     is_verify: 1
   }
-  console.log(image);
+  console.log(userData.image);
   User.findOne({
     where: {
       email: req.body.email
