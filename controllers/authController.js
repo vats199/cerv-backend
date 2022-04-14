@@ -30,7 +30,7 @@ exports.postSignup = (req, res, next) => {
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: req.body.image,
+    image: req.file.path,
     country_code: req.body.country_code,
     phone_number: req.body.phone_number,
     is_verify: 1
