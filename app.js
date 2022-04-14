@@ -37,15 +37,21 @@ const fileFilter = (req,file,cb) => {
 }
 
 const config = require('./util/config');
-app.use(bodyParser.json());
+
 app.use(cors());
+
+app.use(express.json()); 
+
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(bodyParser.json());
 
 app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 const PORT = process.env.PORT || 3000;
-app.use(bodyParser.urlencoded({ extended: false }))
+
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
