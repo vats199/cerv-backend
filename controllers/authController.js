@@ -30,11 +30,12 @@ exports.postSignup = (req, res, next) => {
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: req.file.path,
+    image: req.file,
     country_code: req.body.country_code,
     phone_number: req.body.number,
     is_verify: 1
   }
+  console.log(image);
   User.findOne({
     where: {
       email: req.body.email
