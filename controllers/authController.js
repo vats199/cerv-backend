@@ -32,23 +32,23 @@ exports.postSignup = async (req, res, next) => {
     return console.log("Your Body is empty!")
   }
   try {
-    const result = await cloudinary.uploader.upload(req.file.path, {
-    public_id: uuidv4() + ' _profile',
-    width: 500,
-    height: 500,
-    crop: 'fill',
-  })
+  //   const result = await cloudinary.uploader.upload(req.file.path, {
+  //   public_id: uuidv4() + ' _profile',
+  //   width: 500,
+  //   height: 500,
+  //   crop: 'fill',
+  // })
   const userData = {
     email: req.body.email,
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: result.url,
+    image: req.file.path,
     country_code: req.body.country_code,
     phone_number: req.body.phone_number,
     is_verify: 1
   }
-  console.log(userData.image);
+  // console.log(userData.image);
   User.findOne({
     where: {
       email: req.body.email
