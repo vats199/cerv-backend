@@ -6,7 +6,7 @@ const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.m
 const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const { Op } = require('@sequelize/core')
-const path = require('path')
+// const path = require('path')
 const fs = require('fs');
 const cloudinary = require('../util/image');
 
@@ -26,6 +26,7 @@ const Token = require('../models/token');
 // });
 
 exports.postSignup = async (req, res, next) => {
+  console.log(req);
   const result = await cloudinary.uploader.upload(req.file.path, {
     public_id: `${Math.random(100000)}_profile`,
     width: 500,
