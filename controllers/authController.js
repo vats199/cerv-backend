@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const config = require('../util/config');
 const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid')
 const nodemailer = require('nodemailer');
 const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.mjsecret);
 const jwt = require('jsonwebtoken');
@@ -31,7 +32,7 @@ exports.postSignup = async (req, res, next) => {
     return console.log("Your Body is empty!")
   }
   const result = await cloudinary.uploader.upload(req.file.path, {
-    public_id: `${Math.random(100000)}_profile`,
+    public_id: uuidv4() + ' _profile',
     width: 500,
     height: 500,
     crop: 'fill',
