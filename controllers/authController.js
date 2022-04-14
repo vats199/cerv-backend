@@ -7,7 +7,6 @@ const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.m
 const jwt = require('jsonwebtoken');
 const client = require('twilio')(process.env.accounSID, process.env.authToken);
 const { Op } = require('@sequelize/core')
-// const path = require('path')
 const fs = require('fs');
 const cloudinary = require('../util/image');
 
@@ -16,34 +15,24 @@ let refreshTokens = {};
 const User = require('../models/user');
 const Store = require('../models/store');
 const Token = require('../models/token');
-
-// const transporter = nodemailer.createTransport({
-//   host: 'smtp.ethereal.email',
-//   port: 587,
-//   auth: {
-//       user: 'mike.vandervort97@ethereal.email',
-//       pass: '1E8w4hvPuzskRe99sE'
-//   }
-// });
-
 exports.postSignup = async (req, res, next) => {
   console.log(req.body);
   if(req.body === {}){
     return console.log("Your Body is empty!")
   }
   try {
-  //   const result = await cloudinary.uploader.upload(req.file.path, {
-  //   public_id: uuidv4() + ' _profile',
-  //   width: 500,
-  //   height: 500,
-  //   crop: 'fill',
-  // })
+    const result = await cloudinary.uploader.upload(req.file.path, {
+    public_id: uuidv4() + ' _profile',
+    width: 500,
+    height: 500,
+    crop: 'fill',
+  })
   const userData = {
     email: req.body.email,
     password: req.body.password,
     name: req.body.name,
     role: req.body.role,
-    image: req.file.path,
+    image: result.url,
     country_code: req.body.country_code,
     phone_number: req.body.phone_number,
     is_verify: 1
