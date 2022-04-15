@@ -13,6 +13,8 @@ const Address = require('./models/address');
 const Feedback = require('./models/feedback');
 const Token = require('./models/token');
 const Banner = require('./models/banner');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
 
 
 const app = express();
@@ -91,6 +93,11 @@ Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Token.belongsTo(User);
 Banner.belongsTo(User);
+User.hasOne(Cart,{ as: 'Cart', sourceKey: 'id', foreignKey: 'userId' })
+Cart.belongsTo(User,{ as: 'CartOwner', sourceKey: 'userId', foreignKey: 'id' });
+Cart.belongsToMany(Item, {through: CartItem});
+Item.belongsToMany(Cart, {through: CartItem});
+
 
 
 db.sequelize

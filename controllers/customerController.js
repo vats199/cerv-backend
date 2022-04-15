@@ -173,7 +173,7 @@ exports.postReview = async (req,res,next) => {
   }
 }
 
-const search = async (req,res,next)=>{
+exports.search = async (req,res,next)=>{
   const { term } = req.query;
   const key = req.params.key; 
   // key->1   categories
