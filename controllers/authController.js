@@ -15,13 +15,16 @@ let refreshTokens = {};
 const User = require('../models/user');
 const Store = require('../models/store');
 const Token = require('../models/token');
+const Cart = require('../models/cart');
+
 exports.postSignup = async (req, res, next) => {
-  console.log(JSON.stringify(req));
+  // console.log(JSON.stringify(req));
   // console.log()
   if(req.body === {}){
     return console.log("Your Body is empty!")
   }
   try {
+    // console.log(req.file.path)
     const result = await cloudinary.uploader.upload(req.file.path, {
     public_id: uuidv4() + ' _profile',
     width: 500,
@@ -50,7 +53,7 @@ exports.postSignup = async (req, res, next) => {
           userData.password = hash
           User.create(userData)
             .then(user => {
-              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1, cart: cart })
             })
             .catch(err => {
               return res.json({error: err, status: 0})

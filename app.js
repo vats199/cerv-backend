@@ -93,7 +93,7 @@ Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Token.belongsTo(User);
 Banner.belongsTo(User);
-User.hasOne(Cart,{ as: 'Cart', sourceKey: 'id', foreignKey: 'userId' })
+User.hasOne(Cart,{ as: 'Cart', sourceKey: 'id', foreignKey: 'userId' },{ constraints: true, onDelete: 'CASCADE' })
 Cart.belongsTo(User,{ as: 'CartOwner', sourceKey: 'userId', foreignKey: 'id' });
 Cart.belongsToMany(Item, {through: CartItem});
 Item.belongsToMany(Cart, {through: CartItem});
