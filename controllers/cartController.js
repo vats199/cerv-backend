@@ -38,6 +38,7 @@ exports.postCart = async (req,res,next)=>{
         const checkCart = await Cart.findOne({where: {userId: req.user.id}})
         if(checkCart){
             const items = await checkCart.getItems({where: {id: prodId}})
+            
         } else {
             const cart = await user.createCart();
         }

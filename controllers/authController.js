@@ -17,6 +17,7 @@ const Store = require('../models/store');
 const Token = require('../models/token');
 exports.postSignup = async (req, res, next) => {
   console.log(req.body);
+  // console.log()
   if(req.body === {}){
     return console.log("Your Body is empty!")
   }
