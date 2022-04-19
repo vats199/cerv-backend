@@ -341,14 +341,15 @@ exports.getNewPassword = async(req,res,next) => {
 
 exports.postNewPassword = async (req, res, next) => {
   const newPassword = req.body.password;
-  // const userId = req.body.userId;
+  const userId = req.body.userId;
   const token = req.params.token;
   let resetUser;
 
   User.findOne({
     where: {
       resetToken: token,
-      resetTokenExpiration: { [Op.gt]: Date.now() }
+      resetTokenExpiration: { [Op.gt]: Date.now() },
+      id: userId
     }
   }).then(user => {
     resetUser = user;
