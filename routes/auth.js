@@ -20,7 +20,8 @@ router.post('/login', authController.postLogin);
 router.post('/generateOTP', authController.generateOTP);
 router.post('/verifyOTP', authController.verifyOTP);
 router.post('/reset',authController.resetPasswordLink);
-router.post('/resetPassword/:token',authController.resetPassword);
+router.get('/resetPassword/:token',authController.getNewPassword);
+router.post('/new-password',authController.postNewPassword);
 router.post('/storeDetails/:id', authController.postStore);
 router.post('/logout',jwtAuth, authController.logout)
 // router.use(require('../util/check'))

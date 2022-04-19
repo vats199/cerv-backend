@@ -13,9 +13,6 @@ const Address = require('./models/address');
 const Feedback = require('./models/feedback');
 const Token = require('./models/token');
 const Banner = require('./models/banner');
-const Cart = require('./models/cart');
-const CartItem = require('./models/cart-item');
-
 
 const app = express();
 
@@ -65,6 +62,9 @@ app.use((req, res, next) => {
     next();
   });
 
+app.set('view engine', 'ejs');
+app.set('views', 'views');
+
 const Auth = require('./routes/auth');
 const itemRoutes = require('./routes/item');
 const customerRoutes = require('./routes/customer');
@@ -78,7 +78,7 @@ app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
-  res.status(status).json({message: message, data: data, status: 0})
+  res.status(status).json({message: message, data: data, statusCode:status , status: 0})
 })
 
 const db = require('./util/database');
@@ -93,16 +93,10 @@ Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Token.belongsTo(User);
 Banner.belongsTo(User);
-User.hasOne(Cart,{ as: 'Cart', sourceKey: 'id', foreignKey: 'userId' },{ constraints: true, onDelete: 'CASCADE' })
-Cart.belongsTo(User,{ as: 'CartOwner', sourceKey: 'userId', foreignKey: 'id' });
-Cart.belongsToMany(Item, {through: CartItem});
-Item.belongsToMany(Cart, {through: CartItem});
-
-
 
 db.sequelize
-  // .sync({force: true})
-  .sync()
+  .sync({force: true})
+  // .sync()
   .then(_database => {
     console.log('Database Connected Successfully.')
   })

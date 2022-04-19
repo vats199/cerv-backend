@@ -15,7 +15,6 @@ let refreshTokens = {};
 const User = require('../models/user');
 const Store = require('../models/store');
 const Token = require('../models/token');
-const Cart = require('../models/cart');
 
 exports.postSignup = async (req, res, next) => {
   // console.log(JSON.stringify(req));
@@ -53,7 +52,7 @@ exports.postSignup = async (req, res, next) => {
           userData.password = hash
           User.create(userData)
             .then(user => {
-              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1, cart: cart })
+              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1})
             })
             .catch(err => {
               return res.json({error: err, status: 0})
@@ -317,8 +316,31 @@ exports.resetPasswordLink = (req, res, next) => {
   })
 }
 
-exports.resetPassword = async (req, res, next) => {
-  const newPassword = req.body.newPassword;
+exports.getNewPassword = async(req,res,next) => {
+  const token = req.params.token;
+  User.findOne({
+    where: {
+      resetToken: token,
+      resetTokenExpiration: { [Op.gt]: Date.now() }
+    }
+  })
+  .then(user=> {
+  res.render('auth/new-password', {
+      path: '/new-password',
+      pageTitle: 'New Password',
+      userId: user.id,
+      passwordToken: token
+    });
+})
+.catch(err=>{
+    const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+});
+}
+
+exports.postNewPassword = async (req, res, next) => {
+  const newPassword = req.body.password;
   // const userId = req.body.userId;
   const token = req.params.token;
   let resetUser;
