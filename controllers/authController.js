@@ -342,7 +342,7 @@ exports.getNewPassword = async(req,res,next) => {
 exports.postNewPassword = async (req, res, next) => {
   const newPassword = req.body.password;
   const userId = req.body.userId;
-  const token = req.params.token;
+  const token = req.body.passwordToken;
   let resetUser;
 
   User.findOne({
