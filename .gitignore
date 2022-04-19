@@ -4,4 +4,4 @@ package-lock.json
 
 util/config.js
 
-nodemon.json
+/nodemon.json

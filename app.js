@@ -13,6 +13,7 @@ const Address = require('./models/address');
 const Feedback = require('./models/feedback');
 const Token = require('./models/token');
 const Banner = require('./models/banner');
+const Card = require('./models/card');
 
 const app = express();
 
@@ -83,16 +84,17 @@ app.use((error, req, res, next) => {
 
 const db = require('./util/database');
 
-Store.belongsTo(User);
+Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Driver.belongsTo(Store);
-Category.belongsTo(User);
-Item.belongsTo(User);
-Item.belongsTo(Category);
-Address.belongsTo(User);
+Category.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Item.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Item.belongsTo(Category, { constraints: true, onDelete: 'CASCADE' });
+Address.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
-Token.belongsTo(User);
-Banner.belongsTo(User);
+Token.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Banner.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Card.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 
 db.sequelize
   // .sync({force: true})
