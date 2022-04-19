@@ -19,56 +19,56 @@ const Token = require('../models/token');
 exports.postSignup = async (req, res, next) => {
   // console.log(JSON.stringify(req));
   // console.log()
-  if(req.body === {}){
+  if (req.body === {}) {
     return console.log("Your Body is empty!")
   }
   try {
     // console.log(req.file.path)
     const result = await cloudinary.uploader.upload(req.file.path, {
-    public_id: uuidv4() + ' _profile',
-    width: 500,
-    height: 500,
-    crop: 'fill',
-  })
-  const userData = {
-    email: req.body.email,
-    password: req.body.password,
-    name: req.body.name,
-    role: req.body.role,
-    image: result.url,
-    country_code: req.body.country_code,
-    phone_number: req.body.phone_number,
-    is_verify: 1
-  }
-  // console.log(userData.image);
-  User.findOne({
-    where: {
-      email: req.body.email
+      public_id: uuidv4() + ' _profile',
+      width: 500,
+      height: 500,
+      crop: 'fill',
+    })
+    const userData = {
+      email: req.body.email,
+      password: req.body.password,
+      name: req.body.name,
+      role: req.body.role,
+      image: result.url,
+      country_code: req.body.country_code,
+      phone_number: req.body.phone_number,
+      is_verify: 1
     }
-  })
-    .then(user => {
-      if (!user) {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          userData.password = hash
-          User.create(userData)
-            .then(user => {
-              return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1})
-            })
-            .catch(err => {
-              return res.json({error: err, status: 0})
-            })
-        })
-      } else {
-        return res.json({ error: "USER ALREADY EXISTS", status: 0 })
+    // console.log(userData.image);
+    User.findOne({
+      where: {
+        email: req.body.email
       }
     })
-    .catch(err => {
-      return res.json({error: err, status: 0})
-    });
-}catch (err){
-  console.log(err);
-}
-  
+      .then(user => {
+        if (!user) {
+          bcrypt.hash(req.body.password, 10, (err, hash) => {
+            userData.password = hash
+            User.create(userData)
+              .then(user => {
+                return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+              })
+              .catch(err => {
+                return res.json({ error: err, status: 0 })
+              })
+          })
+        } else {
+          return res.json({ error: "USER ALREADY EXISTS", status: 0 })
+        }
+      })
+      .catch(err => {
+        return res.json({ error: err, status: 0 })
+      });
+  } catch (err) {
+    console.log(err);
+  }
+
 }
 
 exports.postLogin = async (req, res, next) => {
@@ -116,7 +116,7 @@ exports.postLogin = async (req, res, next) => {
             message: 'Logged-in Successfully',
             user: loadedUser,
             token: token,
-            refreshToken: refreshToken, 
+            refreshToken: refreshToken,
             status: 1
           })
         } else {
@@ -152,26 +152,26 @@ exports.postLogin = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
   const userId = req.user.id;
-  
-  try{
+
+  try {
     const getToken = await Token.findOne({ where: { userId: userId } })
-  
+
     if (getToken) {
-      if(getToken.token == null){
-        return res.json({error: "User already Logged-out!", status: 0})
-      } else{
-        
+      if (getToken.token == null) {
+        return res.json({ error: "User already Logged-out!", status: 0 })
+      } else {
+
         getToken.token = null;
         getToken.status = 'expired';
         getToken.expiry = null;
-    
+
         await getToken.save();
-        return res.status(200).json({ message: 'Logged-out Successfully', status: 1})
+        return res.status(200).json({ message: 'Logged-out Successfully', status: 1 })
       }
     } else {
-      return res.json({error: "Log-out Failed!", status: 0})
+      return res.json({ error: "Log-out Failed!", status: 0 })
     }
-  } catch(err){
+  } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
@@ -184,18 +184,18 @@ exports.refreshTokens;
 exports.generateOTP = async (req, res, next) => {
   const country_code = req.body.country_code
   const number = req.body.phone_number;
-  try{
+  try {
     const otp = await client
-                          .verify
-                          .services(process.env.serviceID)
-                          .verifications
-                          .create({
-                            to: `${country_code}${number}`,
-                            channel: req.body.channel
-                          })
-    return res.status(200).json({ message: "OTP sent Successfuly", status: 1});
+      .verify
+      .services(process.env.serviceID)
+      .verifications
+      .create({
+        to: `${country_code}${number}`,
+        channel: req.body.channel
+      })
+    return res.status(200).json({ message: "OTP sent Successfuly", status: 1 });
   }
-  catch(err){
+  catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
@@ -207,23 +207,23 @@ exports.verifyOTP = async (req, res, next) => {
   const country_code = req.body.country_code
   const number = req.body.phone_number;
 
-  try{
+  try {
     const otp = await client
-                            .verify
-                            .services(process.env.serviceID)
-                            .verificationChecks
-                            .create({
-                              to: `${country_code}${number}`,
-                              code: req.body.otpValue
-                            })
-    if(otp.valid == true){
-      
-      return res.status(200).json({ message: "Mobile Number verified!", status: 1});
-    }else {
+      .verify
+      .services(process.env.serviceID)
+      .verificationChecks
+      .create({
+        to: `${country_code}${number}`,
+        code: req.body.otpValue
+      })
+    if (otp.valid == true) {
+
+      return res.status(200).json({ message: "Mobile Number verified!", status: 1 });
+    } else {
       return res.status(400).json({ error: "Invalid OTP entered!", status: 0 })
     }
   }
-  catch(err){
+  catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
     }
@@ -316,7 +316,7 @@ exports.resetPasswordLink = (req, res, next) => {
   })
 }
 
-exports.getNewPassword = async(req,res,next) => {
+exports.getNewPassword = async (req, res, next) => {
   const token = req.params.token;
   User.findOne({
     where: {
@@ -324,26 +324,31 @@ exports.getNewPassword = async(req,res,next) => {
       resetTokenExpiration: { [Op.gt]: Date.now() }
     }
   })
-  .then(user=> {
-  res.render('auth/new-password', {
-      path: '/new-password',
-      pageTitle: 'New Password',
-      userId: user.id,
-      passwordToken: token
-    });
-})
-.catch(err=>{
-    const error = new Error(err);
+    .then(user => {
+      res.render('auth/new-password', {
+        path: '/new-password',
+        pageTitle: 'New Password',
+        userId: user.id,
+        passwordToken: token
+      });
+    })
+    .catch(err => {
+      const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
-});
+    });
 }
 
 exports.postNewPassword = async (req, res, next) => {
   const newPassword = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
   const userId = req.body.userId;
   const token = req.body.passwordToken;
   let resetUser;
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ message: "Passwords does not match!" })
+  }
 
   User.findOne({
     where: {
@@ -442,20 +447,20 @@ exports.postStore = (req, res, next) => {
                 return res.status(200).json({ message: 'Store Registered', data: storeData, status: 1 })
               })
               .catch(err => {
-                return res.json({error: err, status: 0})
+                return res.json({ error: err, status: 0 })
               })
           } else {
             return res.json({ error: "STORE ALREADY EXISTS", status: 0 })
           }
         })
         .catch(err => {
-          return res.json({error: err, status: 0})
+          return res.json({ error: err, status: 0 })
         })
     } else {
       return res.json({ error: "USER IS NOT A CATERER!", status: 0 })
     }
   }).catch(err => {
-    return res.json({error: err, status: 0})
+    return res.json({ error: err, status: 0 })
   })
 
 }
