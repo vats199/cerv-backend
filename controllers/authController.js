@@ -358,7 +358,7 @@ exports.postNewPassword = async (req, res, next) => {
     }
   }).then(user => {
     if(!user){
-      return res.status(400).json({message : 'Reset token not found!'});
+      return res.status(400).json({message : 'Reset token Invalid!'});
     }
     resetUser = user;
     return bcrypt.hash(newPassword, 10);
