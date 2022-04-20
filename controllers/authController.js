@@ -40,32 +40,19 @@ exports.postSignup = async (req, res, next) => {
       phone_number: req.body.phone_number,
       is_verify: 1
     }
-    // console.log(userData.image);
-    User.findOne({
-      where: {
-        email: req.body.email
-      }
-    })
-      .then(user => {
-        if (!user) {
-          bcrypt.hash(req.body.password, 10, (err, hash) => {
-            userData.password = hash
-            User.create(userData)
-              .then(user => {
-                return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
-              })
-              .catch(err => {
-                return res.json({ error: err, status: 0 })
-              })
-          })
-        } else {
-          return res.json({ error: "USER ALREADY EXISTS", status: 0 })
-        }
+    
+    const test = await User.findOne({where: {email: req.body.email}})
+
+    if(!test){
+      bcrypt.hash(req.body.password, 10, (err, hash) => {
+        userData.password = hash
+        const user = await User.create(userData)
+        return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
       })
-      .catch(err => {
-        return res.json({ error: err, status: 0 })
-      });
-  } catch (err) {
+    } else {
+      return res.json({ error: "USER ALREADY EXISTS", status: 0 })
+    }
+    } catch (err) {
     console.log(err);
   }
 
@@ -237,7 +224,7 @@ exports.verifyOTP = async (req, res, next) => {
 exports.refresh = (req, res, next) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken || !(refreshToken in refreshTokens)) {
-    return res.status(403).json({ error: "User not Authenticated!", status: 0 })
+    return res.status(403).json({ error: "Invalid RefreshToken!", status: 0 })
   }
   jwt.verify(refreshToken, "somesupersuperrefreshsecret",(err, user) => {
     if (!err) {
