@@ -41,17 +41,17 @@ exports.postSignup = async (req, res, next) => {
       is_verify: 1
     }
     
-    const test = await User.findOne({where: {email: req.body.email}})
+    // const test = await User.findOne({where: {email: req.body.email}})
 
-    if(!test){
-      bcrypt.hash(req.body.password, 10, (err, hash) => {
-        userData.password = hash
-        const user = await User.create(userData)
-        return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
-      })
-    } else {
-      return res.json({ error: "USER ALREADY EXISTS", status: 0 })
-    }
+    // if(!test){
+    //   bcrypt.hash(req.body.password, 10, (err, hash) => {
+    //     userData.password = hash
+    //     const user = await User.create(userData)
+    //     return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+    //   })
+    // } else {
+    //   return res.json({ error: "USER ALREADY EXISTS", status: 0 })
+    // }
     } catch (err) {
     console.log(err);
   }
