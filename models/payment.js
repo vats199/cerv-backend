@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../util/database');
 
-module.exports = db.sequelize.define('item' , {
+module.exports = db.sequelize.define('payment' , {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -17,7 +17,6 @@ module.exports = db.sequelize.define('item' , {
     status: {
         type: Sequelize.ENUM('PENDING', 'SUCCESS', 'FAILED'),
         defaultValue: 'PENDING',
-        comment: 'PENDING, SUCCESS, FAILED'
     }
     },
     {

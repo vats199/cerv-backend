@@ -1,22 +1,110 @@
-// const User = require('../models/user');
-// const Card = require('../models/card');
-// const Payment = require('../models/payment');
+const User = require('../models/user');
+const Card = require('../models/card');
+const Payment = require('../models/payment');
 
-// const Stripe = require('stripe');
+const Stripe = require('stripe');
 
-// const stripe = Stripe(process.env.STRIPE_SK);
+const stripe = Stripe(process.env.STRIPE_SK);
 
-// exports.addCard = async (req,res,next) => {
-//     try{
+exports.addCard = async (req,res,next) => {
+    try{
 
-//         const user = await User.findByPk(req.user.id);
+        const user = await User.findByPk(req.user.id);
 
-//         const card = await stripe.customers.createSource(user.stripe_id)
+        const card = await stripe.customers.createSource(user.stripe_id, {
+            source: {
+                'object': 'card',
+                'number': req.body.number,
+                'exp_month': req.body.exp_month,
+                'exp_year': req.body.exp_year,
+                'cvc': req.body.cvc,
+                'name': req.body.name
+            }
+        })
+    const save = Card.create({ card_id: card.id, userId: req.user.id })
+    return res.status(200).json({
+        message: 'Card saved successfully!',
+        data: save
+    });
 
-//     }catch(err){
-//             if (!err.statusCode) {
-//                 err.statusCode = 500;
-//             }
-//             next(err);
-//     }
-// }
+    }catch(err){
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}
+
+exports.getCard = async (req, res, next) => {
+    try {
+
+        const user = await User.findByPk(req.user.id);
+
+        try {
+            const cards = await stripe.customers.listSources(
+                user.stripe_id,
+                { object: 'card' }
+            );
+            return res.status(200).json({
+                message: cards
+            });
+
+        } catch (err) {
+            console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+        }
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}
+
+exports.checkout_online = async (req, res, next) => {
+
+    try {
+        const user = await User.findByPk(req.user.id);
+        const amount = req.body.amount;
+        
+        // Cheack whether user exists in stripe. 
+        if (!user.stripe_id) {
+            return res.status(500).json({ status: 0, message: 'Stripe account was not found!' });
+        }
+
+
+        const card = await stripe.customers.retrieveSource(
+            user.stripe_id,
+            req.body.card_id
+        );
+
+        const payment_intent = await stripe.paymentIntents.create({
+            payment_method_types: ['card'],
+            description: 'Pay for CERV',
+            receipt_email: user.email,
+            amount: parseFloat(amount)*100,
+            currency: 'usd',
+            customer : user.stripe_id,
+            payment_method: card.id
+        });
+
+        return Payment.create({
+            amount: parseFloat(amount),
+            userId: req.user.id,
+            transaction_id: payment_intent.client_secret,
+            status: 'PENDING',
+        })
+            .then((data) => {
+                return res.status(200).json({
+                    message: 'Checkout data fetched successfully!',
+                    data: {
+                        paymentIntent: payment_intent.id
+                    }
+                });
+            })
+            .catch((err) => {
+                return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+            })
+    }
+    catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}

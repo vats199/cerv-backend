@@ -14,6 +14,7 @@ const Feedback = require('./models/feedback');
 const Token = require('./models/token');
 const Banner = require('./models/banner');
 const Card = require('./models/card');
+const Payment = require('./models/payment');
 
 const app = express();
 
@@ -94,6 +95,7 @@ Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Token.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Banner.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Payment.belongsTo(User);
 Card.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 
 db.sequelize
