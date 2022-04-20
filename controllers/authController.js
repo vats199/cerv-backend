@@ -394,7 +394,7 @@ exports.changePassword = (req, res, body) => {
     })
     .then(isEqual => {
       if (!isEqual) {
-        return res.status(403).json({ error: 'Invalid password', status: 0 });
+        return res.status(403).json({ error: 'Invalid Current password!', status: 0 });
       }
       return bcrypt.hash(newPassword, 10);
     })
