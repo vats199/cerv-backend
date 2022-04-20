@@ -11,6 +11,9 @@ module.exports = db.sequelize.define('token' , {
       token: {
         type: Sequelize.TEXT
       },
+      refreshToken: {
+        type: Sequelize.TEXT
+      },
       token_type: {
         type: Sequelize.ENUM('access_token'),
         defaultValue: 'access_token'

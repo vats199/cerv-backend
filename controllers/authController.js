@@ -107,6 +107,7 @@ exports.postLogin = async (req, res, next) => {
         if (getToken) {
           getToken.login_count += 1;
           getToken.token = token;
+          getToken.refreshToken = refreshToken;
           getToken.status = 'active';
           getToken.expiry = '1h';
 
@@ -123,6 +124,7 @@ exports.postLogin = async (req, res, next) => {
           const data = {
             userId: loadedUser.id,
             token: token,
+            refreshToken: refreshToken,
             status: 'active',
             login_count: 1,
             expiry: '1h'
@@ -233,17 +235,18 @@ exports.verifyOTP = async (req, res, next) => {
 
 
 exports.refresh = (req, res, next) => {
-  const refreshToken = req.body.token;
+  const refreshToken = req.body.refreshToken;
   if (!refreshToken || !(refreshToken in refreshTokens)) {
     return res.status(403).json({ error: "User not Authenticated!", status: 0 })
   }
-  jwt.verify(refreshToken, "somesupersuperrefreshsecret", (err, user) => {
+  jwt.verify(refreshToken, "somesupersuperrefreshsecret",(err, user) => {
     if (!err) {
       const token = jwt.sign(
         { user: user.loadedUser },
         process.env.secret,
         { expiresIn: process.env.jwtExpiration }
       );
+      Token.update({token:token},{where: {refreshToken: refreshToken}}).then(res=>console.log(res)).catch(err=>console.log(err))
       return res.status(201).json({ token, status: 1 });
     } else {
       return res.status(403).json({ error: "User not Authenticated!", status: 0 })
