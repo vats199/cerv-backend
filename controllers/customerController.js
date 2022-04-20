@@ -217,6 +217,48 @@ try{
 
 }
 
+exports.getDeliveryFee = (req,res,next) => {
+  const lat1 = req.body.lat;
+  const lon1 = req.body.lng;
+  let deliveryFee;
+  Store.findOne({where: {
+    userId: req.body.userId
+  }})
+    .then((store) => {
+        const lat2 = store.lat;
+        const lon2 = store.lng;
+
+        const R = 6371; // kms
+        const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        const d = R * c; // in km
+        if (d < 5){
+          deliveryFee = 2.5
+        } else if(d < 10) {
+          deliveryFee = 5
+        }
+
+        return deliveryFee;
+    })
+    .then((results) => {
+      res.status(200).json({
+        deliveryFee: results
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) err.statusCode = 500;
+      next(err);
+    });
+
+}
 
 
 

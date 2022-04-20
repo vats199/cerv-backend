@@ -374,13 +374,12 @@ exports.postNewPassword = async (req, res, next) => {
 
 
 exports.changePassword = (req, res, body) => {
-  const email = req.body.email,
-    currentPassword = req.body.currentPassword,
-    newPassword = req.body.newPassword;
+    const currentPassword = req.body.currentPassword;
+    const newPassword = req.body.newPassword;
 
   User.findOne({
     where: {
-      email: email
+      id: req.user.id
     }
   })
     .then(user => {
@@ -394,7 +393,7 @@ exports.changePassword = (req, res, body) => {
       if (!isEqual) {
         return res.status(403).json({ error: 'Invalid password', status: 0 });
       }
-      return bcrypt.hash(newPassword, 12);
+      return bcrypt.hash(newPassword, 10);
     })
     .then(hashedPassword => {
       resetUser.password = hashedPassword;
@@ -412,9 +411,6 @@ exports.changePassword = (req, res, body) => {
     })
     .catch(err => {
       console.log(err);
-      return res.json({
-        error: 'Some thing goes wrong!', status: 0
-      });
     })
 }
 

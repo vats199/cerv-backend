@@ -60,6 +60,9 @@ module.exports = db.sequelize.define('user' , {
     phone_number: {
         type: Sequelize.STRING
     },
+    stripe_id: {
+        type: Sequelize.TEXT
+    },
     is_verify: {
         type: Sequelize.BOOLEAN,
         defaultValue: 0
