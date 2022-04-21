@@ -15,6 +15,9 @@ const Token = require('./models/token');
 const Banner = require('./models/banner');
 const Card = require('./models/card');
 const Payment = require('./models/payment');
+const Order = require('./models/order');
+const OrderItem = require('./models/orderItem');
+const Favourites = require('./models/favourites');
 
 const app = express();
 
@@ -97,6 +100,12 @@ Token.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Banner.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Payment.belongsTo(User);
 Card.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+Order.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
+Order.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+Order.hasMany(OrderItem);
+Favourites.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
+Favourites.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+// OrderItem.belongsTo(Item);
 
 db.sequelize
   // .sync({force: true})

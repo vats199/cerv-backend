@@ -2,18 +2,23 @@ const Sequelize = require('sequelize');
 const db = require('../util/database');
 
 module.exports = db.sequelize.define('address' , {
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
+  primary_address: {
+        type: Sequelize.STRING(45)
     },
-      title: {
-        type: Sequelize.STRING
-      },
-      address: {
-        type: Sequelize.STRING
-      }
+  addition_address_info: {
+        type: Sequelize.TEXT
+    },
+  address_type: {
+        type: Sequelize.TINYINT(1),
+        defaultValue: 0,
+        comment: '0 = Home, 1  = Office, 2 = Location'
+    },
+  latitude : {
+        type : Sequelize.STRING
+    },
+  longitude : {
+        type : Sequelize.STRING
+}
     },
     {
       timestamps: true,
