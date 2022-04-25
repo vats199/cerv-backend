@@ -28,7 +28,8 @@ exports.addCard = async (req,res,next) => {
     const save = Card.create({ card_id: card.id, userId: req.user.id })
     return res.status(200).json({
         message: 'Card saved successfully!',
-        data: save
+        card: save,
+        status: 1
     });
 
     }catch(err){
