@@ -11,12 +11,16 @@ exports.addCard = async (req,res,next) => {
 
         const user = await User.findByPk(req.user.id);
 
+        const exp = req.body.expire.split('/');
+        const exp_month = exp[0];
+        const exp_year = exp[1];
+
         const card = await stripe.customers.createSource(user.stripe_id, {
             source: {
                 'object': 'card',
                 'number': req.body.number,
-                'exp_month': req.body.exp_month,
-                'exp_year': req.body.exp_year,
+                'exp_month': exp_month,
+                'exp_year': exp_year,
                 'cvc': req.body.cvc,
                 'name': req.body.name
             }
