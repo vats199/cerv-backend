@@ -6,7 +6,8 @@ const Category = require('../models/category');
 const Feedback = require('../models/feedback');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
-const Favourites = require('../models/favourites')
+const Favourites = require('../models/favourites');
+const Coupon = require('../models/coupon');
 
 const Sequelize = require('sequelize');
 const { Op } = Sequelize.Op;
@@ -77,6 +78,21 @@ exports.getProfile = async (req,res,next)=>{
     next(err);
   }
 
+}
+
+exports.getDP = async (req,res,next) => {
+  const userId = req.user.id;
+
+  try{
+
+    const dp = await User.findOne({where: { id: userId }})
+
+    return res.status(200).json({message: "Profile Picture fetched Successfully!", dp: dp.image, status: 1})
+
+  }catch(err){
+    console.log(err);
+        return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
 }
 
 exports.editInfo = async (req,res,next)=>{
@@ -403,6 +419,39 @@ exports.deleteFav = async (req,res,next) => {
     console.log(err);
     return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
   }
+}
+
+exports.applyToken = async (req,res,next) => {
+  const price = req.body.price;
+  const couponCode = req.body.couponCode;
+  let updatedPrice;
+
+  try{
+
+    const coupon = await Coupon.findOne({ where: { code: couponCode } });
+     if(!coupon){
+       return res.status(400).json({message: "Coupon Code is invalid!", status: 0})
+     } else {
+            if(coupon.is_percent === 1){
+
+              updatedPrice = price - ( price * ((coupon.value)/100) );
+
+            } else {
+                    if(price < coupon.value){
+                      updatedPrice = 0;
+                    }else{
+                      updatedPrice = price - coupon.value;
+                    }
+
+            }
+            return res.status(200).json({message: "Price updated!", updatedPrice: updatedPrice})
+     }
+
+  }catch(err){
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+
 }
 
 const clearImage = filePath => {

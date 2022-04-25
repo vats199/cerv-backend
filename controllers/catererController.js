@@ -3,6 +3,7 @@ const Store = require('../models/store')
 const Item = require('../models/item');
 const Category = require('../models/category');
 const Banner = require('../models/banner');
+const Coupon = require('../models/coupon');
 
 const fs = require('fs')
 const path = require('path')
@@ -104,6 +105,31 @@ exports.postBanner = (req,res,next)=>{
         })
         .catch(err=>console.log(err))
 
+}
+
+exports.postCoupon = async (req,res,next) => {
+    const catererId = req.user.id;
+    const data = req.body;
+
+    const payLoad = {
+        title: data.title,
+        description: data.description,
+        expiry: data.expiry,
+        code: data.code,
+        is_percent: data.is_percent,
+        value: data.value,
+        catererId: catererId
+    }
+
+    try{
+
+        const coupon = await Coupon.create(payLoad);
+        return res.status(200).json({message: "Coupon Created!", status: 1, data: coupon})
+
+    }catch(err){
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
 }
 
 

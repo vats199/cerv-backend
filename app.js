@@ -18,6 +18,7 @@ const Payment = require('./models/payment');
 const Order = require('./models/order');
 const OrderItem = require('./models/orderItem');
 const Favourites = require('./models/favourites');
+const Coupon = require('./models/coupon')
 
 const app = express();
 
@@ -105,6 +106,7 @@ Order.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Order.hasMany(OrderItem);
 Favourites.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Favourites.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+Coupon.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 // OrderItem.belongsTo(Item);
 
 db.sequelize
