@@ -97,8 +97,16 @@ exports.getDP = async (req,res,next) => {
 
 exports.editInfo = async (req,res,next)=>{
   const name = req.body.name;
-  const image = req.file.path;
   const email = req.body.email;
+  let image;
+  if(file){
+    
+    image = req.file.path;
+  } else {
+    image = null
+  }
+
+
   try{
     const user = await User.findOne({where: {id: req.user.id}});
     if(!user){
