@@ -99,7 +99,7 @@ exports.editInfo = async (req,res,next)=>{
   const name = req.body.name;
   const email = req.body.email;
   let image;
-  if(file){
+  if(req.file){
     
     image = req.file.path;
   } else {
