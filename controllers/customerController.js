@@ -9,6 +9,7 @@ const OrderItem = require('../models/orderItem');
 const Favourites = require('../models/favourites');
 const Coupon = require('../models/coupon');
 const cloudinary = require('../util/image');
+const { v4: uuidv4 } = require('uuid')
 
 const Sequelize = require('sequelize');
 const { Op } = Sequelize.Op;
