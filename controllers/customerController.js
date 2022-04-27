@@ -98,13 +98,14 @@ exports.getDP = async (req,res,next) => {
 exports.editInfo = async (req,res,next)=>{
   const name = req.body.name;
   const email = req.body.email;
-  let image;
-  if(req.file){
+  const image = req.file?.path; 
+  // let image;
+  // if(req.file){
     
-    image = req.file.path;
-  } else {
-    image = null
-  }
+  //   image = req.file.path;
+  // } else {
+  //   image = null
+  // }
 
 
   try{
