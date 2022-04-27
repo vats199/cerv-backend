@@ -111,9 +111,9 @@ exports.editInfo = async (req,res,next)=>{
        clearImage(user.image)
      }
     //  console.log(name)
-     user.name = name;
-     user.image = image
-     user.email = email;
+     user.name = name || user.name;
+     user.image = image || user.image
+     user.email = email || user.email;
      const result = await user.save();
      return res.status(200).json({message:"Profile Updated!", data: result, status: 1});
     }
