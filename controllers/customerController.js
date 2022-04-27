@@ -8,6 +8,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Favourites = require('../models/favourites');
 const Coupon = require('../models/coupon');
+const cloudinary = require('../util/image');
 
 const Sequelize = require('sequelize');
 const { Op } = Sequelize.Op;
@@ -99,6 +100,21 @@ exports.editInfo = async (req,res,next)=>{
   const name = req.body.name;
   const email = req.body.email;
   const image = req.file?.path; 
+  let url;
+  if(image){
+
+    const result = await cloudinary.uploader.upload(image, {
+      public_id: uuidv4() + ' _profile',
+      width: 500,
+      height: 500,
+      crop: 'fill',
+    })
+    url = result.url
+  } else {
+    url = null;
+  }
+  
+ 
   // let image;
   // if(req.file){
     
@@ -121,7 +137,7 @@ exports.editInfo = async (req,res,next)=>{
      }
     //  console.log(name)
      user.name = name || user.name;
-     user.image = image || user.image
+     user.image = url || user.image
      user.email = email || user.email;
      const result = await user.save();
      return res.status(200).json({message:"Profile Updated!", data: result, status: 1});
