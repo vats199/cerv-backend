@@ -230,7 +230,7 @@ exports.activateAddress = async (req,res,next) => {
     const address = await Address.findOne({ where: { id: addressId, userId: userId } })
 
     if(address.is_active === true){
-      return res.status(200).json({message: "Address is already active!"})
+      return res.status(200).json({message: "Address is already active!", status: 0})
     } else {
       address.is_active = 1;
       const otherAddresses = await Address.findAll({ where: { is_active: 1 , userId: userId}})
@@ -241,7 +241,7 @@ exports.activateAddress = async (req,res,next) => {
       }
     }
       const result = await address.save();
-      return res.status(200).json({message: "Address Activated!", data: result})
+      return res.status(200).json({message: "Address Activated!", data: result, status: 1})
     }
     
   } catch (err) {
