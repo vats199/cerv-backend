@@ -252,7 +252,7 @@ exports.activateAddress = async (req,res,next) => {
 
 exports.deleteAddress = async (req,res,next) => {
   const userId = req.user.id;
-  const addressId = req.params.addressId;
+  const addressId = req.body.addressId;
 
   try {
     
