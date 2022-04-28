@@ -174,6 +174,21 @@ exports.postAddress = async (req,res,next)=>{
   }
 }
 
+exports.getAddress = async (req,res,next) => {
+  const userId = req.user.id;
+
+  try {
+
+    const addresses = await Address.findAll({where: { userId: userId }})
+
+    return res.status(200).json({message: "Addresses fetched successfully!", data: addresses , status: 1, length: addresses.length})
+    
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 exports.editAddress = async (req,res,next)=>{
   const userId = req.user.id;
   const addressId = req.params.id;
