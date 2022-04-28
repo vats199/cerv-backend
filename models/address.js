@@ -2,10 +2,10 @@ const Sequelize = require('sequelize');
 const db = require('../util/database');
 
 module.exports = db.sequelize.define('address' , {
-  primary_address: {
-        type: Sequelize.STRING(45)
+  address: {
+        type: Sequelize.TEXT
     },
-  addition_address_info: {
+  icon: {
         type: Sequelize.TEXT
     },
   address_type: {
@@ -13,12 +13,16 @@ module.exports = db.sequelize.define('address' , {
         defaultValue: 0,
         comment: '0 = Home, 1  = Office, 2 = Location'
     },
-  latitude : {
-        type : Sequelize.STRING
-    },
-  longitude : {
-        type : Sequelize.STRING
-}
+    is_active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 0
+    }
+  // latitude : {
+  //       type : Sequelize.STRING
+  //   },
+  // longitude : {
+  //       type : Sequelize.STRING
+  //   }
     },
     {
       timestamps: true,
