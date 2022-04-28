@@ -207,23 +207,26 @@ exports.editAddress = async (req,res,next)=>{
 }
 
 exports.activateAddress = async (req,res,next) => {
-  const addressId = req.body.id;
+  const addressId = req.body.addressId;
   const userId = req.user.id;
 
   try {
 
     const address = await Address.findOne({ where: { id: addressId, userId: userId } })
 
-    if(address.is_active === 1){
+    if(address.is_active === true){
       return res.status(200).json({message: "Address is already active!"})
     } else {
       address.is_active = 1;
       const otherAddresses = await Address.findAll({ where: { is_active: 1 , userId: userId}})
-      for(let i=0; i<otherAddresses.length; i++){
+      if(otherAddresses.length !== 0){
+        for(let i=0; i<otherAddresses.length; i++){
         otherAddresses[i].is_active = 0;
         await otherAddresses[i].save();
       }
-      await address.save();
+    }
+      const result = await address.save();
+      return res.status(200).json({message: "Address Activated!", data: result})
     }
     
   } catch (err) {

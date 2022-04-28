@@ -15,6 +15,7 @@ router.get('/picture', jwtAuth, customerController.getDP);
 router.put('/edit-profile',jwtAuth, customerController.editInfo);
 router.post('/add-address',jwtAuth,customerController.postAddress);
 router.put('/edit-address/:id',jwtAuth, customerController.editAddress);
+router.post('/activate-address', jwtAuth, customerController.activateAddress);
 router.post('/addCard', jwtAuth, stripeController.addCard);
 router.get('/getCards', jwtAuth, stripeController.getCard);
 router.post('/checkout_online',jwtAuth, stripeController.checkout_online);
