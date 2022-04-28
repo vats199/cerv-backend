@@ -16,7 +16,7 @@ router.put('/edit-profile',jwtAuth, customerController.editInfo);
 router.get('/get-address', jwtAuth, customerController.getAddress);
 router.post('/add-address',jwtAuth,customerController.postAddress);
 router.put('/edit-address/:id',jwtAuth, customerController.editAddress);
-router.delete('/delete-address/:addressId', jwtAuth, customerController.deleteAddress);
+router.delete('/delete-address', jwtAuth, customerController.deleteAddress);
 router.post('/activate-address', jwtAuth, customerController.activateAddress);
 router.post('/addCard', jwtAuth, stripeController.addCard);
 router.get('/getCards', jwtAuth, stripeController.getCard);
