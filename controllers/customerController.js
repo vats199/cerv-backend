@@ -154,16 +154,16 @@ exports.editInfo = async (req,res,next)=>{
 
 exports.postAddress = async (req,res,next)=>{
   const payload = {
-    primary_address: req.body.primary_address,
-    addition_address_info: req.body.addition_address_info,
+    address: req.body.address,
+    icon: req.body.icon,
     address_type: req.body.address_type || 0,
-    latitude: req.body.latitude,
-    longitude: req.body.longitude,
+    // latitude: req.body.latitude,
+    // longitude: req.body.longitude,
     userId: req.user.id
 }
   try{
 
-    const address = await Address.create(payload)
+    const address = await Address.create(payload);
     return res.status(200).json({message:"Address Added!", data: address, status: 1});
 
   }catch(err){
@@ -182,11 +182,11 @@ exports.editAddress = async (req,res,next)=>{
     const address = await Address.findOne({where:{id: addressId, userId: userId}})
   
     if(address){
-      address.primary_address = req.body.primary_address || address.primary_address;
-      address.addition_address_info = req.body.addition_address_info || address.addition_address_info;
+      address.address = req.body.address || address.address;
+      address.icon = req.body.icon || address.icon;
       address.address_type = req.body.address_type || address.address_type;
-      address.latitude = req.body.latitude || address.latitude;
-      address.longitude = req.body.longitude || address.longitude;
+      // address.latitude = req.body.latitude || address.latitude;
+      // address.longitude = req.body.longitude || address.longitude;
       try {
           const result = await address.save();
           return res.status(200).json({message:"Address Updated!", data: result, status: 1});
@@ -203,6 +203,32 @@ exports.editAddress = async (req,res,next)=>{
       err.statusCode = 500;
     }
     next(err);
+  }
+}
+
+exports.activateAddress = async (req,res,next) => {
+  const addressId = req.body.id;
+  const userId = req.user.id;
+
+  try {
+
+    const address = await Address.findOne({ where: { id: addressId, userId: userId } })
+
+    if(address.is_active === 1){
+      return res.status(200).json({message: "Address is already active!"})
+    } else {
+      address.is_active = 1;
+      const otherAddresses = await Address.findAll({ where: { is_active: 1 , userId: userId}})
+      for(let i=0; i<otherAddresses.length; i++){
+        otherAddresses[i].is_active = 0;
+        await otherAddresses[i].save();
+      }
+      await address.save();
+    }
+    
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
   }
 }
 
