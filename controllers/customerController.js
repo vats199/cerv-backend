@@ -250,6 +250,22 @@ exports.activateAddress = async (req,res,next) => {
   }
 }
 
+exports.deleteAddress = async (req,res,next) => {
+  const userId = req.user.id;
+  const addressId = req.params.addressId;
+
+  try {
+    
+    await Address.destroy({ where: { id: addressId, userId: userId } })
+
+    return res.status(204).json({message: "Address Deleted Successfully!", status: 1});
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 exports.postReview = async (req,res,next) => {
   const userId = req.user.id;
   const catererId = req.body.catId;
