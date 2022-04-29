@@ -9,6 +9,7 @@ const fs = require('fs')
 const path = require('path')
 
 const cloudinary = require('../util/image');
+const { v4: uuidv4 } = require('uuid')
 
 exports.postCategory = async (req,res,next) => {
     const title = req.body.title;
