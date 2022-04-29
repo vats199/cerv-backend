@@ -10,7 +10,7 @@ const path = require('path')
 
 const cloudinary = require('../util/image');
 
-exports.postCategory = (req,res,next) => {
+exports.postCategory = async (req,res,next) => {
     const title = req.body.title;
     const image = await cloudinary.uploader.upload(req.file.path, {
         public_id: uuidv4() + ' _profile',
@@ -45,7 +45,7 @@ exports.postCategory = (req,res,next) => {
     
 }
 
-exports.postItems = (req,res,next)=>{
+exports.postItems = async(req,res,next)=>{
     const title = req.body.title;
     const image = await cloudinary.uploader.upload(req.file.path, {
         public_id: uuidv4() + ' _profile',
