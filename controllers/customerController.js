@@ -47,7 +47,7 @@ exports.getCaterer = async (req,res,next)=>{
         throw error;
       }
 //   const items = await 
-     return res.status(200).json({ message: 'Caterer fetched', data: caterer,items: category, status: 1 })
+     return res.status(200).json({ message: 'Caterer fetched', data: caterer,category: category, status: 1 })
 } catch(err) {
   if (!err.statusCode) {
     err.statusCode = 500;
