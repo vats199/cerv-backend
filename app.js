@@ -90,10 +90,14 @@ app.use((error, req, res, next) => {
 const db = require('./util/database');
 
 Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasOne(Store, { constraints: true, onDelete: 'CASCADE' });
 Driver.belongsTo(Store);
 Category.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Category, { constraints: true, onDelete: 'CASCADE' });
 Item.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Item, { constraints: true, onDelete: 'CASCADE' });
 Item.belongsTo(Category, { constraints: true, onDelete: 'CASCADE' });
+Category.hasMany(Item, { constraints: true, onDelete: 'CASCADE' });
 Address.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });

@@ -36,9 +36,10 @@ exports.getCaterers = async (req,res,next) => {
 }
 
 exports.getCaterer = async (req,res,next)=>{
-    const catId = req.params.catId;
+    const catId = req.body.catId;
   try { 
-  const caterer = await Store.findOne({where:{ id: catId }})
+  const caterer = await Store.findOne({where:{ userId: catId }})
+  const category = await Category.findAll({include: Item, where: {userId: catId}})
   
       if (!caterer) {
         const error = new Error("Couldn't Find the Caterer");
@@ -46,7 +47,7 @@ exports.getCaterer = async (req,res,next)=>{
         throw error;
       }
 //   const items = await 
-     return res.status(200).json({ message: 'Caterer fetched', data: caterer, status: 1 })
+     return res.status(200).json({ message: 'Caterer fetched', data: caterer,items: category, status: 1 })
 } catch(err) {
   if (!err.statusCode) {
     err.statusCode = 500;
