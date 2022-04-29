@@ -191,7 +191,7 @@ exports.getAddress = async (req,res,next) => {
 
 exports.editAddress = async (req,res,next)=>{
   const userId = req.user.id;
-  const addressId = req.body.id;
+  const addressId = req.body.addressId;
 
   try{
     const address = await Address.findOne({where:{id: addressId, userId: userId}})
