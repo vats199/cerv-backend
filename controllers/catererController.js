@@ -8,9 +8,16 @@ const Coupon = require('../models/coupon');
 const fs = require('fs')
 const path = require('path')
 
+const cloudinary = require('../util/image');
+
 exports.postCategory = (req,res,next) => {
     const title = req.body.title;
-    const image = req.file.path;
+    const image = await cloudinary.uploader.upload(req.file.path, {
+        public_id: uuidv4() + ' _profile',
+        width: 500,
+        height: 500,
+        crop: 'fill',
+      })
     Category.findOne({
         where: {
             title: title,
@@ -20,7 +27,7 @@ exports.postCategory = (req,res,next) => {
         if(!cat){
             Category.create({
                 title: title,
-                image: image,
+                image: image.url,
                 userId: req.user.id
             })
                       .then(category => {
@@ -40,7 +47,12 @@ exports.postCategory = (req,res,next) => {
 
 exports.postItems = (req,res,next)=>{
     const title = req.body.title;
-    const image = req.file.path;
+    const image = await cloudinary.uploader.upload(req.file.path, {
+        public_id: uuidv4() + ' _profile',
+        width: 500,
+        height: 500,
+        crop: 'fill',
+      })
     const categoryId = req.body.categoryId;
     const price = req.body.price;
     Category.findOne({
@@ -55,7 +67,7 @@ exports.postItems = (req,res,next)=>{
         }else{
             Item.create({
                 title: title,
-                image: image,
+                image: image.url,
                 categoryName: cat.title,
                 price: price,
                 userId: req.user.id,
