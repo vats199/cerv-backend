@@ -258,7 +258,7 @@ exports.deleteAddress = async (req,res,next) => {
     
     await Address.destroy({ where: { id: addressId, userId: userId } })
 
-    return res.status(204).json({message: "Address Deleted Successfully!", status: 1});
+    return res.status(200).json({message: "Address Deleted Successfully!", status: 1});
 
   } catch (err) {
     console.log(err);
