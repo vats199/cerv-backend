@@ -101,6 +101,7 @@ Category.hasMany(Item, { constraints: true, onDelete: 'CASCADE' });
 Address.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Feedback.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Feedback.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+User.hasMany(Feedback);
 Token.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Banner.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Payment.belongsTo(User);
