@@ -23,6 +23,13 @@ exports.getCaterers = async (req,res,next) => {
         const totalCaterers = await Store.count()
         const caterers = await Store.findAll({include: User})
         // const details = await Store.findAll( {where: { userId: caterers._id }})
+
+        if(totalCaterers !== 0){
+          for(let i=0; i<caterers.length;i++){
+            const rating = await Feedback.findAll({ where: { catererId: caterers[i] } ,order: [Sequelize.fn('AVG', Sequelize.col('rating'))] });
+            caterers[i].rating = rating;
+          }
+        }
                 return res.status(200).json({message: 'Fetched Caterers Successfully!', 
                                               caterer: caterers,
                                               totalCaterers: totalCaterers, status: 1})
