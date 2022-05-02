@@ -14,6 +14,8 @@ const { v4: uuidv4 } = require('uuid')
 const Sequelize = require('sequelize');
 const { Op } = Sequelize.Op;
 
+const db = require('../util/database');
+
 const fs = require('fs')
 const path = require('path');
 
@@ -26,7 +28,8 @@ exports.getCaterers = async (req,res,next) => {
 
         if(totalCaterers !== 0){
           for(let i=0; i<caterers.length;i++){
-            const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+            // const rating = await Feedback.findAll({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+            const rating = db.sequelize.query(`SELECT AVG(rating) FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
             console.log(rating)
             caterers[i].rating = rating;
           }
