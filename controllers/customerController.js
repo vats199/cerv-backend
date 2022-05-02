@@ -26,7 +26,7 @@ exports.getCaterers = async (req,res,next) => {
 
         if(totalCaterers !== 0){
           for(let i=0; i<caterers.length;i++){
-            const rating = await Feedback.findAll({ where: { catererId: caterers[i] } ,order: [Sequelize.fn('AVG', Sequelize.col('rating'))] });
+            const rating = await Feedback.findOne({ where: { catererId: caterers[i] } ,order: [Sequelize.fn('AVG', Sequelize.col('rating'))] });
             caterers[i].rating = rating;
           }
         }
