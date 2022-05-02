@@ -48,39 +48,45 @@ exports.postCategory = async (req,res,next) => {
 
 exports.postItems = async(req,res,next)=>{
     const title = req.body.title;
-    const image = await cloudinary.uploader.upload(req.file.path, {
-        public_id: uuidv4() + ' _profile',
-        width: 500,
-        height: 500,
-        crop: 'fill',
-      })
-    const categoryId = req.body.categoryId;
-    const price = req.body.price;
-    Category.findOne({
-        where: {
-            id: categoryId,
-            userId: req.user.id
-        }
-    }).then(cat=>{
-        if(!cat){
-            return res.json({ error: `No Category exists for the given name!
-                               Enter Valid Category Name!`, status: 0 })
-        }else{
-            Item.create({
-                title: title,
-                image: image.url,
-                categoryName: cat.title,
-                price: price,
-                userId: req.user.id,
-                categoryId: cat.id
-            }).then(item => {
-                return res.status(200).json({message: 'Item Stored!', data: item, status: 1})
-              })
-              .catch(err => {
-                return res.json({error: err, status: 0})
-                })
-        }
-    })
+    try {
+        const image = await cloudinary.uploader.upload(req.file.path, {
+            public_id: uuidv4() + ' _profile',
+            width: 500,
+            height: 500,
+            crop: 'fill',
+          })
+        const categoryId = req.body.categoryId;
+        const price = req.body.price;
+        Category.findOne({
+            where: {
+                id: categoryId,
+                userId: req.user.id
+            }
+        }).then(cat=>{
+            if(!cat){
+                return res.json({ error: `No Category exists for the given name!
+                                   Enter Valid Category Name!`, status: 0 })
+            }else{
+                Item.create({
+                    title: title,
+                    image: image.url,
+                    categoryName: cat.title,
+                    price: price,
+                    userId: req.user.id,
+                    categoryId: cat.id
+                }).then(item => {
+                    return res.status(200).json({message: 'Item Stored!', data: item, status: 1})
+                  })
+                  .catch(err => {
+                    return res.json({error: err, status: 0})
+                    })
+            }
+        })
+        
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
 }
 
 exports.editItem = (req,res,next)=>{
