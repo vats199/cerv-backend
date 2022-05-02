@@ -280,7 +280,7 @@ exports.deleteAddress = async (req,res,next) => {
 
 exports.postReview = async (req,res,next) => {
   const userId = req.user.id;
-  const catererId = req.body.catId;
+  const catererId = req.body.catererId;
   try{
     const rev = await Feedback.create({
       rating: req.body.rating,
