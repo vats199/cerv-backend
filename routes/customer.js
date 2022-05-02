@@ -18,6 +18,7 @@ router.post('/add-address',jwtAuth,customerController.postAddress);
 router.put('/edit-address',jwtAuth, customerController.editAddress);
 router.delete('/delete-address', jwtAuth, customerController.deleteAddress);
 router.post('/activate-address', jwtAuth, customerController.activateAddress);
+router.post('/post-review',jwtAuth, customerController.postReview);
 router.post('/addCard', jwtAuth, stripeController.addCard);
 router.get('/getCards', jwtAuth, stripeController.getCard);
 router.post('/checkout_online',jwtAuth, stripeController.checkout_online);
