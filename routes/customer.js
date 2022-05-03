@@ -10,6 +10,7 @@ router.use(cors());
 
 router.get('/caterers', customerController.getCaterers);
 router.get('/catererInfo', customerController.getCaterer);
+router.get('/get-banners', customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
 router.get('/picture', jwtAuth, customerController.getDP);
 router.put('/edit-profile',jwtAuth, customerController.editInfo);

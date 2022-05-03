@@ -112,10 +112,16 @@ exports.editItem = (req,res,next)=>{
          }).catch(err=>console.log(err))
 }
 
-exports.postBanner = (req,res,next)=>{
+exports.postBanner = async (req,res,next)=>{
     const userId = req.user.id;
+    const image = await cloudinary.uploader.upload(req.file.path, {
+        public_id: uuidv4() + ' _profile',
+        width: 500,
+        height: 500,
+        crop: 'fill',
+      })
     const data = {
-        image: req.file.path,
+        image: image.url,
         userId: userId
     }
     Banner.create(data)

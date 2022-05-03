@@ -1,7 +1,8 @@
 const User = require('../models/user');
 const Store = require('../models/store')
 const Item = require('../models/item');
-const Address = require('../models/address')
+const Address = require('../models/address');
+const Banner = require('../models/banner');
 const Category = require('../models/category');
 const Feedback = require('../models/feedback');
 const Order = require('../models/order');
@@ -66,6 +67,20 @@ exports.getCaterer = async (req,res,next)=>{
   next(err);
 }
 }
+
+
+exports.getBanner = async (req,res,next) => {
+  try {
+
+      const banners = await Banner.findAll();
+      return res.status(200).json({message: "Banners fetched successfully!", banners: banners, length: banners.length , status: 1})
+      
+  } catch (err) {
+      console.log(err);
+      return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 exports.getProfile = async (req,res,next)=>{
   try{
     const user = await User.findOne({where: {id: req.user.id}});

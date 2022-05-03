@@ -9,6 +9,6 @@ router.use(cors());
 router.post('/add-category',jwtAuth, catererController.postCategory);
 router.post('/add-item', jwtAuth,catererController.postItems);
 router.post('/edit-item/:itemId', jwtAuth,catererController.editItem);
-router.post('/add-banner',jwtAuth, catererController.postBanner)
+router.post('/add-banner',jwtAuth, catererController.postBanner);
 
 module.exports = router;
