@@ -9,6 +9,7 @@ const stripeController = require('../controllers/stripe');
 router.use(cors());
 
 router.get('/caterers', customerController.getCaterers);
+router.get('/caterers/:filter', customerController.filterCaterers);
 router.get('/catererInfo/:catId', customerController.getCaterer);
 router.get('/get-banners', customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);

@@ -55,11 +55,48 @@ exports.getCaterers = async (req,res,next) => {
 
 }
 
+exports.filterCaterers = async (req,res,next) => {
+  const filter = req.params.filter;
+
+  try{
+    const totalCaterers = await Store.count()
+    const caterers = await Store.findAll({include: User})
+    // const details = await Store.findAll( {where: { userId: caterers._id }})
+
+    if(totalCaterers !== 0){
+      for(let i=0; i<caterers.length;i++){
+        // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+        const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
+        const decimal = (rating[0][0].rating)%1;
+        let rate;
+        if(decimal < 0.25){
+          rate = Math.floor(rating[0][0].rating)
+        } else if(decimal <= 0.75){
+          rate = Math.floor(rating[0][0].rating) + 0.5;
+        }else {
+          rate = Math.floor(rating[0][0].rating) + 1;
+        }
+        caterers[i].dataValues.rating = rate;
+      }
+    }
+    if(filter === 'rating'){
+      return res.status(200).json({message: 'Fetched Caterers Successfully!', 
+                                    caterer: caterers.sort((a,b) => (a.rating < b.rating) ? 1 : ((b.rating < a.rating) ? -1 : 0)),
+                                    totalCaterers: totalCaterers, status: 1})
+    }
+    } catch(err) {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+    }
+}
+
 exports.getCaterer = async (req,res,next)=>{
   // console.log(req.body);
     const catId = req.params.catId;
   try { 
-  const caterer = await Store.findOne({where:{ userId: catId }})
+  const caterer = await Store.findOne({ include: User ,where:{ userId: catId }})
   const category = await Category.findAll({include: Item, where: {userId: catId}})
   
       if (!caterer) {
