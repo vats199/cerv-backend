@@ -56,6 +56,7 @@ exports.getCaterers = async (req,res,next) => {
 }
 
 exports.getCaterer = async (req,res,next)=>{
+  console.log(req.body);
     const catId = req.body.catId;
   try { 
   const caterer = await Store.findOne({where:{ userId: catId }})
