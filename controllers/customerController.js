@@ -24,7 +24,7 @@ exports.getCaterers = async (req,res,next) => {
 
     try{
         const totalCaterers = await Store.count()
-        const caterers = await Store.findAll({include: User})
+        const caterers = await Store.findAll({include: [User, Category, Item]});
         // const details = await Store.findAll( {where: { userId: caterers._id }})
 
         if(totalCaterers !== 0){
