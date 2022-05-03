@@ -83,6 +83,8 @@ exports.postLogin = async (req, res, next) => {
       if (!isEqual) {
         return res.status(400).json({ error: 'Invalid Password!', status: 0 })
       }
+      loadedUser.is_active = 1;
+      await loadedUser.save();
       const token = jwt.sign(
         { loadedUser },
         process.env.secret,
@@ -151,6 +153,7 @@ exports.logout = async (req, res, next) => {
   const userId = req.user.id;
 
   try {
+    const user = await User.findByPk(userId);
     const getToken = await Token.findOne({ where: { userId: userId } })
 
     if (getToken) {
@@ -161,8 +164,9 @@ exports.logout = async (req, res, next) => {
         getToken.token = null;
         getToken.status = 'expired';
         getToken.expiry = null;
-
+        user.is_active = 0;
         await getToken.save();
+        await user.save();
         return res.status(200).json({ message: 'Logged-out Successfully', status: 1 })
       }
     } else {
