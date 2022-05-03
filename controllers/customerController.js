@@ -31,8 +31,16 @@ exports.getCaterers = async (req,res,next) => {
           for(let i=0; i<caterers.length;i++){
             // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
             const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
-            
-            caterers[i].dataValues.rating = rating[0][0].rating;
+            const decimal = (rating[0][0].rating)%1;
+            let rate;
+            if(decimal < 0.25){
+              rate = Math.floor(rating[0][0].rating)
+            } else if(decimal <= 0.75){
+              rate = Math.floor(rating[0][0].rating) + 0.5;
+            }else {
+              rate = Math.floor(rating[0][0].rating) + 1;
+            }
+            caterers[i].dataValues.rating = rate;
           }
         }
                 return res.status(200).json({message: 'Fetched Caterers Successfully!', 
