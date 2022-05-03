@@ -434,7 +434,8 @@ exports.postStore = (req, res, next) => {
         bio: req.body.bio,
         order_type: req.body.order_type,
         userId: userId,
-        name: user.name
+        name: user.name,
+        category: req.body.category
       }
       Store.findOne({
         where: {

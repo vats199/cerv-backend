@@ -25,6 +25,9 @@ module.exports = db.sequelize.define('store' , {
     name: {
         type: Sequelize.STRING
     },
+    category: {
+        type: Sequelize.STRING
+    },
     order_type: { 
         type: Sequelize.TINYINT(1),
         allowNull: false,
