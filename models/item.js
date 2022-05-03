@@ -14,6 +14,9 @@ module.exports = db.sequelize.define('item' , {
       image: {
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.STRING
+      },
       categoryName: {
         type: Sequelize.STRING
       },

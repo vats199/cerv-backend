@@ -24,12 +24,14 @@ exports.postCategory = async (req,res,next) => {
             title: title,
             userId: req.user.id
         }
-    }).then(cat=>{
+    }).then(async cat=>{
         if(!cat){
+            const store = await Store.findOne({where: {userId: req.user.id}})
             Category.create({
                 title: title,
                 image: image.url,
-                userId: req.user.id
+                userId: req.user.id,
+                storeId: store.id
             })
                       .then(category => {
                                 return res.status(200).json({message: 'Category Stored!', data: category, status: 1})
@@ -48,6 +50,7 @@ exports.postCategory = async (req,res,next) => {
 
 exports.postItems = async(req,res,next)=>{
     const title = req.body.title;
+    const desc = req.body.description;
     try {
         const image = await cloudinary.uploader.upload(req.file.path, {
             public_id: uuidv4() + ' _profile',
@@ -55,6 +58,7 @@ exports.postItems = async(req,res,next)=>{
             height: 500,
             crop: 'fill',
           })
+        const store = await Store.findOne({where: {userId: req.user.id}})
         const categoryId = req.body.categoryId;
         const price = req.body.price;
         Category.findOne({
@@ -70,10 +74,12 @@ exports.postItems = async(req,res,next)=>{
                 Item.create({
                     title: title,
                     image: image.url,
+                    description: desc,
                     categoryName: cat.title,
                     price: price,
                     userId: req.user.id,
-                    categoryId: cat.id
+                    categoryId: cat.id,
+                    storeId: store.id
                 }).then(item => {
                     return res.status(200).json({message: 'Item Stored!', data: item, status: 1})
                   })
