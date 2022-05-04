@@ -30,7 +30,7 @@ router.put('/order-status', jwtAuth, customerController.putOrderStatus);
 router.post('/add-to-favourites', jwtAuth, customerController.postFav);
 router.get('/get-favourites', jwtAuth, customerController.getFav);
 router.delete('/delete-favourites', jwtAuth, customerController.deleteFav);
-// router.get('/search/:key', customerController.search)
+router.get('/search/:key', customerController.search)
 
 
 

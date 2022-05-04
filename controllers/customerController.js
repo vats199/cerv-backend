@@ -12,8 +12,7 @@ const Coupon = require('../models/coupon');
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid')
 
-const Sequelize = require('sequelize');
-const { Op } = Sequelize.Op;
+const {Op} = require('sequelize');
 
 const db = require('../util/database');
 
@@ -21,16 +20,25 @@ const fs = require('fs')
 const path = require('path');
 
 exports.getCaterers = async (req,res,next) => {
-
     try{
         const totalCaterers = await Store.count()
-        const caterers = await Store.findAll({include: [User, Category, Item]});
+        const caterers = await Store.findAll({include: {
+                                              model: User,
+                                              include: {
+                                                model: Category,
+                                                include: {
+                                                  model: Item
+                                                }
+                                              }
+                                            } });
         // const details = await Store.findAll( {where: { userId: caterers._id }})
 
         if(totalCaterers !== 0){
           for(let i=0; i<caterers.length;i++){
             // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
             const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
+            const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE storeId = ${caterers[i].id}`)
+            const avgPrice = Math.floor(avgPri[0][0].avgPrice);
             const decimal = (rating[0][0].rating)%1;
             let rate;
             if(decimal < 0.25){
@@ -41,6 +49,7 @@ exports.getCaterers = async (req,res,next) => {
               rate = Math.floor(rating[0][0].rating) + 1;
             }
             caterers[i].dataValues.rating = rate;
+            caterers[i].dataValues.averagePrice = avgPrice;
           }
         }
                 return res.status(200).json({message: 'Fetched Caterers Successfully!', 
@@ -67,6 +76,8 @@ exports.filterCaterers = async (req,res,next) => {
           for(let i=0; i<caterers.length;i++){
             // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
             const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
+            const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE storeId = ${caterers[i].id}`)
+            const avgPrice = Math.floor(avgPri[0][0].avgPrice);
             const decimal = (rating[0][0].rating)%1;
             let rate;
             if(decimal < 0.25){
@@ -77,11 +88,22 @@ exports.filterCaterers = async (req,res,next) => {
               rate = Math.floor(rating[0][0].rating) + 1;
             }
             caterers[i].dataValues.rating = rate;
+            caterers[i].dataValues.averagePrice = avgPrice;
           }
         }
     if(filter === 'rating'){
       return res.status(200).json({message: 'Fetched Caterers Successfully!', 
                                     caterer: caterers.sort((a,b) => (a.dataValues.rating < b.dataValues.rating) ? 1 : ((b.dataValues.rating < a.dataValues.rating) ? -1 : 0)),
+                                    totalCaterers: totalCaterers, status: 1})
+    }
+    if(filter === 'descPrice'){
+      return res.status(200).json({message: 'Fetched Caterers Successfully!', 
+                                    caterer: caterers.sort((a,b) => (a.dataValues.averagePrice < b.dataValues.averagePrice) ? 1 : ((b.dataValues.averagePrice < a.dataValues.averagePrice) ? -1 : 0)),
+                                    totalCaterers: totalCaterers, status: 1})
+    }
+    if(filter === 'ascPrice'){
+      return res.status(200).json({message: 'Fetched Caterers Successfully!', 
+                                    caterer: caterers.sort((a,b) => (a.dataValues.averagePrice > b.dataValues.averagePrice) ? 1 : ((b.dataValues.averagePrice > a.dataValues.averagePrice) ? -1 : 0)),
                                     totalCaterers: totalCaterers, status: 1})
     }
     } catch(err) {
@@ -360,15 +382,15 @@ exports.postReview = async (req,res,next) => {
 }
 
 exports.search = async (req,res,next)=>{
-  const { term } = req.query;
+  const term  = req.query.term;
   const key = req.params.key; 
   // key->1   categories
   // key->2   items
   // key->3   caterers
 try{
-  if(key === 1){
+  if(key == 1){
     const totalResults = await Category.count({where: {title: { [Op.like]: '%'+ term + '%' }}})
-    const results = await Category.findAll({where: {title: { [Op.like]: '%'+ term + '%' }}});
+    const results = await Category.findAll({ include: Item ,where: {title: { [Op.like]: '%'+ term + '%' }}});
 
     return res.status(200).json({message: 'Fetched Categories Successfully!', 
                                               results: results,
@@ -376,9 +398,9 @@ try{
   }
 
 
-  if(key === 2){
+  else if(key == 2){
     const totalResults = await Item.count({where: {title: { [Op.like]: '%'+ term + '%' }}})
-    const results = await Item.findAll({where: {title: { [Op.like]: '%'+ term + '%' }}});
+    const results = await Item.findAll({ include: Category ,where: {title: { [Op.like]: '%'+ term + '%' }}});
 
     return res.status(200).json({message: 'Fetched Items Successfully!', 
                                               results: results,
@@ -386,7 +408,7 @@ try{
   }
 
 
-  if(key === 3){
+  else if(key == 3){
     const totalResults = await Store.count({where: {name: { [Op.like]: '%'+ term + '%' }}})
     const results = await Store.findAll({where: {name: { [Op.like]: '%'+ term + '%' }}});
 
