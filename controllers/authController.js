@@ -47,15 +47,17 @@ exports.postSignup = async (req, res, next) => {
     if(!test){
       bcrypt.hash(req.body.password, 10, async (err, hash) => {
         userData.password = hash
+        const user = await User.create(userData)
+
         const customer = await stripe.customers.create({
                                       name: userData.name,
                                       email: userData.email,
                                       phone: userData.country_code + userData.phone_number,
                                       description: 'Cerv Customer!',
                                   });
-        userData.stripe_id = customer.id;
-        const user = await User.create(userData)
-        return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+        user.stripe_id = customer.id;
+        const data = await user.save()
+        return res.status(200).json({ message: 'Registeration Successfull!', userData: data, status: 1 })
       })
     } else {
       return res.json({ error: "USER ALREADY EXISTS", status: 0 })
