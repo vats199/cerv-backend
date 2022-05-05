@@ -518,8 +518,10 @@ exports.postOrder = async (req,res,next) => {
             let key  = keys[i];
             arr[key] = items[key];
         }
+        console.log(arr);
     for(let j=0 ; j<arr.length ; j++){
           if(arr[j]){
+            return 
     const orderItems = await OrderItem.create({ itemId: arr[j].id,
                                                 orderId: order.id,
                                                 quantity: arr[j].qty,
