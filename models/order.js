@@ -18,6 +18,12 @@ module.exports = db.sequelize.define('order' , {
     },
     amount :{
         type : Sequelize.FLOAT,
+    },
+    date_time: {
+        type: Sequelize.TEXT
+    },
+    instructions: {
+        type: Sequelize.TEXT
     }
     },
     {

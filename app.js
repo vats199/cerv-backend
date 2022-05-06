@@ -117,7 +117,10 @@ Favourites.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Favourites.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 Coupon.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 OrderItem.belongsTo(Item);
-Item.hasMany(OrderItem)
+Item.hasMany(OrderItem);
+Order.belongsToMany(Item, { through: OrderItem });
+Order.belongsTo(Address);
+Address.hasMany(Order);
 
 db.sequelize
   // .sync({force: true})

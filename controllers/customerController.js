@@ -505,27 +505,29 @@ exports.postOrder = async (req,res,next) => {
         catererId = req.body.catererId,
         items = req.body.items,
         order_type = req.body.orderType,
-        amount = req.body.totalAmount;
+        amount = req.body.totalAmount,
+        dateTime = req.body.dateTime,
+        instructions = req.body.instructions;
   try{
     const order = await Order.create({ order_type: order_type ,
                                       catererId: catererId,
                                       userId: userId,
-                                      amount: amount})
-    let arr  = [],
-        keys = Object.keys(items);
+                                      amount: amount,
+                                      date_time: dateTime,
+                                      instructions: instructions})
+    // let arr  = [],
+    //     keys = Object.keys(items);
       
-    for(let i=0,n=keys.length;i<n;i++){
-            let key  = keys[i];
-            arr[key] = items[key];
-        }
-        console.log(arr);
-    for(let j=0 ; j<arr.length ; j++){
-          if(arr[j]){
-            return 
-    const orderItems = await OrderItem.create({ itemId: arr[j].id,
+    // for(let i=0,n=keys.length;i<n;i++){
+    //         let key  = keys[i];
+    //         arr[key] = items[key];
+    //     }
+    for(let j=0 ; j<items.length ; j++){
+          if(items[j]){
+    const orderItems = await OrderItem.create({ itemId: items[j].id,
                                                 orderId: order.id,
-                                                quantity: arr[j].qty,
-                                                itemTotal: (arr[j].qty) * (arr[j].price)});
+                                                quantity: items[j].qty,
+                                                itemTotal: (items[j].qty) * (items[j].price)});
             
       }
     }
