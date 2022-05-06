@@ -539,6 +539,35 @@ exports.postOrder = async (req,res,next) => {
   
 }
 
+exports.getOrders = async (req,res,next) => {
+  const userId = req.user.id;
+  try {
+    
+    const pastOrders = await Order.findAll({where: { userId: userId, 
+                                                      status: { [Op.between]: [4,6] } }, 
+                                                      include: {
+                                                              model: OrderItem,
+                                                              include: {
+                                                                model: Item
+                                                              }
+                                                            }})
+    const currentOrders = await Order.findAll({where: { userId: userId, 
+                                                     status: { [Op.between]: [0,3] } }, 
+                                                     include: {
+                                                              model: OrderItem,
+                                                              include: {
+                                                                model: Item
+                                                              }
+                                                            }})
+    
+    return res.status(200).json({message: "Orders Fetched!", curOrdLength: currentOrders.length, pasOrdLength: pastOrders.length, currentOrders: currentOrders, pastOrders: pastOrders})
+
+  } catch (err) {
+    console.log(err);
+        return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 exports.putOrderStatus = async (req,res,next) => {
   const catererId = req.user.id;
   const status = req.body.status;
