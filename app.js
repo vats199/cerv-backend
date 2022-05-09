@@ -18,7 +18,9 @@ const Payment = require('./models/payment');
 const Order = require('./models/order');
 const OrderItem = require('./models/orderItem');
 const Favourites = require('./models/favourites');
-const Coupon = require('./models/coupon')
+const Coupon = require('./models/coupon');
+const Chat = require('./models/chat');
+const Message = require('./models/message');
 
 const app = express();
 
@@ -41,7 +43,6 @@ const fileFilter = (req,file,cb) => {
       }
 }
 
-const config = require('./util/config');
 
 app.use(cors());
 
@@ -74,10 +75,14 @@ app.set('views', 'views');
 const Auth = require('./routes/auth');
 const itemRoutes = require('./routes/item');
 const customerRoutes = require('./routes/customer');
+const ChatRoutes = require('./routes/chat');
+const MessageRoutes = require('./routes/message');
 
 app.use('/users', Auth);
 app.use('/caterer', itemRoutes);
 app.use('/', customerRoutes);
+app.use('/chat', ChatRoutes);
+app.use('/message', MessageRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -121,6 +126,15 @@ Item.hasMany(OrderItem);
 Order.belongsToMany(Item, { through: OrderItem });
 Order.belongsTo(Address);
 Address.hasMany(Order);
+Chat.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
+User.hasMany(Chat, { foreignKey: "userId", targetKey: "id" });
+Chat.belongsTo(Driver, { foreignKey: "driverId", targetKey: "id" });
+Driver.hasMany(Chat, { foreignKey: "driverId", targetKey: "id" });
+Message.belongsTo(User, { foreignKey: "senderId", targetKey: "id" });
+User.hasMany(Message, { foreignKey: "senderId", targetKey: "id" });
+Message.belongsTo(Chat, { foreignKey: "chatId", targetKey: "id" });
+Chat.hasMany(Message, { foreignKey: "chatId", targetKey: "id" });
+// Message.hasOne(Chat, { foreignKey: "latestMessageId", targetKey: "id" });
 
 db.sequelize
   // .sync({force: true})

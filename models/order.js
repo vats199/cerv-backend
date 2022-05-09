@@ -19,8 +19,17 @@ module.exports = db.sequelize.define('order' , {
     amount :{
         type : Sequelize.FLOAT,
     },
-    date_time: {
-        type: Sequelize.TEXT
+    date: {
+        type: Sequelize.DATEONLY
+    },
+    time: {
+        type: Sequelize.TIME
+    },
+    discount :{
+        type : Sequelize.FLOAT,
+    },
+    netAmount :{
+        type : Sequelize.FLOAT,
     },
     instructions: {
         type: Sequelize.TEXT

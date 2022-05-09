@@ -145,7 +145,7 @@ exports.postCoupon = async (req,res,next) => {
     const payLoad = {
         title: data.title,
         description: data.description,
-        expiry: data.expiry,
+        expiry: Date.now(),
         code: data.code,
         is_percent: data.is_percent,
         value: data.value,

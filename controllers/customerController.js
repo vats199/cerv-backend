@@ -18,6 +18,7 @@ const db = require('../util/database');
 
 const fs = require('fs')
 const path = require('path');
+const { time } = require('console');
 
 exports.getCaterers = async (req,res,next) => {
     try{
@@ -501,19 +502,28 @@ exports.getDeliveryFee = (req,res,next) => {
 // }
 
 exports.postOrder = async (req,res,next) => {
+  const dateTime = req.body.dateTime;
   const userId = req.user.id,
         catererId = req.body.catererId,
         items = req.body.items,
         order_type = req.body.orderType,
         amount = req.body.totalAmount,
-        dateTime = req.body.dateTime,
+        date = dateTime.split(' ')[0],
+        time = dateTime.split(' ')[1],
+        discount = req.body.discount,
+        addressId = req.body.addressId,
         instructions = req.body.instructions;
+  const netAmount = amount - discount;
   try{
     const order = await Order.create({ order_type: order_type ,
                                       catererId: catererId,
                                       userId: userId,
                                       amount: amount,
-                                      date_time: dateTime,
+                                      date: date,
+                                      time: time,
+                                      discount: discount,
+                                      netAmount: netAmount,
+                                      addressId: addressId,
                                       instructions: instructions})
     // let arr  = [],
     //     keys = Object.keys(items);
@@ -560,7 +570,7 @@ exports.getOrders = async (req,res,next) => {
                                                               }
                                                             }})
     
-    return res.status(200).json({message: "Orders Fetched!", curOrdLength: currentOrders.length, pasOrdLength: pastOrders.length, currentOrders: currentOrders, pastOrders: pastOrders})
+    return res.status(200).json({message: "Orders Fetched!", curOrdLength: currentOrders.length, pasOrdLength: pastOrders.length, currentOrders: currentOrders, pastOrders: pastOrders, status: 1 })
 
   } catch (err) {
     console.log(err);
@@ -638,7 +648,8 @@ exports.deleteFav = async (req,res,next) => {
 exports.applyToken = async (req,res,next) => {
   const price = req.body.price;
   const couponCode = req.body.couponCode;
-  let updatedPrice;
+  let updatedPrice,
+      discAmount;
 
   try{
 
@@ -646,19 +657,22 @@ exports.applyToken = async (req,res,next) => {
      if(!coupon){
        return res.status(400).json({message: "Coupon Code is invalid!", status: 0})
      } else {
-            if(coupon.is_percent === 1){
+            if(coupon.is_percent == 1){
 
-              updatedPrice = price - ( price * ((coupon.value)/100) );
+              discAmount = price * ((coupon.value)/100)
+              updatedPrice = price - discAmount;
 
             } else {
                     if(price < coupon.value){
                       updatedPrice = 0;
+                      discAmount = price;
                     }else{
-                      updatedPrice = price - coupon.value;
+                      discAmount = coupon.value
+                      updatedPrice = price - discAmount;
                     }
 
             }
-            return res.status(200).json({message: "Price updated!", updatedPrice: updatedPrice})
+            return res.status(200).json({message: "Price updated!", updatedPrice: updatedPrice, discAmount: discAmount})
      }
 
   }catch(err){

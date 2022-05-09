@@ -10,5 +10,6 @@ router.post('/add-category',jwtAuth, catererController.postCategory);
 router.post('/add-item', jwtAuth,catererController.postItems);
 router.post('/edit-item/:itemId', jwtAuth,catererController.editItem);
 router.post('/add-banner',jwtAuth, catererController.postBanner);
+router.post('/addCoupon', jwtAuth, catererController.postCoupon);
 
 module.exports = router;
