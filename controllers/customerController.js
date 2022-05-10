@@ -555,20 +555,30 @@ exports.getOrders = async (req,res,next) => {
     
     const pastOrders = await Order.findAll({where: { userId: userId, 
                                                       status: { [Op.between]: [4,6] } }, 
-                                                      include: {
+                                                      include: [{
                                                               model: OrderItem,
                                                               include: {
                                                                 model: Item
                                                               }
-                                                            }})
+                                                            }, Address, {
+                                                              model: User,
+                                                              as: 'caterer',
+                                                              foreignKey: 'catererId',
+                                                              include: { model: Store }
+                                                            }]})
     const currentOrders = await Order.findAll({where: { userId: userId, 
                                                      status: { [Op.between]: [0,3] } }, 
-                                                     include: {
-                                                              model: OrderItem,
-                                                              include: {
-                                                                model: Item
-                                                              }
-                                                            }})
+                                                     include: [{
+                                                            model: OrderItem,
+                                                            include: {
+                                                              model: Item
+                                                            }
+                                                          }, Address, {
+                                                            model: User,
+                                                            as: 'caterer',
+                                                            foreignKey: 'catererId',
+                                                            include: { model: Store }
+                                                          }]})
     
     return res.status(200).json({message: "Orders Fetched!", curOrdLength: currentOrders.length, pasOrdLength: pastOrders.length, currentOrders: currentOrders, pastOrders: pastOrders, status: 1 })
 

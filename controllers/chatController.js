@@ -15,6 +15,7 @@ const db = require('../util/database');
 
 const fs = require('fs')
 const path = require('path');
+const { response } = require('express');
 
 exports.getChat = async (req,res,next) => {
     const driverId = req.body.driverId;
@@ -61,6 +62,7 @@ exports.getChats = async (req,res,next) => {
                 chats[i].dataValues.lastMessage = decrypt(chats[i].dataValues.lastMessage);
             }
         }
+        // console.log(chats);
             return res.status(200).json({message: "Chats fetched Successfully!" ,
                                          length: chats.length ,
                                          chats: chats.sort((a,b) => (a.updatedAt < b.updatedAt) ? 1 : ((b.updatedAt < a.updatedAt) ? -1 : 0)), 
@@ -77,7 +79,7 @@ exports.sendMessage = async (req,res,next) => {
     const content = encrypt(req.body.content);
     const chatId = req.body.chatId;
 
-    const newMessage = {
+    let newMessage = {
         senderId: userId,
         content: content,
         chatId: chatId
@@ -85,15 +87,22 @@ exports.sendMessage = async (req,res,next) => {
 
     try {
 
+        if(req.user.role == 2){
+            newMessage.is_driver = 1
+        }
+
         const message = await Message.create(newMessage);
+
         
         const chat = await Chat.findByPk(chatId);
 
         chat.lastMessage = content;
 
         chat.save();
+
+        const response = await Message.findByPk(message.id,{ include: Chat })
                 
-        return res.status(200).json({message: "Message sent Successfully!", data: message, status: 1});
+        return res.status(200).json({message: "Message sent Successfully!", data: response, status: 1});
         
     } catch (err) {
         console.log(err);
@@ -111,6 +120,13 @@ exports.allMessages = async (req,res,next) => {
 
         for(let i=0; i < messages.length; i++){
             messages[i].content = decrypt(messages[i].content);
+            if(messages[i].is_driver == true){
+                const sender = await Driver.findByPk(messages[i].senderId, { attributes: ['id','name','image'] });
+                messages[i].dataValues.sender = sender
+            }else{
+                const sender = await User.findByPk(messages[i].senderId, { attributes: ['id','name','image'] });
+                messages[i].dataValues.sender = sender
+            }
         }
 
         return res.status(200).json({message: "Messages fetched!", 

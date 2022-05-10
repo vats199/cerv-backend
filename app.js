@@ -56,7 +56,7 @@ app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 
 
 app.use((req, res, next) => {
@@ -143,9 +143,52 @@ db.sequelize
     console.log('Database Connected Successfully.')
   })
   .then((_result) => {
-    app.listen(PORT, (_port) => {
-        console.log('Server running on port : ' + PORT);
-    });
+    const server = app.listen(PORT, (_port) => {
+                            console.log('Server running on port : ' + PORT);
+                        });
+    const io = require('socket.io')(server, {
+      pingTimeout: 60000,
+      cors: {
+        origin: "http://localhost:3000"
+
+      }
+    })
+    io.on("connection", (socket)=>{
+      console.log('Connected to socket.io');
+      
+      socket.on('setup', (userData)=>{
+        socket.join(userData.id);
+        socket.emit("connected");
+      })
+
+      socket.on('join chat', (room)=>{
+        socket.join(room) 
+      })
+
+      socket.on('typing', (room)=>socket.in(room).emit("typing"))
+      socket.on('stop typing', (room)=>socket.in(room).emit("stop typing"))
+
+      socket.on('new message', (newMessageRecieved)=>{
+        let chat = newMessageRecieved.chat;
+        
+        if(!chat.userId || !chat.driverId) return console.log('Users are not there!');
+
+        if(newMessageRecieved.is_driver == 1){
+          if(chat.driverId == newMessageRecieved.senderId){
+            socket.in(chat.userId).emit("message recieved", newMessageRecieved);
+          }
+        }else {
+          if(chat.userId == newMessageRecieved.senderId){
+            socket.in(chat.driverId).emit("message recieved", newMessageRecieved);
+          }
+        }
+
+      })
+      socket.off('setup', ()=>{
+        socket.leave(userData.id);
+      })
+
+    })
   })
   .catch(err => {
     console.log(err);
