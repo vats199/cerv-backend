@@ -116,7 +116,7 @@ Banner.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Payment.belongsTo(User);
 Card.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 Order.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
-Order.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
+Order.belongsTo(User, { foreignKey: "catererId", targetKey: "id", as: 'caterer' });
 Order.hasMany(OrderItem);
 Favourites.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 Favourites.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
