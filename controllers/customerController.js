@@ -604,13 +604,38 @@ exports.getOrders = async (req,res,next) => {
   }
 }
 
+exports.cancelOrder = async (req,res,next) => {
+  const userId = req.user.id;
+  const orderId = req.body.orderId;
+
+try{
+
+  const order = await Order.findOne({ where: { userId: userId, id: orderId } })
+
+  if(order){
+
+    order.status = 4;
+    const result = await order.save();
+    return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
+  }else{
+    return res.status(400).json({message: "No order found", status: 0})
+  }
+  
+
+} catch(err){
+  console.log(err);
+        return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+}
+}
+
 exports.putOrderStatus = async (req,res,next) => {
+  const catererId = req.user.id;
   const status = req.body.status;
   const orderId = req.body.orderId;
 
 try{
 
-  const order = await Order.findOne({ where: { id: orderId } })
+  const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
   
   order.status = status;
   const result = await order.save();
