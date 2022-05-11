@@ -570,7 +570,7 @@ exports.getOrders = async (req,res,next) => {
                                                               include: { model: Store }
                                                             }]})
 
-      return res.status(200).json({message: "Orders Fetched!", length: currentOrders.length, currentOrders: currentOrders, status: 1 })
+      return res.status(200).json({message: "Orders Fetched!", length: currentOrders.length, orders: currentOrders, status: 1 })
     }
     else if(key == 2){
 
@@ -588,7 +588,7 @@ exports.getOrders = async (req,res,next) => {
                                                                 include: { model: Store }
                                                               }]})
 
-      return res.status(200).json({message: "Orders Fetched!",length: pastOrders.length , pastOrders: pastOrders, status: 1 })
+      return res.status(200).json({message: "Orders Fetched!",length: pastOrders.length , orders: pastOrders, status: 1 })
     } else {
       return res.status(400).json({message: "Enter Valid Key!", status: 0})
     }
