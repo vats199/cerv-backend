@@ -1,15 +1,50 @@
 const User = require('../models/user');
 const Store = require('../models/store')
 const Item = require('../models/item');
-const Category = require('../models/category');
+const Address = require('../models/address');
 const Banner = require('../models/banner');
+const Category = require('../models/category');
+const Feedback = require('../models/feedback');
+const Order = require('../models/order');
+const OrderItem = require('../models/orderItem');
+const Favourites = require('../models/favourites');
 const Coupon = require('../models/coupon');
-
 const fs = require('fs')
 const path = require('path')
 
 const cloudinary = require('../util/image');
-const { v4: uuidv4 } = require('uuid')
+const { v4: uuidv4 } = require('uuid');
+
+exports.getCategories = async (req,res,next) => {
+    const catererId = req.user.id;
+
+    try {
+
+        const categories = await Category.findAll({where: { userId: catererId }});
+
+        return res.status(200).json({message: "Categories fetched successfully!", categories: categories, length: categories.length , status:1})
+        
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}
+
+exports.getCategory = async(req,res,next) => {
+    const categoryId = req.params.catId;
+    const catererId = req.user.id;
+    try {
+        
+        const category = await Category.findByPk(categoryId);
+        const items = await Item.findAll({ where: { categoryId: categoryId , userId: catererId} })
+
+        return res.status(200).json({message: "Items fetched successfully!", category: category, items: items, length: items.length , status:1})
+
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}
 
 exports.postCategory = async (req,res,next) => {
     const title = req.body.title;
@@ -47,6 +82,55 @@ exports.postCategory = async (req,res,next) => {
       })
     
 }
+
+exports.editCategory = async (req,res,next) => {
+    const categoryId = req.params.catId;
+    const title = req.body.title;
+    const image = req.file?.path; 
+    let url;
+    if(image){
+  
+      const result = await cloudinary.uploader.upload(image, {
+        public_id: uuidv4() + ' _profile',
+        width: 500,
+        height: 500,
+        crop: 'fill',
+      })
+      url = result.url
+    } else {
+      url = null;
+    }
+
+    try {
+
+        const category = await Category.findByPk(categoryId);
+        category.title = title || category.title;
+        category.image = url || category.image;
+        const updatedCategory = await category.save();
+
+        return res.status(200).json({message: 'Category updated!', data: updatedCategory, status: 1})
+        
+    } catch (err) {
+        console.log(err);
+        return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+    }
+}
+
+exports.deleteCategory = async (req,res,next) => {
+    // const catererId = req.user.id;
+    const categoryId = req.params.catId;
+  
+    try {
+      
+      await Category.destroy({ where: { id: categoryId} })
+  
+      return res.status(200).json({message: "Item Deleted Successfully!", status: 1});
+  
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+    }
+  }
 
 exports.postItems = async(req,res,next)=>{
     const title = req.body.title;
@@ -99,7 +183,6 @@ exports.editItem = (req,res,next)=>{
     const itemId = req.params.itemId;
     const title = req.body.title;
     const image = req.file.path;
-    const categoryId = req.body.categoryId;
     const price = req.body.price;
 
     Item.findOne({where: {id: itemId}})
@@ -108,7 +191,6 @@ exports.editItem = (req,res,next)=>{
                 clearImage(item.image);
                 item.title = title ;
                 item.image = image;
-                item.categoryId = categoryId;
                 item.price = price;
                 item.save();
                 return res.status(200).json({message:"Updated item successfully!", data: item, status: 1})
@@ -117,6 +199,22 @@ exports.editItem = (req,res,next)=>{
             }
          }).catch(err=>console.log(err))
 }
+
+exports.deleteItem = async (req,res,next) => {
+    // const catererId = req.user.id;
+    const itemId = req.params.itemId;
+  
+    try {
+      
+      await Item.destroy({ where: { id: itemId} })
+  
+      return res.status(200).json({message: "Item Deleted Successfully!", status: 1});
+  
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+    }
+  }
 
 exports.postBanner = async (req,res,next)=>{
     const userId = req.user.id;
@@ -163,7 +261,96 @@ exports.postCoupon = async (req,res,next) => {
     }
 }
 
+exports.getOrders = async (req,res,next) => {
+    const catererId = req.user.id;
+    const key = req.params.key;
+    try {
+      
+      if(key == 1){
+        
+        const currentOrders = await Order.findAll({where: { catererId: catererId, 
+                                                       status: { [Op.between]: [0,3] } }, 
+                                                       include: [{
+                                                              model: OrderItem,
+                                                              include: {
+                                                                model: Item
+                                                              }
+                                                            }, Address, {
+                                                              model: User,
+                                                              as: 'user',
+                                                              foreignKey: 'userId'
+                                                            }]})
+  
+        return res.status(200).json({message: "Orders Fetched!", length: currentOrders.length, orders: currentOrders, status: 1 })
+      }
+      else if(key == 2){
+  
+        const pastOrders = await Order.findAll({where: { catererId: catererId, 
+                                                    status: { [Op.between]: [4,6] } }, 
+                                                    include: [{
+                                                        model: OrderItem,
+                                                        include: {
+                                                            model: Item
+                                                        }
+                                                        }, Address, {
+                                                        model: User,
+                                                        as: 'user',
+                                                        foreignKey: 'userId'
+                                                        }]})
+  
+        return res.status(200).json({message: "Orders Fetched!",length: pastOrders.length , orders: pastOrders, status: 1 })
+      } else {
+        return res.status(400).json({message: "Enter Valid Key!", status: 0})
+      }
+      
+  
+    } catch (err) {
+      console.log(err);
+          return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+    }
+  }
 
+exports.acceptOrder = async (req,res,next) => {
+    const catererId = req.user.id;
+    const orderId = req.params.orderId;
+  
+  try{
+  
+    const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+    
+    if(order.status != 0){
+        return res.status(400).json({message: "Order is already accepted/rejected!", status: 0})
+    }
+    order.status = 1;
+    const result = await order.save();
+    return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
+  
+  } catch(err){
+    console.log(err);
+          return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+  }
+
+exports.rejectOrder = async (req,res,next) => {
+    const catererId = req.user.id;
+    const orderId = req.params.orderId;
+  
+  try{
+  
+    const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+    
+    if(order.status != 0){
+        return res.status(400).json({message: "Order is already accepted/rejected!", status: 0})
+    }
+    order.status = 6;
+    const result = await order.save();
+    return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
+  
+  } catch(err){
+    console.log(err);
+          return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+  }
 
 
 const clearImage = filePath => {

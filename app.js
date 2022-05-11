@@ -73,13 +73,13 @@ app.set('view engine', 'ejs');
 app.set('views', 'views');
 
 const Auth = require('./routes/auth');
-const itemRoutes = require('./routes/item');
+const catererRoutes = require('./routes/caterer');
 const customerRoutes = require('./routes/customer');
 const ChatRoutes = require('./routes/chat');
 const MessageRoutes = require('./routes/message');
 
 app.use('/users', Auth);
-app.use('/caterer', itemRoutes);
+app.use('/caterer', catererRoutes);
 app.use('/', customerRoutes);
 app.use('/chat', ChatRoutes);
 app.use('/message', MessageRoutes);

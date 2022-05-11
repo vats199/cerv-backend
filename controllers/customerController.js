@@ -628,25 +628,6 @@ try{
 }
 }
 
-exports.putOrderStatus = async (req,res,next) => {
-  const catererId = req.user.id;
-  const status = req.body.status;
-  const orderId = req.body.orderId;
-
-try{
-
-  const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
-  
-  order.status = status;
-  const result = await order.save();
-  return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
-
-} catch(err){
-  console.log(err);
-        return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
-}
-}
-
 exports.postFav = async (req,res,next) => {
   const userId = req.user.id;
   const catererId = req.body.catererId;
