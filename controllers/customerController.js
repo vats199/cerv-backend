@@ -551,11 +551,14 @@ exports.postOrder = async (req,res,next) => {
 
 exports.getOrders = async (req,res,next) => {
   const userId = req.user.id;
+  const key = req.params.key;
   try {
     
-    const pastOrders = await Order.findAll({where: { userId: userId, 
-                                                      status: { [Op.between]: [4,6] } }, 
-                                                      include: [{
+    if(key == 1){
+      
+      const currentOrders = await Order.findAll({where: { userId: userId, 
+                                                       status: { [Op.between]: [0,3] } }, 
+                                                       include: [{
                                                               model: OrderItem,
                                                               include: {
                                                                 model: Item
@@ -566,21 +569,30 @@ exports.getOrders = async (req,res,next) => {
                                                               foreignKey: 'catererId',
                                                               include: { model: Store }
                                                             }]})
-    const currentOrders = await Order.findAll({where: { userId: userId, 
-                                                     status: { [Op.between]: [0,3] } }, 
-                                                     include: [{
-                                                            model: OrderItem,
-                                                            include: {
-                                                              model: Item
-                                                            }
-                                                          }, Address, {
-                                                            model: User,
-                                                            as: 'caterer',
-                                                            foreignKey: 'catererId',
-                                                            include: { model: Store }
-                                                          }]})
+
+      return res.status(200).json({message: "Orders Fetched!", length: currentOrders.length, currentOrders: currentOrders, status: 1 })
+    }
+    else if(key == 2){
+
+      const pastOrders = await Order.findAll({where: { userId: userId, 
+                                                        status: { [Op.between]: [4,6] } }, 
+                                                        include: [{
+                                                                model: OrderItem,
+                                                                include: {
+                                                                  model: Item
+                                                                }
+                                                              }, Address, {
+                                                                model: User,
+                                                                as: 'caterer',
+                                                                foreignKey: 'catererId',
+                                                                include: { model: Store }
+                                                              }]})
+
+      return res.status(200).json({message: "Orders Fetched!",length: pastOrders.length , pastOrders: pastOrders, status: 1 })
+    } else {
+      return res.status(400).json({message: "Enter Valid Key!", status: 0})
+    }
     
-    return res.status(200).json({message: "Orders Fetched!", curOrdLength: currentOrders.length, pasOrdLength: pastOrders.length, currentOrders: currentOrders, pastOrders: pastOrders, status: 1 })
 
   } catch (err) {
     console.log(err);

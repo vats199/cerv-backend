@@ -26,7 +26,7 @@ router.get('/getCards', jwtAuth, stripeController.getCard);
 router.post('/checkout_online',jwtAuth, stripeController.checkout_online);
 router.get('/fee', customerController.getDeliveryFee);
 router.post('/postOrder', jwtAuth,customerController.postOrder);
-router.get('/getOrders', jwtAuth, customerController.getOrders);
+router.get('/getOrders/:key', jwtAuth, customerController.getOrders);
 router.post('/applyToken', customerController.applyToken);
 router.put('/order-status', jwtAuth, customerController.putOrderStatus);
 router.post('/add-to-favourites', jwtAuth, customerController.postFav);
