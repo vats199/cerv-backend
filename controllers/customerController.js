@@ -365,13 +365,17 @@ exports.deleteAddress = async (req,res,next) => {
 exports.postReview = async (req,res,next) => {
   const userId = req.user.id;
   const catererId = req.body.catererId;
+  const orderId = req.body.orderId;
   try{
     const rev = await Feedback.create({
       rating: req.body.rating,
       review: req.body.review,
       userId: userId,
-      catererId: catererId
+      catererId: catererId,
+      orderId: orderId
     })
+
+    Order.update({is_reviewed = 1}, { where: {id: orderId} });
     return res.status(200).json({message: "Feedback Submitted!", data: rev, status: 1})
   }
   catch(err){
