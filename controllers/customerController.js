@@ -605,13 +605,12 @@ exports.getOrders = async (req,res,next) => {
 }
 
 exports.putOrderStatus = async (req,res,next) => {
-  const catererId = req.user.id;
   const status = req.body.status;
   const orderId = req.body.orderId;
 
 try{
 
-  const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+  const order = await Order.findOne({ where: { id: orderId } })
   
   order.status = status;
   const result = await order.save();
