@@ -33,6 +33,10 @@ module.exports = db.sequelize.define('order' , {
     },
     instructions: {
         type: Sequelize.TEXT
+    },
+    is_reviewed: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 0
     }
     },
     {
