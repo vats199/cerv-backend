@@ -375,7 +375,7 @@ exports.postReview = async (req,res,next) => {
       orderId: orderId
     })
 
-    await Order.update({is_reviewed = 1}, { where: {id: orderId} });
+    await Order.update({is_reviewed: 1}, { where: {id: orderId} });
     return res.status(200).json({message: "Feedback Submitted!", data: rev, status: 1})
   }
   catch(err){
