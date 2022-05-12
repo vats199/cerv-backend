@@ -29,8 +29,9 @@ module.exports = db.sequelize.define('store' , {
         type: Sequelize.STRING
     },
     is_approved: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: 0
+        type: Sequelize.TINYINT(1),
+        defaultValue: 0,
+        comment: '0 = not approved, 1 = approved, 2 = rejected'
     },
     order_type: { 
         type: Sequelize.TINYINT(1),

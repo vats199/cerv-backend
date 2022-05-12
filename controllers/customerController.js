@@ -57,10 +57,8 @@ exports.getCaterers = async (req,res,next) => {
                                               caterer: caterers,
                                               totalCaterers: totalCaterers, status: 1})
         } catch(err) {
-            if (!err.statusCode) {
-                err.statusCode = 500;
-              }
-              next(err);
+          console.log(err);
+          return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
         }
 
 }
@@ -136,7 +134,6 @@ exports.getCaterer = async (req,res,next)=>{
   next(err);
 }
 }
-
 
 exports.getBanner = async (req,res,next) => {
   try {

@@ -71,12 +71,23 @@ exports.postSignup = async (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   User.findOne({
     where: {
-      email: req.body.email
+      email: req.body.email,
+      role: req.body.role
     }
   })
     .then(user => {
       if (!user) {
-        return res.status(400).json({ error: 'User does not exist!', status: 0 })
+        return res.status(400).json({ error: 'User does not exist with the role or email selected!', status: 0 })
+      }
+      if(user.role == 0){
+        Store.findOne({where: { userId: user.id }})
+             .then(store=>{
+               if(store.is_approved == 0){
+                 return res.status(400).json({message: "Caterer is not verified by the admin!", status: 0});
+               } else if(store.is_approved == 2){
+                 return res.status(400).json({message: "Caterer is declined by the admin!", status: 0});
+               }
+             }).catch(err=>console.log(err));
       }
       loadedUser = user;
       return bcrypt.compare(req.body.password, user.password)
@@ -234,7 +245,6 @@ exports.verifyOTP = async (req, res, next) => {
   }
 }
 
-
 exports.refresh = (req, res, next) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken || !(refreshToken in refreshTokens)) {
@@ -254,7 +264,6 @@ exports.refresh = (req, res, next) => {
     }
   })
 }
-
 
 exports.resetPasswordLink = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
@@ -376,7 +385,6 @@ exports.postNewPassword = async (req, res, next) => {
   }).catch(err => console.log(err))
 }
 
-
 exports.changePassword = (req, res, body) => {
     const currentPassword = req.body.currentPassword;
     const newPassword = req.body.newPassword;
@@ -417,7 +425,6 @@ exports.changePassword = (req, res, body) => {
       console.log(err);
     })
 }
-
 
 exports.postStore = (req, res, next) => {
 
