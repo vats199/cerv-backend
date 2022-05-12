@@ -23,7 +23,7 @@ const { time } = require('console');
 exports.getCaterers = async (req,res,next) => {
     try{
         const totalCaterers = await Store.count()
-        const caterers = await Store.findAll({include: {
+        const caterers = await Store.findAll({ where: { is_approved: 1 } ,include: {
                                               model: User,
                                               include: {
                                                 model: Category,

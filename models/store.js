@@ -28,6 +28,10 @@ module.exports = db.sequelize.define('store' , {
     category: {
         type: Sequelize.STRING
     },
+    is_approved: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: 0
+    },
     order_type: { 
         type: Sequelize.TINYINT(1),
         allowNull: false,

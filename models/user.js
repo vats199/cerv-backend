@@ -37,7 +37,7 @@ module.exports = db.sequelize.define('user' , {
         validate: {
             notEmpty: true
         },
-        comment: '0 = Caterer, 1 = Customer, 2 = DeliveryBoy',
+        comment: '0 = Caterer, 1 = Customer, 2 = DeliveryBoy, 3 = admin',
     },
     email: {
         type: Sequelize.STRING,
