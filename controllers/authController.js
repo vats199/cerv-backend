@@ -10,6 +10,7 @@ const { Op } = require('@sequelize/core')
 const fs = require('fs');
 const cloudinary = require('../util/image');
 const stripe = require('stripe')(process.env.STRIPE_SK);
+const request = require('request');
 
 let refreshTokens = {};
 
@@ -31,120 +32,154 @@ exports.postSignup = async (req, res, next) => {
       height: 500,
       crop: 'fill',
     })
-    const userData = {
-      email: req.body.email,
-      password: req.body.password,
-      name: req.body.name,
-      role: req.body.role,
-      image: result.url,
-      country_code: req.body.country_code,
-      phone_number: req.body.phone_number,
-      is_verify: 1
-    }
-    
-    const test = await User.findOne({where: {email: req.body.email}})
 
-    if(!test){
-      bcrypt.hash(req.body.password, 10, async (err, hash) => {
-        userData.password = hash
-        const user = await User.create(userData)
+    const test = await User.findOne({ where: { email: req.body.email } })
 
+    if (!test) {
+      const options = {
+        method: 'POST',
+        url: 'https://dev-3sdvkvha.us.auth0.com/dbconnections/signup',
+        headers: { 'content-type': 'application/json' },
+        form: {
+          client_id: process.env.CLIENT_ID,
+          connection: process.env.CONNECTION,
+          email: req.body.email,
+          password: req.body.password,
+          name: req.body.name
+        }
+      }
+
+      request(options, async(error,response, body)=>{
+        if (error) {
+          console.log(error);
+          return res.json(500).json({
+            ErrorMessage: 'Some Auth0 error while making singup request!',
+            status: 0
+          })
+        }
+
+        // Check whether any logical error is occurd or not.
+        let json_body = JSON.parse(body);
+        if (json_body.statusCode === 400) {
+          return next(json_body);
+        }
         const customer = await stripe.customers.create({
-                                      name: userData.name,
-                                      email: userData.email,
-                                      phone: userData.country_code + userData.phone_number,
-                                      description: 'Cerv Customer!',
-                                  });
-        user.stripe_id = customer.id;
-        const data = await user.save()
-        return res.status(200).json({ message: 'Registeration Successfull!', userData: data, status: 1 })
+              name: req.body.name,
+              email: req.body.email,
+              phone: req.body.country_code + req.body.phone_number,
+              description: 'Cerv Customer!',
+            });
+            const user = await User.findByPk(json_body.user_id);
+            user.stripe_id = customer.id;
+            user.role = req.body.role;
+            user.image = result.url;
+            user.country_code = req.body.country_code;
+            user.phone_number = req.body.phone_number;
+            user.is_verify = 1;
+            await user.save();
+            return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
       })
     } else {
       return res.json({ error: "USER ALREADY EXISTS", status: 0 })
     }
-    } catch (err) {
+  } catch (err) {
     console.log(err);
   }
 
 }
 
 exports.postLogin = async (req, res, next) => {
-  User.findOne({
-    where: {
-      email: req.body.email,
-      role: req.body.role
-    }
-  })
-    .then(user => {
-      if (!user) {
-        return res.status(400).json({ error: 'User does not exist with the role or email selected!', status: 0 })
+
+  try {
+    const user = await User.findOne({
+      where: {
+        email: req.body.email,
+        role: req.body.role
       }
-      if(user.role == 0){
-        Store.findOne({where: { userId: user.id }})
-             .then(store=>{
-               if(store.is_approved == 0){
-                 return res.status(400).json({message: "Caterer is not verified by the admin!", status: 0});
-               } else if(store.is_approved == 2){
-                 return res.status(400).json({message: "Caterer is declined by the admin!", status: 0});
-               }
-             }).catch(err=>console.log(err));
-      }
-      loadedUser = user;
-      return bcrypt.compare(req.body.password, user.password)
     })
-    .then(async isEqual => {
-      if (!isEqual) {
-        return res.status(400).json({ error: 'Invalid Password!', status: 0 })
+
+    if (!user) {
+      return res.status(400).json({ error: 'User does not exist with the role or email selected!', status: 0 })
+    }
+    if (user.role == 0) {
+      const store = await Store.findOne({ where: { userId: user.id } })
+
+      if (store.is_approved == 0) {
+        return res.status(400).json({ message: "Caterer is not verified by the admin!", status: 0 });
+      } else if (store.is_approved == 2) {
+        return res.status(400).json({ message: "Caterer is declined by the admin!", status: 0 });
       }
-      loadedUser.is_active = 1;
-      await loadedUser.save();
-      const token = jwt.sign(
-        { loadedUser },
-        process.env.secret,
-        { expiresIn: process.env.jwtExpiration }
-      );
-      const refreshToken = jwt.sign(
-        { loadedUser },
-        "somesupersuperrefreshsecret",
-        { expiresIn: process.env.jwtRefreshExpiration }
-      );
-      // refreshTokens.push(refreshToken); 
-      // const response = { message: 'Logged-in Successfully', user: loadedUser , token: token, refreshToken: refreshToken }
-      refreshTokens[refreshToken] = { token: token, refreshToken: refreshToken };
+
+    }
+    var options = {
+      method: 'POST',
+      url: 'https://dev-3sdvkvha.us.auth0.com/oauth/token',
+      headers: { 'content-type': 'application/x-www-form-urlencoded' },
+      form: {
+        grant_type: 'password',
+        username: req.body.email,
+        password: req.body.password,
+        audience: process.env.AUDIENCE,
+        scope: 'offline_access',
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET
+      }
+    };
+
+    // Make login request to third party Auth0 api.
+
+    request(options, async (error, response, body) => {
+      if (error) {
+        console.log(error);
+        return res.json(500).json({
+          ErrorMessage: 'Some Auth0 error while making login request!',
+          status: 0
+        })
+      }
+
+      // Check whether any logical error is occurd or not.
+      let json_body = JSON.parse(body);
+      if (json_body.error) {
+        return next(json_body);
+      }
+          let loadedUser = user;
+
+        loadedUser.is_active = 1;
+        await loadedUser.save();
       try {
 
         const getToken = await Token.findOne({ where: { userId: loadedUser.id } })
         if (getToken) {
           getToken.login_count += 1;
-          getToken.token = token;
-          getToken.refreshToken = refreshToken;
+          getToken.token = json_body.access_token;
+          getToken.refreshToken = json_body.refresh_token;
           getToken.status = 'active';
-          getToken.expiry = '1h';
-
+          getToken.expiry = json_body.expires_in;
+  
           await getToken.save();
-
+  
           return res.status(200).json({
             message: 'Logged-in Successfully',
             user: loadedUser,
-            token: token,
-            refreshToken: refreshToken,
+            token: json_body.access_token,
+            refreshToken: json_body.refresh,
             status: 1
           })
         } else {
           const data = {
             userId: loadedUser.id,
-            token: token,
-            refreshToken: refreshToken,
+            token: json_body.access_token,
+            refreshToken: json_body.refresh_token,
             status: 'active',
             login_count: 1,
-            expiry: '1h'
+            expiry: json_body.expires_in
           }
           await Token.create(data)
           return res.status(200).json({
             message: 'Logged-in Successfully',
             user: loadedUser,
-            token: token,
-            refreshToken: refreshToken, status: 1
+            token: json_body.access_token,
+            refreshToken: json_body.refresh_token, status: 1
           })
         }
       } catch (err) {
@@ -154,13 +189,14 @@ exports.postLogin = async (req, res, next) => {
         next(err);
       }
 
-      // res.status(200).json(response);
     })
-    .catch(err => {
-      if (!err.statusCode) err.statusCode = 500;
-      next(err);
-    })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
 }
+
 
 exports.logout = async (req, res, next) => {
   const userId = req.user.id;
@@ -245,25 +281,54 @@ exports.verifyOTP = async (req, res, next) => {
   }
 }
 
-exports.refresh = (req, res, next) => {
+exports.refresh = async (req, res, next) => {
   const refreshToken = req.body.refreshToken;
   if (!refreshToken || !(refreshToken in refreshTokens)) {
     return res.status(403).json({ error: "Invalid RefreshToken!", status: 0 })
   }
-  jwt.verify(refreshToken, "somesupersuperrefreshsecret",(err, user) => {
-    if (!err) {
-      const token = jwt.sign(
-        { user: user.loadedUser },
-        process.env.secret,
-        { expiresIn: process.env.jwtExpiration }
-      );
-      Token.update({token:token},{where: {refreshToken: refreshToken}}).then(res=>console.log(res)).catch(err=>console.log(err))
-      return res.status(201).json({ token, status: 1 });
-    } else {
-      return res.status(403).json({ error: "User not Authenticated!", status: 0 })
+  var options = {
+    method: 'POST',
+    url: 'https://dev-3sdvkvha.us.auth0.com/oauth/token',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    form:
+    {
+      grant_type: 'refresh_token',
+      client_id: process.env.CLIENT_ID,
+      client_secret: process.env.CLIENT_SECRET,
+      refresh_token: refreshToken
     }
-  })
+  };
+  try {
+    request(options, function (error, response, body) {
+      if (error) {
+        console.log(error);
+        return res.status(500).json({ ErrorMessage: 'Some Auth0 error while making refresh_token request!', status: 0 });
+      }
+
+      // Check whether any logical error is occurd or not.
+      let json_body = JSON.parse(body);
+      if (json_body.error_description) { return next(json_body); }
+
+      await Token.update({ token: json_body.access_token }, { where: { refreshToken: refreshToken } })
+
+      // Send success response.
+      return res.status(200).json({
+        message: "Get access token successfully.",
+        access_token: json_body.access_token,
+        expires_in: json_body.expires_in,
+        token_type: json_body.token_type,
+        status: 1
+      });
+
+    });
+
+  }
+  catch (err) {
+    console.log(err)
+    return res.status(500).json({ ErrorMessage: 'Getting refresh token failed!', status: 0 });
+  }
 }
+
 
 exports.resetPasswordLink = (req, res, next) => {
   crypto.randomBytes(32, (err, buffer) => {
@@ -370,8 +435,8 @@ exports.postNewPassword = async (req, res, next) => {
       id: userId
     }
   }).then(user => {
-    if(!user){
-      return res.status(400).json({message : 'Reset token Invalid!'});
+    if (!user) {
+      return res.status(400).json({ message: 'Reset token Invalid!' });
     }
     resetUser = user;
     return bcrypt.hash(newPassword, 10);
@@ -386,8 +451,8 @@ exports.postNewPassword = async (req, res, next) => {
 }
 
 exports.changePassword = (req, res, body) => {
-    const currentPassword = req.body.currentPassword;
-    const newPassword = req.body.newPassword;
+  const currentPassword = req.body.currentPassword;
+  const newPassword = req.body.newPassword;
 
   User.findOne({
     where: {
