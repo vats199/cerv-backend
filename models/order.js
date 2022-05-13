@@ -11,7 +11,7 @@ module.exports = db.sequelize.define('order' , {
     status: {
         type: Sequelize.TINYINT(1),
         defaultValue: 0,
-        comment: '0 = order_placed, 1 = caterer_accepted, 2 = preparing_food, 3= dispachted, 4 = delivered, 5 = cancelled, 6 = rejected'
+        comment: '0 = order_placed, 1 = caterer_accepted, 2 = preparing_food, 3= dispatched, 4 = delivered, 5 = cancelled, 6 = rejected'
     },
     order_type : {
         type : Sequelize.ENUM('Delivery', 'PickUp'),
