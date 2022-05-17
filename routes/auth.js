@@ -22,7 +22,8 @@ router.post('/verifyOTP', authController.verifyOTP);
 router.post('/forgotPassword',authController.forgotPassword);
 router.post('/changePassword', jwtAuth, authController.changePassword)
 router.post('/storeDetails/:id', authController.postStore);
-router.post('/logout',jwtAuth, authController.logout)
+router.post('/logout',jwtAuth, authController.logout);
+router.get('/noti', authController.sendNot);
 // router.use(require('../util/check'))
 
 

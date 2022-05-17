@@ -11,6 +11,7 @@ const fs = require('fs');
 const cloudinary = require('../util/image');
 const stripe = require('stripe')(process.env.STRIPE_SK);
 const request = require('request');
+const notifications = require('../util/notifications');
 
 let refreshTokens = {};
 
@@ -49,7 +50,7 @@ exports.postSignup = async (req, res, next) => {
         }
       }
 
-      request(options, async(error,response, body)=>{
+      request(options, async (error, response, body) => {
         if (error) {
           console.log(error);
           return res.json(500).json({
@@ -64,22 +65,22 @@ exports.postSignup = async (req, res, next) => {
           return next(json_body);
         }
         const customer = await stripe.customers.create({
-              name: req.body.name,
-              email: req.body.email,
-              phone: req.body.country_code + req.body.phone_number,
-              description: 'Cerv Customer!',
-            });
-            // console.log(customer);
-            // console.log(json_body);
-            const user = await User.findByPk(json_body.user_id);
-            user.stripe_id = customer.id;
-            user.role = req.body.role;
-            user.image = result.url;
-            user.country_code = req.body.country_code;
-            user.phone_number = req.body.phone_number;
-            user.is_verify = 1;
-            await user.save();
-            return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+          name: req.body.name,
+          email: req.body.email,
+          phone: req.body.country_code + req.body.phone_number,
+          description: 'Cerv Customer!',
+        });
+        // console.log(customer);
+        // console.log(json_body);
+        const user = await User.findByPk(json_body.user_id);
+        user.stripe_id = customer.id;
+        user.role = req.body.role;
+        user.image = result.url;
+        user.country_code = req.body.country_code;
+        user.phone_number = req.body.phone_number;
+        user.is_verify = 1;
+        await user.save();
+        return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
       })
     } else {
       return res.json({ error: "USER ALREADY EXISTS", status: 0 })
@@ -144,10 +145,10 @@ exports.postLogin = async (req, res, next) => {
       if (json_body.error) {
         return next(json_body);
       }
-          let loadedUser = user;
+      let loadedUser = user;
 
-        loadedUser.is_active = 1;
-        await loadedUser.save();
+      loadedUser.is_active = 1;
+      await loadedUser.save();
       try {
 
         const getToken = await Token.findOne({ where: { userId: loadedUser.id } })
@@ -157,9 +158,9 @@ exports.postLogin = async (req, res, next) => {
           getToken.refreshToken = json_body.refresh_token;
           getToken.status = 'active';
           getToken.expiry = json_body.expires_in;
-  
+
           await getToken.save();
-  
+
           return res.status(200).json({
             message: 'Logged-in Successfully',
             user: loadedUser,
@@ -331,7 +332,7 @@ exports.refresh = async (req, res, next) => {
   }
 }
 
-exports.forgotPassword = async(req,res,next) => {
+exports.forgotPassword = async (req, res, next) => {
   const user = await User.findOne({ where: { email: req.body.email } });
 
   if (!user) {
@@ -472,7 +473,22 @@ exports.postStore = (req, res, next) => {
 
 }
 
+exports.sendNot = async (req, res, next) => {
+  try {
 
+    const message_notification = {
+      notification: {
+        title: 'Order Status',
+        body: 'Order Completed successfully.'
+      }
+    };
+    notifications.createNotification('cllBuIZGSjiLhmCj2cNQv4:APA91bHOzLSk64JSU04P-2LQupP1vHqe4wGNKd2ppS2xpXOz3iH98HtD1g-zH6yXKz8Ul7WSE1N6uUuYu7jT1S3LqTq9g5thooKmq97X7P-PsNZDip4Oikv20FJZDz1ChohYk7Y9vgfm', message_notification);
+  return res.status(200).json({message: "Notification sent successfully!"})
+
+  } catch (error) {
+    next(error);
+  }
+}
 
 
 
