@@ -299,7 +299,7 @@ exports.refresh = async (req, res, next) => {
     }
   };
   try {
-    request(options, function (error, response, body) {
+    request(options, async (error, response, body) => {
       if (error) {
         console.log(error);
         return res.status(500).json({ ErrorMessage: 'Some Auth0 error while making refresh_token request!', status: 0 });
