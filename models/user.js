@@ -68,14 +68,6 @@ module.exports = db.sequelize.define('user' , {
         type: Sequelize.BOOLEAN,
         defaultValue: 0
     },
-    resetToken:{
-        type: Sequelize.TEXT,
-        defaultValue: null
-    },
-    resetTokenExpiration: {
-        type: Sequelize.DATE,
-        defaultValue: null
-    },
     createdAt: {
         type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
     },
