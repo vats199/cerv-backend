@@ -9,7 +9,7 @@ const stripe = Stripe(process.env.STRIPE_SK);
 exports.addCard = async (req,res,next) => {
     try{
 
-        const user = await User.findByPk(req.user.id);
+        const user = await User.findByPk(req.user_id);
 
         const exp = req.body.expire.split('/');
         const exp_month = exp[0];
@@ -25,7 +25,7 @@ exports.addCard = async (req,res,next) => {
                 'name': req.body.name
             }
         })
-    const save = Card.create({ card_id: card.id, userId: req.user.id })
+    const save = Card.create({ card_id: card.id, userId: req.user_id })
     return res.status(200).json({
         message: 'Card saved successfully!',
         card: save,
@@ -41,7 +41,7 @@ exports.addCard = async (req,res,next) => {
 exports.getCard = async (req, res, next) => {
     try {
 
-        const user = await User.findByPk(req.user.id);
+        const user = await User.findByPk(req.user_id);
 
         try {
             const cards = await stripe.customers.listSources(
@@ -66,7 +66,7 @@ exports.getCard = async (req, res, next) => {
 exports.checkout_online = async (req, res, next) => {
 
     try {
-        const user = await User.findByPk(req.user.id);
+        const user = await User.findByPk(req.user_id);
         const amount = req.body.amount;
         
         // Cheack whether user exists in stripe. 
@@ -92,7 +92,7 @@ exports.checkout_online = async (req, res, next) => {
 
         return Payment.create({
             amount: parseFloat(amount),
-            userId: req.user.id,
+            userId: req.user_id,
             transaction_id: payment_intent.client_secret,
             status: 'PENDING',
         })

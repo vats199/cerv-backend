@@ -15,9 +15,8 @@ module.exports = (req, res, next) => {
 
     jwt.verify(token, cert ,(err,user)=>{
         if(!err){
-            // console.log(user);
-            req.user = user.loadedUser;
-            req.token = user.token;
+            console.log(user);
+            req.user_id = user.sub.split('|')[1];
             next();
         } else{
             return res.status(403).json({error: "User not Authenticated", status: 0})

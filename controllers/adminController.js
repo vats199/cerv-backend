@@ -17,7 +17,7 @@ const { v4: uuidv4 } = require('uuid');
 
 exports.getUsers = async (req,res,next) => {
     const key = req.params.key;
-    const adminId = req.user.id;
+    const adminId = req.user_id;
     try{
 
       const admin = await User.findByPk(adminId);
@@ -78,7 +78,7 @@ exports.getUsers = async (req,res,next) => {
 
 exports.search = async (req,res,next) => {
     const term = req.query.term;
-    const adminId = req.user.id;
+    const adminId = req.user_id;
 
     try {
       const admin = await User.findByPk(adminId);
@@ -115,7 +115,7 @@ exports.search = async (req,res,next) => {
 
 exports.approve = async (req,res,next) => {
     const storeId = req.body.storeId;
-    const adminId = req.user.id;
+    const adminId = req.user_id;
 
     try {
       const admin = await User.findByPk(adminId);
@@ -140,7 +140,7 @@ exports.approve = async (req,res,next) => {
 
 exports.reject = async (req,res,next) => {
     const storeId = req.body.storeId;
-    const adminId = req.user.id;
+    const adminId = req.user_id;
 
     try {
       const admin = await User.findByPk(adminId);
@@ -167,7 +167,7 @@ exports.reject = async (req,res,next) => {
 exports.sort = async (req,res,next) => {
     const key = req.params.key;
     const term = req.params.term;
-    const adminId = req.user.id;
+    const adminId = req.user_id;
 
     try {
       const admin = await User.findByPk(adminId);

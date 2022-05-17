@@ -19,7 +19,7 @@ const { response } = require('express');
 
 exports.getChat = async (req,res,next) => {
     const driverId = req.body.driverId;
-    const userId = req.user.id;
+    const userId = req.user_id;
 
     try {
         
@@ -51,7 +51,7 @@ exports.getChat = async (req,res,next) => {
 }
 
 exports.getChats = async (req,res,next) => {
-    const userId = req.user.id;
+    const userId = req.user_id;
 
     try {
         
@@ -75,7 +75,7 @@ exports.getChats = async (req,res,next) => {
 }
 
 exports.sendMessage = async (req,res,next) => {
-    const userId = req.user.id;
+    const userId = req.user_id;
     const content = encrypt(req.body.content);
     const chatId = req.body.chatId;
 
@@ -111,7 +111,7 @@ exports.sendMessage = async (req,res,next) => {
 }
 
 exports.allMessages = async (req,res,next) => {
-    // const userId = req.user.id;
+    // const userId = req.user_id;
     const chatId = req.params.chatId;
 
     try {

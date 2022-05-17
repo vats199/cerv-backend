@@ -16,7 +16,7 @@ const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
 
 exports.getCategories = async (req,res,next) => {
-    const catererId = req.user.id;
+    const catererId = req.user_id;
 
     try {
 
@@ -32,7 +32,7 @@ exports.getCategories = async (req,res,next) => {
 
 exports.getCategory = async(req,res,next) => {
     const categoryId = req.params.catId;
-    const catererId = req.user.id;
+    const catererId = req.user_id;
     try {
         
         const category = await Category.findByPk(categoryId);
@@ -57,15 +57,15 @@ exports.postCategory = async (req,res,next) => {
     Category.findOne({
         where: {
             title: title,
-            userId: req.user.id
+            userId: req.user_id
         }
     }).then(async cat=>{
         if(!cat){
-            const store = await Store.findOne({where: {userId: req.user.id}})
+            const store = await Store.findOne({where: {userId: req.user_id}})
             Category.create({
                 title: title,
                 image: image.url,
-                userId: req.user.id,
+                userId: req.user_id,
                 storeId: store.id
             })
                       .then(category => {
@@ -117,7 +117,7 @@ exports.editCategory = async (req,res,next) => {
 }
 
 exports.deleteCategory = async (req,res,next) => {
-    // const catererId = req.user.id;
+    // const catererId = req.user_id;
     const categoryId = req.params.catId;
   
     try {
@@ -142,13 +142,13 @@ exports.postItems = async(req,res,next)=>{
             height: 500,
             crop: 'fill',
           })
-        const store = await Store.findOne({where: {userId: req.user.id}})
+        const store = await Store.findOne({where: {userId: req.user_id}})
         const categoryId = req.body.categoryId;
         const price = req.body.price;
         Category.findOne({
             where: {
                 id: categoryId,
-                userId: req.user.id
+                userId: req.user_id
             }
         }).then(cat=>{
             if(!cat){
@@ -161,7 +161,7 @@ exports.postItems = async(req,res,next)=>{
                     description: desc,
                     categoryName: cat.title,
                     price: price,
-                    userId: req.user.id,
+                    userId: req.user_id,
                     categoryId: cat.id,
                     storeId: store.id
                 }).then(item => {
@@ -187,7 +187,7 @@ exports.editItem = (req,res,next)=>{
 
     Item.findOne({where: {id: itemId}})
         .then(item=>{
-            if(item.userId === req.user.id){
+            if(item.userId === req.user_id){
                 clearImage(item.image);
                 item.title = title ;
                 item.image = image;
@@ -201,7 +201,7 @@ exports.editItem = (req,res,next)=>{
 }
 
 exports.deleteItem = async (req,res,next) => {
-    // const catererId = req.user.id;
+    // const catererId = req.user_id;
     const itemId = req.params.itemId;
   
     try {
@@ -217,7 +217,7 @@ exports.deleteItem = async (req,res,next) => {
   }
 
 exports.postBanner = async (req,res,next)=>{
-    const userId = req.user.id;
+    const userId = req.user_id;
     const image = await cloudinary.uploader.upload(req.file.path, {
         public_id: uuidv4() + ' _profile',
         width: 500,
@@ -237,7 +237,7 @@ exports.postBanner = async (req,res,next)=>{
 }
 
 exports.postCoupon = async (req,res,next) => {
-    const catererId = req.user.id;
+    const catererId = req.user_id;
     const data = req.body;
 
     const payLoad = {
@@ -262,7 +262,7 @@ exports.postCoupon = async (req,res,next) => {
 }
 
 exports.getOrders = async (req,res,next) => {
-    const catererId = req.user.id;
+    const catererId = req.user_id;
     const key = req.params.key;
     try {
       
@@ -311,7 +311,7 @@ exports.getOrders = async (req,res,next) => {
   }
 
 exports.acceptOrder = async (req,res,next) => {
-    const catererId = req.user.id;
+    const catererId = req.user_id;
     const orderId = req.params.orderId;
   
   try{
@@ -332,7 +332,7 @@ exports.acceptOrder = async (req,res,next) => {
   }
 
 exports.rejectOrder = async (req,res,next) => {
-    const catererId = req.user.id;
+    const catererId = req.user_id;
     const orderId = req.params.orderId;
   
   try{

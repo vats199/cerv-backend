@@ -69,6 +69,8 @@ exports.postSignup = async (req, res, next) => {
               phone: req.body.country_code + req.body.phone_number,
               description: 'Cerv Customer!',
             });
+            // console.log(customer);
+            // console.log(json_body);
             const user = await User.findByPk(json_body.user_id);
             user.stripe_id = customer.id;
             user.role = req.body.role;
@@ -199,7 +201,7 @@ exports.postLogin = async (req, res, next) => {
 
 
 exports.logout = async (req, res, next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
 
   try {
     const user = await User.findByPk(userId);
@@ -456,7 +458,7 @@ exports.changePassword = (req, res, body) => {
 
   User.findOne({
     where: {
-      id: req.user.id
+      id: req.user_id
     }
   })
     .then(user => {

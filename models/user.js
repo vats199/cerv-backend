@@ -33,10 +33,7 @@ module.exports = db.sequelize.define('user' , {
     },
     role: { 
         type: Sequelize.TINYINT(1),
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        },
+        allowNull: true,
         comment: '0 = Caterer, 1 = Customer, 2 = DeliveryBoy, 3 = admin',
     },
     email: {

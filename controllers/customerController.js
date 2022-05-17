@@ -149,7 +149,7 @@ exports.getBanner = async (req,res,next) => {
 
 exports.getProfile = async (req,res,next)=>{
   try{
-    const user = await User.findOne({where: {id: req.user.id}});
+    const user = await User.findOne({where: {id: req.user_id}});
     if(!user){
         const error = new Error("Couldn't Find the Profile!");
         error.statusCode = 404;
@@ -176,7 +176,7 @@ exports.getProfile = async (req,res,next)=>{
 }
 
 exports.getDP = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
 
   try{
 
@@ -219,7 +219,7 @@ exports.editInfo = async (req,res,next)=>{
 
 
   try{
-    const user = await User.findOne({where: {id: req.user.id}});
+    const user = await User.findOne({where: {id: req.user_id}});
     if(!user){
         const error = new Error("Couldn't Find the Profile!");
         error.statusCode = 404;
@@ -252,7 +252,7 @@ exports.postAddress = async (req,res,next)=>{
     address_type: req.body.address_type || 0,
     // latitude: req.body.latitude,
     // longitude: req.body.longitude,
-    userId: req.user.id
+    userId: req.user_id
 }
   try{
 
@@ -268,7 +268,7 @@ exports.postAddress = async (req,res,next)=>{
 }
 
 exports.getAddress = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
 
   try {
 
@@ -283,7 +283,7 @@ exports.getAddress = async (req,res,next) => {
 }
 
 exports.editAddress = async (req,res,next)=>{
-  const userId = req.user.id;
+  const userId = req.user_id;
   const addressId = req.body.addressId;
 
   try{
@@ -316,7 +316,7 @@ exports.editAddress = async (req,res,next)=>{
 
 exports.activateAddress = async (req,res,next) => {
   const addressId = req.body.addressId;
-  const userId = req.user.id;
+  const userId = req.user_id;
 
   try {
 
@@ -344,7 +344,7 @@ exports.activateAddress = async (req,res,next) => {
 }
 
 exports.deleteAddress = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const addressId = req.body.addressId;
 
   try {
@@ -360,7 +360,7 @@ exports.deleteAddress = async (req,res,next) => {
 }
 
 exports.postReview = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const catererId = req.body.catererId;
   const orderId = req.body.orderId;
   try{
@@ -504,7 +504,7 @@ exports.getDeliveryFee = (req,res,next) => {
 
 exports.postOrder = async (req,res,next) => {
   const dateTime = req.body.dateTime;
-  const userId = req.user.id,
+  const userId = req.user_id,
         catererId = req.body.catererId,
         items = req.body.items,
         order_type = req.body.orderType,
@@ -551,7 +551,7 @@ exports.postOrder = async (req,res,next) => {
 }
 
 exports.getOrders = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const key = req.params.key;
   try {
     
@@ -602,7 +602,7 @@ exports.getOrders = async (req,res,next) => {
 }
 
 exports.cancelOrder = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const orderId = req.body.orderId;
 
 try{
@@ -626,7 +626,7 @@ try{
 }
 
 exports.postFav = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const catererId = req.body.catererId;
 
   try{
@@ -639,7 +639,7 @@ exports.postFav = async (req,res,next) => {
 }
 
 exports.getFav = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
 
   try{
 
@@ -661,7 +661,7 @@ exports.getFav = async (req,res,next) => {
 }
 
 exports.deleteFav = async (req,res,next) => {
-  const userId = req.user.id;
+  const userId = req.user_id;
   const catererId = req.body.id;
   try{
 
