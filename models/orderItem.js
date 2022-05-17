@@ -13,9 +13,12 @@ module.exports = db.sequelize.define('orderItem' , {
       },
       itemTotal: {
           type: Sequelize.FLOAT
+      },
+      createdAt: {
+          type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+      },
+      updatedAt: {
+          type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
       }
-    },
-    {
-      timestamps: true,
     }
 )

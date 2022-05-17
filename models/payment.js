@@ -17,9 +17,12 @@ module.exports = db.sequelize.define('payment' , {
     status: {
         type: Sequelize.ENUM('PENDING', 'SUCCESS', 'FAILED'),
         defaultValue: 'PENDING',
-    }
     },
-    {
-      timestamps: true,
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    }
     }
 )

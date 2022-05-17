@@ -29,9 +29,12 @@ module.exports = db.sequelize.define('coupons' , {
     },
     value: {
         type: Sequelize.FLOAT
-    }
     },
-    {
-      timestamps: true,
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    }
     }
 )

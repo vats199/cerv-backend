@@ -7,9 +7,12 @@ module.exports = db.sequelize.define('favourite' , {
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
-    }
     },
-    {
-      timestamps: true,
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    }
     }
 )

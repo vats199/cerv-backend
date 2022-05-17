@@ -40,8 +40,11 @@ module.exports = db.sequelize.define('store' , {
             notEmpty: true
         },
         comment: '0 = Delivery, 1 = Pickup, 2 = Both Delivery and Pickup',
+    },
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
     }
-},
-{
-    timestamps: true
 })

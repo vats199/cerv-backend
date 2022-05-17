@@ -37,9 +37,12 @@ module.exports = db.sequelize.define('order' , {
     is_reviewed: {
         type: Sequelize.BOOLEAN,
         defaultValue: 0
-    }
     },
-    {
-      timestamps: true,
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    }
     }
 )

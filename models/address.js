@@ -16,6 +16,12 @@ module.exports = db.sequelize.define('address' , {
     is_active: {
         type: Sequelize.BOOLEAN,
         defaultValue: 0
+    },
+    createdAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
+    },
+    updatedAt: {
+        type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
     }
   // latitude : {
   //       type : Sequelize.STRING
@@ -23,8 +29,5 @@ module.exports = db.sequelize.define('address' , {
   // longitude : {
   //       type : Sequelize.STRING
   //   }
-    },
-    {
-      timestamps: true,
     }
 )
