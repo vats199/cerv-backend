@@ -164,7 +164,7 @@ exports.postLogin = async (req, res, next) => {
             message: 'Logged-in Successfully',
             user: loadedUser,
             token: json_body.access_token,
-            refreshToken: json_body.refresh,
+            refreshToken: json_body.refresh_token,
             status: 1
           })
         } else {
