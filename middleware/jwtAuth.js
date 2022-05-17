@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
 
     jwt.verify(token, cert ,(err,user)=>{
         if(!err){
-            console.log(user);
+            // console.log(user);
             req.user_id = user.sub.split('|')[1];
             next();
         } else{
