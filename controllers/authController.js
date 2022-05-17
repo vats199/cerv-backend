@@ -331,125 +331,54 @@ exports.refresh = async (req, res, next) => {
   }
 }
 
+exports.forgotPassword = async(req,res,next) => {
+  const user = await User.findOne({ where: { email: req.body.email } });
 
-exports.resetPasswordLink = (req, res, next) => {
-  crypto.randomBytes(32, (err, buffer) => {
-    if (err) {
-      return res.status(200).json({
-        error: err, status: 0
-      });
-    }
-    const token = buffer.toString('hex');
-    User.findOne({
-      where: {
-        email: req.body.email
-      }
-    }).then(user => {
-      if (!user) {
-        return res.send({ error: "No account found for this email!", status: 0 })
-      }
-      user.resetToken = token;
-      user.resetTokenExpiration = Date.now() + 3600000;
-      return user.save();
-    })
-      .then(result => {
-        // transporter.sendMail({
-        //   to: req.body.email,
-        //   from: 'vatsalp.tcs@gmail.com',
-        //         subject: 'Password Reset Form!',
-        //         html: `
-        //             <p>You requested to reset your password for our website</p>
-        //             <p>Click on this <a href="http://localhost:3000/reset/${token}">link</a> to reset a new password
-        //         `
-        // })
-
-        const request = mailjet
-          .post("send", { 'version': 'v3.1' })
-          .request({
-            "Messages": [
-              {
-                "From": {
-                  "Email": "vatsalp.tcs@gmail.com",
-                  "Name": "Vatsal"
-                },
-                "To": [
-                  {
-                    "Email": req.body.email
-                  }
-                ],
-                "Subject": "Greetings from CERV.",
-                "HTMLPart": `
-                                                <p>You requested to reset your password for our website</p>
-                                                <p>Click on this <a href="https://cerv-api.herokuapp.com/users/resetPassword/${token}">link</a> to reset a new password
-                                              `,
-                "CustomID": "AppGettingStartedTest"
-              }
-            ]
-          })
-        request.then(result => {
-          return res.status(200).json({
-            message: 'Password reset link send to your email', status: 1
-          })
-        }).catch(err => console.log(err))
-
-      }).catch(err => console.log(err))
-  })
-}
-
-exports.getNewPassword = async (req, res, next) => {
-  const token = req.params.token;
-  User.findOne({
-    where: {
-      resetToken: token,
-      resetTokenExpiration: { [Op.gt]: Date.now() }
-    }
-  })
-    .then(user => {
-      res.render('auth/new-password', {
-        path: '/new-password',
-        pageTitle: 'New Password',
-        userId: user.id,
-        passwordToken: token
-      });
-    })
-    .catch(err => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+  if (!user) {
+    return res.status(404).json({
+      ErrorMessage: "Email does not exist!",
+      status: 0
     });
-}
-
-exports.postNewPassword = async (req, res, next) => {
-  const newPassword = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
-  const userId = req.body.userId;
-  const token = req.body.passwordToken;
-  let resetUser;
-
-  if (newPassword !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords does not match!" })
   }
 
-  User.findOne({
-    where: {
-      resetToken: token,
-      resetTokenExpiration: { [Op.gt]: Date.now() },
-      id: userId
+  var options = {
+    method: 'POST',
+    url: 'https://dev-3sdvkvha.us.auth0.com/dbconnections/change_password',
+    headers: { 'content-type': 'application/json' },
+    form:
+    {
+      client_id: process.env.CLIENT_ID,
+      username: req.body.email,
+      connection: process.env.CONNECTION
     }
-  }).then(user => {
-    if (!user) {
-      return res.status(400).json({ message: 'Reset token Invalid!' });
-    }
-    resetUser = user;
-    return bcrypt.hash(newPassword, 10);
-  }).then(hashedPassword => {
-    resetUser.password = hashedPassword;
-    resetUser.resetToken = null;
-    resetUser.resetTokenExpiration = null;
-    return resetUser.save();
-  }).then(result => {
-    return res.json({ message: "Password Changed Successfully!!", status: 1 })
-  }).catch(err => console.log(err))
+  }
+
+  try {
+
+    // Make forgot_password request to third party Auth0 api.
+    request(options, function (error, response, body) {
+      if (error) {
+        console.log(error);
+        return res.json(500).json({
+          ErrorMessage: 'Some Auth0 error while making forgot_password request!',
+          status: 0
+        })
+      }
+
+      // Send success reponse.
+      return res.status(200).json({
+        message: "Reset password link send to your email successfully",
+        status: 1
+      });
+
+    });
+
+  }
+  catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+
 }
 
 exports.changePassword = (req, res, body) => {
