@@ -158,6 +158,7 @@ exports.postLogin = async (req, res, next) => {
           getToken.refreshToken = json_body.refresh_token;
           getToken.status = 'active';
           getToken.expiry = json_body.expires_in;
+          getToken.device_token = req.body.device_token;
 
           await getToken.save();
 
@@ -172,6 +173,7 @@ exports.postLogin = async (req, res, next) => {
           const data = {
             userId: loadedUser.id,
             token: json_body.access_token,
+            device_token: req.body.device_token,
             refreshToken: json_body.refresh_token,
             status: 'active',
             login_count: 1,

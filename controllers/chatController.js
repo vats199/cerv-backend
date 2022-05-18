@@ -112,7 +112,7 @@ exports.sendMessage = async (req,res,next) => {
         
     } catch (err) {
         console.log(err);
-    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+        return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
     }
 }
 

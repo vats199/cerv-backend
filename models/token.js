@@ -11,6 +11,9 @@ module.exports = db.sequelize.define('token' , {
       token: {
         type: Sequelize.TEXT
       },
+      device_token: {
+        type: Sequelize.TEXT
+      },
       refreshToken: {
         type: Sequelize.TEXT
       },
