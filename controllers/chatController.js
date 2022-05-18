@@ -25,6 +25,7 @@ exports.getChat = async (req,res,next) => {
         
         const driver = await Driver.findByPk(driverId)
         const chat = await Chat.findOne({where: { driverId: driverId, userId: userId }});
+        const user = await User.findByPk(userId)
 
         if(chat){
             if(chat.lastMessage){
@@ -33,7 +34,7 @@ exports.getChat = async (req,res,next) => {
             return res.status(200).json({message: "Chat fetched Successfully!", chat: chat, status: 1})
         } else {
             let chatData = {
-                chat_name : req.user.name + "'s Chat with " + driver.name,
+                chat_name : user.name + "'s Chat with " + driver.name,
                 userId : userId,
                 driverId: driverId
             }
