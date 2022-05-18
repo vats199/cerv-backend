@@ -8,7 +8,11 @@ const Feedback = require('../models/feedback');
 const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const Favourites = require('../models/favourites');
+const Token = require('../models/token')
 const Coupon = require('../models/coupon');
+const Notification = require('../models/notifications');
+const notifications = require('../util/notifications');
+
 const fs = require('fs')
 const path = require('path')
 
@@ -323,7 +327,37 @@ exports.acceptOrder = async (req,res,next) => {
     }
     order.status = 1;
     const result = await order.save();
-    return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
+
+    const message_notification = {
+      notification: {
+        title: 'Order Accepted',
+        body: 'Your order is accepted.'
+      }
+    };
+
+    try {
+
+      const store = await Store.findOne({ where: { userId: catererId } });
+      const token = await Token.findOne({ where: { userId: order.userId } });
+
+      notifications.createNotification(token.device_token, message_notification);
+
+      const data = {
+        title: 'Order Accepted',
+        body: `Your order has been accepted by ${store.name}`,
+        type: 1
+      }
+      await Notification.create(data);
+      
+    } catch (error) {
+      console.log(error);
+      return res.status(404).json({
+        ErrorMessage: 'Device token not found or valid!',
+        status: 0
+    });
+    }
+
+    return res.status(200).json({message: "Order Accepted!", result: result, status: 1})
   
   } catch(err){
     console.log(err);
@@ -344,6 +378,36 @@ exports.rejectOrder = async (req,res,next) => {
     }
     order.status = 6;
     const result = await order.save();
+
+    const message_notification = {
+      notification: {
+        title: 'Order Rejected',
+        body: 'Your order is rejected.'
+      }
+    };
+
+    try {
+
+      const store = await Store.findOne({ where: { userId: catererId } });
+      const token = await Token.findOne({ where: { userId: order.userId } });
+
+      notifications.createNotification(token.device_token, message_notification);
+
+      const data = {
+        title: 'Order Rejected',
+        body: `Your order has been rejected by ${store.name}`,
+        type: 4
+      }
+      await Notification.create(data);
+      
+    } catch (error) {
+      console.log(error);
+      return res.status(404).json({
+        ErrorMessage: 'Device token not found or valid!',
+        status: 0
+    });
+    }
+
     return res.status(200).json({message: "Order Status Updated!", result: result, status: 1})
   
   } catch(err){

@@ -16,7 +16,7 @@ module.exports = db.sequelize.define('notifications' , {
         type: Sequelize.TEXT,
         defaultValue: null,
     },
-    status: {
+    type: {
         type: Sequelize.TINYINT(1),
         defaultValue: 0,
         comment: '0 = order_placed, 1 = caterer_accepted, 2 = preparing_food, 3= dispatched, 4 = rejected, 5 = cancelled, 6 = delivered, 7 = paymentSuccess, 8 = paymentFailed'
