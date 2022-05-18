@@ -76,19 +76,20 @@ exports.getChats = async (req,res,next) => {
 }
 
 exports.sendMessage = async (req,res,next) => {
-    const userId = req.user_id;
+    const senderId = req.user_id;
     const content = encrypt(req.body.content);
     const chatId = req.body.chatId;
+    const role = req.body.role
 
     let newMessage = {
-        senderId: userId,
+        senderId: senderId,
         content: content,
         chatId: chatId
     }
 
     try {
 
-        const driver = await Driver.findByPk(userId);
+        const driver = await Driver.findOne({where: { id: senderId, role: role }});
 
         if(driver){
             newMessage.is_driver = 1
