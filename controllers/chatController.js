@@ -88,7 +88,9 @@ exports.sendMessage = async (req,res,next) => {
 
     try {
 
-        if(req.user.role == 2){
+        const driver = await Driver.findByPk(userId);
+
+        if(driver){
             newMessage.is_driver = 1
         }
 
