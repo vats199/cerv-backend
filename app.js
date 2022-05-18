@@ -21,6 +21,7 @@ const Favourites = require('./models/favourites');
 const Coupon = require('./models/coupon');
 const Chat = require('./models/chat');
 const Message = require('./models/message');
+const Notification = require('./models/notifications');
 
 const app = express();
 
@@ -138,6 +139,7 @@ Message.belongsTo(User, { foreignKey: "senderId", targetKey: "id" });
 User.hasMany(Message, { foreignKey: "senderId", targetKey: "id" });
 Message.belongsTo(Chat, { foreignKey: "chatId", targetKey: "id" });
 Chat.hasMany(Message, { foreignKey: "chatId", targetKey: "id" });
+Notification.belongsTo(User);
 // Message.hasOne(Chat, { foreignKey: "latestMessageId", targetKey: "id" });
 
 db.sequelize

@@ -62,6 +62,8 @@ exports.getChats = async (req,res,next) => {
             if(chats[i].dataValues.lastMessage){
                 chats[i].dataValues.lastMessage = decrypt(chats[i].dataValues.lastMessage);
             }
+            const unseen = await Message.count({ where: { is_seen: 0 , chatId: chats[i].dataValues.id, is_driver: 1} });
+            chats[i].dataValues.unseen = unseen;
         }
         // console.log(chats);
             return res.status(200).json({message: "Chats fetched Successfully!" ,
@@ -131,6 +133,11 @@ exports.allMessages = async (req,res,next) => {
                 const sender = await User.findByPk(messages[i].senderId, { attributes: ['id','name','image'] });
                 messages[i].dataValues.sender = sender
             }
+        }
+        const seen = await Message.findAll({ where: { chatId: chatId, is_driver: 1, is_seen: 0 } })
+        for(let i=0 ; i < seen.length; i++){
+            seen[i].is_seen = 1;
+            await seen[i].save()
         }
 
         return res.status(200).json({message: "Messages fetched!", 

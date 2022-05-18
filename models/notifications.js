@@ -1,19 +1,25 @@
 const Sequelize = require('sequelize');
 const db = require('../util/database');
 
-module.exports = db.sequelize.define('message' , {
+module.exports = db.sequelize.define('notifications' , {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
     },
-    content: {
-        type: Sequelize.TEXT,
+    title: {
+        type: Sequelize.STRING(100),
+        defaultValue: null,
     },
-    is_driver: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: 0
+    body: {
+        type: Sequelize.TEXT,
+        defaultValue: null,
+    },
+    status: {
+        type: Sequelize.TINYINT(1),
+        defaultValue: 0,
+        comment: '0 = order_placed, 1 = caterer_accepted, 2 = preparing_food, 3= dispatched, 4 = rejected, 5 = cancelled, 6 = delivered, 7 = paymentSuccess, 8 = paymentFailed'
     },
     is_seen: {
         type: Sequelize.BOOLEAN,
