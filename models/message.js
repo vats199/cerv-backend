@@ -11,10 +11,6 @@ module.exports = db.sequelize.define('message' , {
     content: {
         type: Sequelize.TEXT,
     },
-    is_driver: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: 0
-    },
     is_seen: {
         type: Sequelize.BOOLEAN,
         defaultValue: 0,

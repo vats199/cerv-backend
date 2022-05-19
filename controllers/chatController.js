@@ -18,14 +18,14 @@ const path = require('path');
 const { response } = require('express');
 
 exports.getChat = async (req,res,next) => {
-    const driverId = req.body.driverId;
+    const catererId = req.body.catererId;
     const userId = req.user_id;
 
     try {
         
-        const driver = await Driver.findByPk(driverId)
-        const chat = await Chat.findOne({where: { driverId: driverId, userId: userId }});
-        const user = await User.findByPk(userId)
+        const chat = await Chat.findOne({where: { catererId: catererId, userId: userId }});
+        const user = await User.findByPk(userId);
+        const caterer = await User.findByPk(catererId)
 
         if(chat){
             if(chat.lastMessage){
@@ -34,9 +34,9 @@ exports.getChat = async (req,res,next) => {
             return res.status(200).json({message: "Chat fetched Successfully!", chat: chat, status: 1})
         } else {
             let chatData = {
-                chat_name : user.name + "'s Chat with " + driver.name,
+                chat_name : user.name + "'s Chat with " + caterer.name,
                 userId : userId,
-                driverId: driverId
+                catererId: catererId
             }
             const newChat = await Chat.create(chatData);
             const fullChat = await Chat.findOne({id: newChat.id});
@@ -56,20 +56,47 @@ exports.getChats = async (req,res,next) => {
 
     try {
         
-        const chats = await Chat.findAll({ include: [{ model: User , attributes: ['name', 'image'] }, { model: Driver , attributes: ['name', 'image'] }], where: { userId: userId }});
+        const user = await User.findByPk(userId)
+
+        if(user.role == 1){
+
+            const chats = await Chat.findAll({ include: [{ model: User , attributes: ['name', 'image'] }], where: { userId: userId }});
 
         for(let i=0; i<chats.length; i++){
             if(chats[i].dataValues.lastMessage){
                 chats[i].dataValues.lastMessage = decrypt(chats[i].dataValues.lastMessage);
             }
-            const unseen = await Message.count({ where: { is_seen: 0 , chatId: chats[i].dataValues.id, is_driver: 1} });
-            chats[i].dataValues.unseen = unseen;
+            const sent = await Message.count({ where: { is_seen: 0 , chatId: chats[i].dataValues.id, senderId: userId} });
+            const recieved = await Message.count({ where: {  is_seen: 0 , chatId: chats[i].dataValues.id} });
+
+
+            chats[i].dataValues.unseen = recieved - sent;
         }
-        // console.log(chats);
             return res.status(200).json({message: "Chats fetched Successfully!" ,
                                          length: chats.length ,
                                          chats: chats.sort((a,b) => (a.updatedAt < b.updatedAt) ? 1 : ((b.updatedAt < a.updatedAt) ? -1 : 0)), 
                                          status: 1})
+
+        } else if(user.role == 0){
+            const chats = await Chat.findAll({ include: [{ model: User , attributes: ['name', 'image']}], where: { catererId: userId }});
+
+        for(let i=0; i<chats.length; i++){
+            if(chats[i].dataValues.lastMessage){
+                chats[i].dataValues.lastMessage = decrypt(chats[i].dataValues.lastMessage);
+            }
+            const sent = await Message.count({ where: { is_seen: 0 , chatId: chats[i].dataValues.id, senderId: userId} });
+            const recieved = await Message.count({ where: {  is_seen: 0 , chatId: chats[i].dataValues.id} });
+
+
+            chats[i].dataValues.unseen = recieved - sent;
+        }
+            return res.status(200).json({message: "Chats fetched Successfully!" ,
+                                         length: chats.length ,
+                                         chats: chats.sort((a,b) => (a.updatedAt < b.updatedAt) ? 1 : ((b.updatedAt < a.updatedAt) ? -1 : 0)), 
+                                         status: 1})
+        }
+
+        
         
     } catch (err) {
         console.log(err);
@@ -81,7 +108,6 @@ exports.sendMessage = async (req,res,next) => {
     const senderId = req.user_id;
     const content = encrypt(req.body.content);
     const chatId = req.body.chatId;
-    const role = req.body.role
 
     let newMessage = {
         senderId: senderId,
@@ -90,12 +116,6 @@ exports.sendMessage = async (req,res,next) => {
     }
 
     try {
-
-        const driver = await Driver.findOne({where: { id: senderId, role: role }});
-
-        if(driver){
-            newMessage.is_driver = 1
-        }
 
         const message = await Message.create(newMessage);
 
@@ -117,28 +137,40 @@ exports.sendMessage = async (req,res,next) => {
 }
 
 exports.allMessages = async (req,res,next) => {
-    // const userId = req.user_id;
+    const userId = req.user_id;
     const chatId = req.params.chatId;
 
     try {
+
+        const chat = await Chat.findByPk(chatId);
+        const user = await User.findByPk(userId);
+
+
 
         const messages = await Message.findAll({ where: { chatId: chatId } });
 
         for(let i=0; i < messages.length; i++){
             messages[i].content = decrypt(messages[i].content);
-            if(messages[i].is_driver == true){
-                const sender = await Driver.findByPk(messages[i].senderId, { attributes: ['id','name','image'] });
+
+                const sender = await User.findByPk(messages[i].senderId, { attributes: ['id','name','image','role'] });
                 messages[i].dataValues.sender = sender
-            }else{
-                const sender = await User.findByPk(messages[i].senderId, { attributes: ['id','name','image'] });
-                messages[i].dataValues.sender = sender
+            
+        }
+        if(user.role == 0){
+            const seen = await Message.findAll({ where: { chatId: chatId, is_seen: 0, senderId: chat.userId } })
+            for(let i=0 ; i < seen.length; i++){
+                seen[i].is_seen = 1;
+                await seen[i].save()
+            }
+
+        } else if(user.role == 1){
+            const seen = await Message.findAll({ where: { chatId: chatId, is_seen: 0, senderId: chat.catererId } })
+            for(let i=0 ; i < seen.length; i++){
+                seen[i].is_seen = 1;
+                await seen[i].save()
             }
         }
-        const seen = await Message.findAll({ where: { chatId: chatId, is_driver: 1, is_seen: 0 } })
-        for(let i=0 ; i < seen.length; i++){
-            seen[i].is_seen = 1;
-            await seen[i].save()
-        }
+        
 
         return res.status(200).json({message: "Messages fetched!", 
                                      data: messages.sort((a,b) => (a.createdAt > b.createdAt) ? 1 : ((b.createdAt > a.createdAt) ? -1 : 0)), 
