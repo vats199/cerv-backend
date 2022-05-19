@@ -60,7 +60,7 @@ exports.getChats = async (req,res,next) => {
 
         if(user.role == 1){
 
-            const chats = await Chat.findAll({ include: [{ model: User , attributes: ['name', 'image'] }], where: { userId: userId }});
+            const chats = await Chat.findAll({ include: [{ model: User, as: 'caterer', foreignKey: 'catererId' , attributes: ['name', 'image'] }], where: { userId: userId }});
 
         for(let i=0; i<chats.length; i++){
             if(chats[i].dataValues.lastMessage){
@@ -78,7 +78,7 @@ exports.getChats = async (req,res,next) => {
                                          status: 1})
 
         } else if(user.role == 0){
-            const chats = await Chat.findAll({ include: [{ model: User , attributes: ['name', 'image']}], where: { catererId: userId }});
+            const chats = await Chat.findAll({ include: [{ model: User , as: 'user', foreignKey: 'userId', attributes: ['name', 'image']}], where: { catererId: userId }});
 
         for(let i=0; i<chats.length; i++){
             if(chats[i].dataValues.lastMessage){

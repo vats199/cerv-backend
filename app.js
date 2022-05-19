@@ -133,8 +133,8 @@ Order.belongsTo(Address);
 Address.hasMany(Order);
 Chat.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 User.hasMany(Chat, { foreignKey: "userId", targetKey: "id" });
-Chat.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
-User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id" });
+Chat.belongsTo(User, { foreignKey: "catererId", targetKey: "id", as: 'caterer'  });
+User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id", as: 'caterer'  });
 Message.belongsTo(User, { foreignKey: "senderId", targetKey: "id" });
 User.hasMany(Message, { foreignKey: "senderId", targetKey: "id" });
 Message.belongsTo(Chat, { foreignKey: "chatId", targetKey: "id" });
@@ -164,10 +164,12 @@ db.sequelize
       
       socket.on('setup', (userData)=>{
         socket.join(userData.id);
+        // console.log(userData);
         socket.emit("connected");
       })
 
       socket.on('join chat', (room)=>{
+        // console.log();
         socket.join(room) 
       })
 
@@ -177,16 +179,12 @@ db.sequelize
       socket.on('new message', (newMessageRecieved)=>{
         let chat = newMessageRecieved.chat;
         
-        if(!chat.userId || !chat.driverId) return console.log('Users are not there!');
+        if(!chat.userId || !chat.catererId) return console.log('Users are not there!');
 
-        if(newMessageRecieved.is_driver == 1){
-          if(chat.driverId == newMessageRecieved.senderId){
+        if(newMessageRecieved.senderId == chat.catererId){
             socket.in(chat.userId).emit("message recieved", newMessageRecieved);
-          }
-        }else {
-          if(chat.userId == newMessageRecieved.senderId){
-            socket.in(chat.driverId).emit("message recieved", newMessageRecieved);
-          }
+        }else if(newMessageRecieved.senderId == chat.userId){
+            socket.in(chat.catererId).emit("message recieved", newMessageRecieved);
         }
 
       })
