@@ -676,7 +676,7 @@ exports.cancelOrder = async (req, res, next) => {
 
     if (order) {
 
-      order.status = 4;
+      order.status = 5;
       const result = await order.save();
 
       const message_notification = {
