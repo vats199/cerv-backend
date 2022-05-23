@@ -8,10 +8,10 @@ const stripeController = require('../controllers/stripe');
 
 router.use(cors());
 
-router.get('/caterers', customerController.getCaterers);
-router.get('/caterers/:filter', customerController.filterCaterers);
-router.get('/catererInfo/:catId', customerController.getCaterer);
-router.get('/get-banners', customerController.getBanner)
+router.get('/caterers', jwtAuth, customerController.getCaterers);
+router.get('/caterers/:filter', jwtAuth, customerController.filterCaterers);
+router.get('/catererInfo', jwtAuth, customerController.getCaterer);
+router.get('/get-banners', jwtAuth, customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
 router.get('/picture', jwtAuth, customerController.getDP);
 router.put('/edit-profile',jwtAuth, customerController.editInfo);

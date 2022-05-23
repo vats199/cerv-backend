@@ -130,7 +130,7 @@ exports.filterCaterers = async (req, res, next) => {
 
 exports.getCaterer = async (req, res, next) => {
   // console.log(req.body);
-  const catId = req.params.catId;
+  const catId = req.body.catererId;
   try {
     const caterer = await Store.findOne({ include: User, where: { userId: catId } })
     const category = await Category.findAll({ include: Item, where: { userId: catId } })

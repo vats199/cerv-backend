@@ -100,7 +100,7 @@ exports.postSignup = async (req, res, next) => {
         await user.save();
 
         const resp = await User.findByPk(user.id, { attributes:  { exclude: ['password'] } });
-        return res.status(200).json({ message: 'Registeration Successfull!', userData: resp, status: 1 })
+        return res.status(200).json({ message: 'Registeration Successfull!', user: resp, status: 1 })
       })
     } else {
       return res.json({ error: "USER ALREADY EXISTS", status: 0 })
@@ -128,7 +128,7 @@ exports.postLogin = async (req, res, next) => {
       const store = await Store.findOne({ where: { userId: user.id } });
 
       if(!store){
-        return res.status(400).json({message: "Register your store and get verified by admin!", status: 0})
+        return res.status(400).json({message: "Register your store and get verified by admin!", userId: user.id, userName: user.name, status: 0})
       }
 
       if (store.is_approved == 0) {
@@ -462,7 +462,7 @@ exports.changePassword = (req, res, body) => {
 
 exports.postStore = (req, res, next) => {
 
-  const userId = req.params.id;
+  const userId = req.body.userId;
 
   User.findOne({
     where: {
