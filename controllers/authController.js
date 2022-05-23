@@ -25,16 +25,34 @@ exports.postSignup = async (req, res, next) => {
   if (req.body === {}) {
     return console.log("Your Body is empty!")
   }
+
+  const image = req.file?.path;
+  let url
+
   try {
     // console.log(req.file.path)
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      public_id: uuidv4() + ' _profile',
-      width: 500,
-      height: 500,
-      crop: 'fill',
-    })
+
+    if (image) {
+
+      const result = await cloudinary.uploader.upload(image, {
+        public_id: uuidv4() + ' _profile',
+        width: 500,
+        height: 500,
+        crop: 'fill',
+      })
+
+      url = result.url;
+    } else {
+      url = null
+    }
 
     const test = await User.findOne({ where: { email: req.body.email } })
+
+    const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+
+    if(test1){
+      return res.json({ error: "USER ALREADY EXISTS WITH ENTERED PHONE NUMBER", status: 0 })
+    }
 
     if (!test) {
       const options = {
@@ -75,12 +93,14 @@ exports.postSignup = async (req, res, next) => {
         const user = await User.findByPk(json_body.user_id);
         user.stripe_id = customer.id;
         user.role = req.body.role;
-        user.image = result.url;
+        user.image = url;
         user.country_code = req.body.country_code;
         user.phone_number = req.body.phone_number;
         user.is_verify = 1;
         await user.save();
-        return res.status(200).json({ message: 'Registeration Successfull!', userData: user, status: 1 })
+
+        const resp = await User.findByPk(user.id, { attributes:  { exclude: ['password'] } });
+        return res.status(200).json({ message: 'Registeration Successfull!', userData: resp, status: 1 })
       })
     } else {
       return res.json({ error: "USER ALREADY EXISTS", status: 0 })
@@ -105,7 +125,11 @@ exports.postLogin = async (req, res, next) => {
       return res.status(400).json({ error: 'User does not exist with the role or email selected!', status: 0 })
     }
     if (user.role == 0) {
-      const store = await Store.findOne({ where: { userId: user.id } })
+      const store = await Store.findOne({ where: { userId: user.id } });
+
+      if(!store){
+        return res.status(400).json({message: "Register your store and get verified by admin!", status: 0})
+      }
 
       if (store.is_approved == 0) {
         return res.status(400).json({ message: "Caterer is not verified by the admin!", status: 0 });
@@ -149,6 +173,9 @@ exports.postLogin = async (req, res, next) => {
 
       loadedUser.is_active = 1;
       await loadedUser.save();
+
+      const resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password'] } })
+
       try {
 
         const getToken = await Token.findOne({ where: { userId: loadedUser.id } })
@@ -164,14 +191,14 @@ exports.postLogin = async (req, res, next) => {
 
           return res.status(200).json({
             message: 'Logged-in Successfully',
-            user: loadedUser,
+            user: resp,
             token: json_body.access_token,
             refreshToken: json_body.refresh_token,
             status: 1
           })
         } else {
           const data = {
-            userId: loadedUser.id,
+            userId: resp.id,
             token: json_body.access_token,
             device_token: req.body.device_token,
             refreshToken: json_body.refresh_token,
@@ -182,7 +209,7 @@ exports.postLogin = async (req, res, next) => {
           await Token.create(data)
           return res.status(200).json({
             message: 'Logged-in Successfully',
-            user: loadedUser,
+            user: resp,
             token: json_body.access_token,
             refreshToken: json_body.refresh_token, status: 1
           })
@@ -240,6 +267,10 @@ exports.generateOTP = async (req, res, next) => {
   const country_code = req.body.country_code
   const number = req.body.phone_number;
   try {
+    const test = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+    if(test){
+      return res.status(400).json({message: "PHONE NUMBER IS ALREADY IN USE!", status: 0})
+    }
     const otp = await client
       .verify
       .services(process.env.serviceID)
@@ -263,6 +294,10 @@ exports.verifyOTP = async (req, res, next) => {
   const number = req.body.phone_number;
 
   try {
+    const test = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+    if(test){
+      return res.status(400).json({message: "PHONE NUMBER IS ALREADY IN USE!", status: 0})
+    }
     const otp = await client
       .verify
       .services(process.env.serviceID)
