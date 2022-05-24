@@ -639,7 +639,7 @@ exports.getOrders = async (req, res, next) => {
           model: User,
           as: 'caterer',
           foreignKey: 'catererId',
-          include: { model: Store }
+          include: { model: Store, as: 'store', foreignKey: 'catererId'}
         }]
       })
 
@@ -661,7 +661,7 @@ exports.getOrders = async (req, res, next) => {
           model: User,
           as: 'caterer',
           foreignKey: 'catererId',
-          include: { model: Store }
+          include: { model: Store, as: 'store', foreignKey: 'catererId'}
         }]
       })
 

@@ -98,7 +98,7 @@ app.use((error, req, res, next) => {
 const db = require('./util/database');
 
 Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'caterer' });
-User.hasOne(Store, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'caterer' });
+User.hasOne(Store, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'store' });
 Driver.belongsTo(Store);
 Store.hasMany(Category);
 Category.belongsTo(Store);
