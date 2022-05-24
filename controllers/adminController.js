@@ -27,7 +27,7 @@ exports.getUsers = async (req,res,next) => {
 
               if(key == 1){
 
-                  const users = await User.findAll()
+                  const users = await User.findAll({where: { role: 1 }})
 
                   return res.status(200).json({message: "Users Fetched Successfully!", customers: users, totalCustomers: users.length, status: 1})
 
