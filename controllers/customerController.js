@@ -31,6 +31,7 @@ exports.getCaterers = async (req, res, next) => {
     const caterers = await Store.findAll({
       where: { is_approved: 1 }, include: {
         model: User,
+        attributes: { exclude: ['password'] },
         include: {
           model: Category,
           include: {
@@ -46,6 +47,13 @@ exports.getCaterers = async (req, res, next) => {
         // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
         const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
         const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].userId})`)
+        const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].userId } });
+        let is_fav;
+        if(fav) {
+          is_fav = 1;
+        } else{
+          is_fav = 0;
+        }
         const avgPrice = Math.floor(avgPri[0][0].avgPrice);
         const decimal = (rating[0][0].rating) % 1;
         let rate;
@@ -58,6 +66,7 @@ exports.getCaterers = async (req, res, next) => {
         }
         caterers[i].dataValues.rating = rate;
         caterers[i].dataValues.averagePrice = avgPrice;
+        caterers[i].dataValues.is_favourite = is_fav;
       }
     }
     return res.status(200).json({
@@ -132,7 +141,7 @@ exports.getCaterer = async (req, res, next) => {
   // console.log(req.body);
   const catId = req.body.catererId;
   try {
-    const caterer = await Store.findOne({ include: User, where: { userId: catId } })
+    const caterer = await Store.findOne({ include: User, attributes: { exclude: ['password'] } , where: { userId: catId } })
     const category = await Category.findAll({ include: Item, where: { userId: catId } })
 
     if (!caterer) {
