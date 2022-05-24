@@ -11,6 +11,7 @@ const Favourites = require('../models/favourites');
 const Coupon = require('../models/coupon');
 const fs = require('fs')
 const path = require('path')
+const db = require('../util/database');
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
