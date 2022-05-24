@@ -19,6 +19,12 @@ module.exports = db.sequelize.define('store' , {
     address: {
         type: Sequelize.STRING
     },
+    latitude : {
+          type : Sequelize.DECIMAL
+      },
+    longitude : {
+          type : Sequelize.DECIMAL
+      },
     bio: {
         type: Sequelize.STRING
     },

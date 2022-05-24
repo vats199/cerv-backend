@@ -22,12 +22,12 @@ module.exports = db.sequelize.define('address' , {
     },
     updatedAt: {
         type: 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    },
+  latitude : {
+        type : Sequelize.DECIMAL
+    },
+  longitude : {
+        type : Sequelize.DECIMAL
     }
-  // latitude : {
-  //       type : Sequelize.STRING
-  //   },
-  // longitude : {
-  //       type : Sequelize.STRING
-  //   }
     }
 )
