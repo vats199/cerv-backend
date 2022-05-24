@@ -31,6 +31,8 @@ exports.getCaterers = async (req, res, next) => {
     const caterers = await Store.findAll({
       where: { is_approved: 1 }, include: {
         model: User,
+        as: 'caterer',
+        foreignKey: 'catererId',
         attributes: { exclude: ['password'] },
         include: {
           model: Category,
@@ -45,9 +47,9 @@ exports.getCaterers = async (req, res, next) => {
     if (totalCaterers !== 0) {
       for (let i = 0; i < caterers.length; i++) {
         // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
-        const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].userId}`)
-        const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].userId})`)
-        const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].userId } });
+        const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
+        const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
+        const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
         let is_fav;
         if(fav) {
           is_fav = 1;

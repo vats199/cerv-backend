@@ -97,8 +97,8 @@ app.use((error, req, res, next) => {
 
 const db = require('./util/database');
 
-Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasOne(Store, { constraints: true, onDelete: 'CASCADE' });
+Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'caterer' });
+User.hasOne(Store, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'caterer' });
 Driver.belongsTo(Store);
 Store.hasMany(Category);
 Category.belongsTo(Store);
@@ -134,7 +134,7 @@ Address.hasMany(Order);
 Chat.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 User.hasMany(Chat, { foreignKey: "userId", targetKey: "id" });
 Chat.belongsTo(User, { foreignKey: "catererId", targetKey: "id", as: 'caterer'  });
-User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id", as: 'caterer'  });
+User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id"});
 Message.belongsTo(User, { foreignKey: "senderId", targetKey: "id" });
 User.hasMany(Message, { foreignKey: "senderId", targetKey: "id" });
 Message.belongsTo(Chat, { foreignKey: "chatId", targetKey: "id" });
