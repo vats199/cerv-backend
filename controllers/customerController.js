@@ -479,6 +479,7 @@ exports.postReview = async (req, res, next) => {
 exports.search = async (req, res, next) => {
   const term = req.query.term;
   const key = req.params.key;
+  const userId = req.user_id;
   // key->1   categories
   // key->2   items
   // key->3   caterers
@@ -527,7 +528,7 @@ for (let i = 0; i < caterers.length; i++) {
           // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
           const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
           const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
-          const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
+          const fav = await Favourites.findOne({ where: { userId: userId, catererId: caterers[i].catererId } });
           let is_fav;
           if(fav) {
             is_fav = 1;
@@ -551,7 +552,7 @@ for (let i = 0; i < caterers.length; i++) {
       }
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
-        results: results,
+        results: caterers,
         totalCaterers: totalResults, status: 1
       })
     }
