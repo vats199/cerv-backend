@@ -485,7 +485,7 @@ exports.search = async (req, res, next) => {
   try {
     if (key == 1) {
       const totalResults = await Category.count({ where: { title: { [Op.like]: '%' + term + '%' } } })
-      const results = await Category.findAll({ include: [Item,User], where: { title: { [Op.like]: '%' + term + '%' } } });
+      const results = await Category.findAll({ include: [{model: Item}, {model: User,attributes: { exclude: ['password'] }}], where: { title: { [Op.like]: '%' + term + '%' } } });
 
       return res.status(200).json({
         message: 'Fetched Categories Successfully!',
@@ -497,7 +497,7 @@ exports.search = async (req, res, next) => {
 
     else if (key == 2) {
       const totalResults = await Item.count({ where: { title: { [Op.like]: '%' + term + '%' } } })
-      const results = await Item.findAll({ include: [Category,User], where: { title: { [Op.like]: '%' + term + '%' } } });
+      const results = await Item.findAll({ include: [{model: Category}, {model: User,attributes: { exclude: ['password'] }}], where: { title: { [Op.like]: '%' + term + '%' } } });
 
       return res.status(200).json({
         message: 'Fetched Items Successfully!',
@@ -509,7 +509,10 @@ exports.search = async (req, res, next) => {
 
     else if (key == 3) {
       const totalResults = await Store.count({ where: { name: { [Op.like]: '%' + term + '%' } } })
-      const results = await Store.findAll({ where: { name: { [Op.like]: '%' + term + '%' } } });
+      const results = await Store.findAll({ where: { name: { [Op.like]: '%' + term + '%' } }, include: {model: User,
+        as: 'caterer',
+        foreignKey: 'catererId',
+        attributes: { exclude: ['password'] }} });
 
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
