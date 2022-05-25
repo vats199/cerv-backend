@@ -10,7 +10,7 @@ router.use(cors());
 
 router.get('/caterers', jwtAuth, customerController.getCaterers);
 router.get('/caterers/:filter', jwtAuth, customerController.filterCaterers);
-router.get('/catererInfo', jwtAuth, customerController.getCaterer);
+router.get('/catererInfo/:catererId', jwtAuth, customerController.getCaterer);
 router.get('/get-banners', jwtAuth, customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
 router.get('/picture', jwtAuth, customerController.getDP);

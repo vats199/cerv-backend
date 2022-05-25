@@ -172,18 +172,54 @@ exports.filterCaterers = async (req, res, next) => {
 
 exports.getCaterer = async (req, res, next) => {
   // console.log(req.body);
-  const catId = req.body.catererId;
+  const catId = req.params.catererId;
   try {
-    const caterer = await Store.findOne({ include: User, attributes: { exclude: ['password'] } , where: { userId: catId } })
-    const category = await Category.findAll({ include: Item, where: { userId: catId } })
+    const caterer = await Store.findOne({
+      where: { catererId: catId }, include: {
+        model: User,
+        as: 'caterer',
+        foreignKey: 'catererId',
+        attributes: { exclude: ['password'] },
+        include: {
+          model: Category,
+          include: {
+            model: Item
+          }
+        }
+      }
+    });
 
     if (!caterer) {
       const error = new Error("Couldn't Find the Caterer");
       error.statusCode = 404;
       throw error;
     }
-    //   const items = await 
-    return res.status(200).json({ message: 'Caterer fetched', data: caterer, category: category, status: 1 })
+
+    const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterer.catererId}`)
+    const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterer.catererId})`)
+    const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterer.catererId } });
+    let is_fav;
+    if(fav) {
+      is_fav = 1;
+    } else{
+      is_fav = 0;
+    }
+    const avgPrice = Math.floor(avgPri[0][0].avgPrice);
+    const decimal = (rating[0][0].rating) % 1;
+    let rate;
+    if (decimal < 0.25) {
+      rate = Math.floor(rating[0][0].rating)
+    } else if (decimal <= 0.75) {
+      rate = Math.floor(rating[0][0].rating) + 0.5;
+    } else {
+      rate = Math.floor(rating[0][0].rating) + 1;
+    }
+    caterer.dataValues.rating = rate;
+    caterer.dataValues.averagePrice = avgPrice;
+    caterer.dataValues.is_favourite = is_fav;
+
+
+    return res.status(200).json({ message: 'Caterer fetched', caterer: caterer, status: 1 })
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
