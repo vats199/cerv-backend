@@ -27,7 +27,7 @@ exports.getUsers = async (req,res,next) => {
 
               if(key == 1){
 
-                  const users = await User.findAll({where: { role: 1 }})
+                  const users = await User.findAll({where: { role: 1 }, attributes: {exclude: ['password']}})
 
                   return res.status(200).json({message: "Users Fetched Successfully!", customers: users, totalCustomers: users.length, status: 1})
 
@@ -67,7 +67,7 @@ exports.getUsers = async (req,res,next) => {
                     }
                   }
                           return res.status(200).json({message: 'Fetched Caterers Successfully!', 
-                                                        caterer: caterers,
+                                                        store: caterers,
                                                         totalCaterers: totalCaterers, status: 1})
               }
       }else {
