@@ -286,6 +286,8 @@ exports.getDP = async (req, res, next) => {
 exports.editInfo = async (req, res, next) => {
   const name = req.body.name;
   const email = req.body.email;
+  const country_code = req.body.country_code;
+  const phone_number = req.body.phone_number;
   const image = req.file?.path;
   let url;
   if (image) {
@@ -323,11 +325,27 @@ exports.editInfo = async (req, res, next) => {
         clearImage(user.image)
       }
       //  console.log(name)
-      user.name = name || user.name;
-      user.image = url || user.image
-      user.email = email || user.email;
-      const result = await user.save();
-      return res.status(200).json({ message: "Profile Updated!", data: result, status: 1 });
+      const test = await User.findOne({ where: { email: req.body.email } })
+
+      const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+
+      if(test){
+
+        return res.status(400).json({message: "E-mail already registered!", status: 0})
+
+      } else if(test1){
+
+        return res.status(400).json({message: "Phone number already registered!", status: 0})
+
+      } else{
+
+        user.name = name || user.name;
+        user.image = url || user.image
+        user.email = email || user.email;
+        await user.save();
+        const result = await User.findOne({ where: { id: req.user_id }, attributes: { exclude: ['password'] } });
+        return res.status(200).json({ message: "Profile Updated!", data: result, status: 1 });
+      }
     }
 
   } catch (err) {

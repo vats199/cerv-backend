@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../util/config');
 router.use(cors());
 const authController = require("../controllers/authController");
+const { check,body } = require('express-validator/check');
 
 
 router.post('/refresh', authController.refresh)
@@ -14,13 +15,33 @@ router.post('/protected', jwtAuth , (req,res)=>{
     return res.send("Inside Protected Route!")
 })
 
-router.post('/register', authController.postSignup);
-router.post('/login', authController.postLogin);
+router.post('/register',
+                        body('email').isEmail()
+                        .withMessage('Please enter a valid email address!')
+                        .normalizeEmail()
+                        ,
+                        body('password', 'Please Enter a valid Password!').isLength({ min: 5 })
+                        .trim() ,authController.postSignup);
+router.post('/login',
+                        body('email').isEmail()
+                        .withMessage('Please enter a valid email address!')
+                        .normalizeEmail()
+                        ,
+                        body('password', 'Please Enter a valid Password!').isLength({ min: 5 })
+                        .trim(), authController.postLogin);
 
 router.post('/generateOTP', authController.generateOTP);
 router.post('/verifyOTP', authController.verifyOTP);
-router.post('/forgotPassword',authController.forgotPassword);
-router.post('/changePassword', jwtAuth, authController.changePassword)
+router.post('/forgotPassword',
+                        body('email').isEmail()
+                        .withMessage('Please enter a valid email address!')
+                        .normalizeEmail(),authController.forgotPassword);
+
+router.post('/changePassword', jwtAuth,
+                        body('currentPassword', 'Please Enter a valid Password!').isLength({ min: 5 })
+                        .trim(),
+                        body('newPassword', 'Please Enter a valid Password!').isLength({ min: 5 })
+                        .trim(), authController.changePassword)
 router.post('/storeDetails', authController.postStore);
 router.post('/logout',jwtAuth, authController.logout);
 router.get('/noti', authController.sendNot);

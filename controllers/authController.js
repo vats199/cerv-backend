@@ -462,7 +462,7 @@ exports.changePassword = (req, res, body) => {
 
 exports.postStore = (req, res, next) => {
 
-  const userId = req.body.userId;
+  const userId = req.body.catererId;
 
   User.findOne({
     where: {
@@ -482,8 +482,14 @@ exports.postStore = (req, res, next) => {
       }
       Store.findOne({
         where: {
-          license_num: req.body.license_num
-        }
+          [Op.or]: [{
+                  license_num: req.body.license_num
+              },
+              {
+                  catererId: userId
+              }
+          ]
+      }
       })
         .then(store => {
           if (!store) {
@@ -495,7 +501,7 @@ exports.postStore = (req, res, next) => {
                 return res.json({ error: err, status: 0 })
               })
           } else {
-            return res.json({ error: "STORE ALREADY EXISTS", status: 0 })
+            return res.json({ error: "User Already Registered the Store with given id or license number!", status: 0 })
           }
         })
         .catch(err => {
