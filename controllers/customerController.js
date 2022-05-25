@@ -509,11 +509,46 @@ exports.search = async (req, res, next) => {
 
     else if (key == 3) {
       const totalResults = await Store.count({ where: { name: { [Op.like]: '%' + term + '%' } } })
-      const results = await Store.findAll({ where: { name: { [Op.like]: '%' + term + '%' } }, include: {model: User,
+      const caterers = await Store.findAll({ where: { name: { [Op.like]: '%' + term + '%' } },  include: {
+        model: User,
         as: 'caterer',
         foreignKey: 'catererId',
-        attributes: { exclude: ['password'] }} });
+        attributes: { exclude: ['password'] },
+        include: {
+          model: Category,
+          include: {
+            model: Item
+          }
+        }
+      } });
 
+for (let i = 0; i < caterers.length; i++) {
+
+          // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+          const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
+          const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
+          const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
+          let is_fav;
+          if(fav) {
+            is_fav = 1;
+          } else{
+            is_fav = 0;
+          }
+          const avgPrice = Math.floor(avgPri[0][0].avgPrice);
+          const decimal = (rating[0][0].rating) % 1;
+          let rate;
+          if (decimal < 0.25) {
+            rate = Math.floor(rating[0][0].rating)
+          } else if (decimal <= 0.75) {
+            rate = Math.floor(rating[0][0].rating) + 0.5;
+          } else {
+            rate = Math.floor(rating[0][0].rating) + 1;
+          }
+          caterers[i].dataValues.rating = rate;
+          caterers[i].dataValues.averagePrice = avgPrice;
+          caterers[i].dataValues.is_favourite = is_fav;
+
+      }
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
         results: results,
