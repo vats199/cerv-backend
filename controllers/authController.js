@@ -158,7 +158,7 @@ exports.postLogin = async (req, res, next) => {
     request(options, async (error, response, body) => {
       if (error) {
         console.log(error);
-        return res.json(500).json({
+        return res.status(500).json({
           ErrorMessage: 'Some Auth0 error while making login request!',
           status: 0
         })
