@@ -37,7 +37,7 @@ router.post('/forgotPassword',
                         .withMessage('Please enter a valid email address!')
                         .normalizeEmail(),authController.forgotPassword);
 
-router.post('/changePassword', jwtAuth,
+router.post('/changePassword',
                         body('currentPassword', 'Please Enter a valid Password!').isLength({ min: 5 })
                         .trim(),
                         body('newPassword', 'Please Enter a valid Password!').isLength({ min: 5 })

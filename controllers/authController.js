@@ -420,12 +420,12 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.changePassword = (req, res, body) => {
-  const currentPassword = req.body.currentPassword;
+  // const currentPassword = req.body.currentPassword;
   const newPassword = req.body.newPassword;
 
   User.findOne({
     where: {
-      id: req.user_id
+      id: 1
     }
   })
     .then(user => {
