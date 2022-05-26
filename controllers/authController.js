@@ -223,7 +223,7 @@ exports.postLogin = async (req, res, next) => {
 
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: err.error_description || 'Something went wrong!', status: 0 });
+    return res.status(500).json({ message: err || 'Something went wrong!', status: 0 });
   }
 }
 

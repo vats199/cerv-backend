@@ -164,7 +164,7 @@ db.sequelize
       
       socket.on('setup', (userData)=>{
         socket.join(userData.id);
-        // console.log(userData);
+        console.log(userData);
         socket.emit("connected");
       })
 
