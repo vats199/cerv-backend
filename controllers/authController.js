@@ -167,7 +167,7 @@ exports.postLogin = async (req, res, next) => {
       // Check whether any logical error is occurd or not.
       let json_body = JSON.parse(body);
       if (json_body.error) {
-        return next(json_body);
+        return res.status(401).json({message: 'Invalid email or password!', status: 0})
       }
       let loadedUser = user;
 
@@ -215,17 +215,15 @@ exports.postLogin = async (req, res, next) => {
           })
         }
       } catch (err) {
-        if (!err.statusCode) {
-          err.statusCode = 500;
-        }
-        next(err);
+        // console.log(err);
+        return res.status(401).json({message: 'Invalid email or password!', status: 0})
       }
 
     })
 
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+    return res.status(500).json({ message: err.error_description || 'Something went wrong!', status: 0 });
   }
 }
 
