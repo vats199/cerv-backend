@@ -21,7 +21,10 @@ router.post('/register',
                         .normalizeEmail()
                         ,
                         body('password', 'Please Enter a valid Password!').isLength({ min: 5 })
-                        .trim() ,authController.postSignup);
+                        .trim()
+                        ,
+                        body('phone_number', 'Please Enter a mobile number!').isMobilePhone()
+                         ,authController.postSignup);
 router.post('/login',
                         body('email').isEmail()
                         .withMessage('Please enter a valid email address!')

@@ -20,6 +20,11 @@ const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
 
 exports.getCategories = async (req,res,next) => {
+
+    const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const catererId = req.user_id;
 
     try {
@@ -35,6 +40,10 @@ exports.getCategories = async (req,res,next) => {
 }
 
 exports.getCategory = async(req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const categoryId = req.params.catId;
     const catererId = req.user_id;
     try {
@@ -51,6 +60,10 @@ exports.getCategory = async(req,res,next) => {
 }
 
 exports.postCategory = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const title = req.body.title;
     const image = await cloudinary.uploader.upload(req.file.path, {
         public_id: uuidv4() + ' _profile',
@@ -88,6 +101,10 @@ exports.postCategory = async (req,res,next) => {
 }
 
 exports.editCategory = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const categoryId = req.params.catId;
     const title = req.body.title;
     const image = req.file?.path; 
@@ -121,14 +138,18 @@ exports.editCategory = async (req,res,next) => {
 }
 
 exports.deleteCategory = async (req,res,next) => {
-    // const catererId = req.user_id;
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
+    const catererId = req.user_id;
     const categoryId = req.params.catId;
   
     try {
       
-      await Category.destroy({ where: { id: categoryId} })
+      await Category.destroy({ where: { id: categoryId, userId: catererId} })
   
-      return res.status(200).json({message: "Item Deleted Successfully!", status: 1});
+      return res.status(200).json({message: "Category Deleted Successfully!", status: 1});
   
     } catch (err) {
       console.log(err);
@@ -137,6 +158,10 @@ exports.deleteCategory = async (req,res,next) => {
   }
 
 exports.postItems = async(req,res,next)=>{
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const title = req.body.title;
     const desc = req.body.description;
     try {
@@ -184,6 +209,10 @@ exports.postItems = async(req,res,next)=>{
 }
 
 exports.editItem = (req,res,next)=>{
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const itemId = req.params.itemId;
     const title = req.body.title;
     const image = req.file.path;
@@ -205,12 +234,16 @@ exports.editItem = (req,res,next)=>{
 }
 
 exports.deleteItem = async (req,res,next) => {
-    // const catererId = req.user_id;
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
+    const catererId = req.user_id;
     const itemId = req.params.itemId;
   
     try {
       
-      await Item.destroy({ where: { id: itemId} })
+      await Item.destroy({ where: { id: itemId, userId: catererId} })
   
       return res.status(200).json({message: "Item Deleted Successfully!", status: 1});
   
@@ -221,6 +254,10 @@ exports.deleteItem = async (req,res,next) => {
   }
 
 exports.postBanner = async (req,res,next)=>{
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const userId = req.user_id;
     const image = await cloudinary.uploader.upload(req.file.path, {
         public_id: uuidv4() + ' _profile',
@@ -241,6 +278,10 @@ exports.postBanner = async (req,res,next)=>{
 }
 
 exports.postCoupon = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const catererId = req.user_id;
     const data = req.body;
 
@@ -266,6 +307,10 @@ exports.postCoupon = async (req,res,next) => {
 }
 
 exports.getOrders = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const catererId = req.user_id;
     const key = req.params.key;
     try {
@@ -315,6 +360,10 @@ exports.getOrders = async (req,res,next) => {
   }
 
 exports.acceptOrder = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const catererId = req.user_id;
     const orderId = req.params.orderId;
   
@@ -366,6 +415,10 @@ exports.acceptOrder = async (req,res,next) => {
   }
 
 exports.rejectOrder = async (req,res,next) => {
+  const role = req.user.role;
+    if(role != 0){
+      return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
+    }
     const catererId = req.user_id;
     const orderId = req.params.orderId;
   

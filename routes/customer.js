@@ -4,6 +4,7 @@ const cors = require('cors');
 const jwtAuth = require('../middleware/jwtAuth')
 const customerController = require('../controllers/customerController');
 const stripeController = require('../controllers/stripe');
+const { check,body } = require('express-validator/check');
 
 
 router.use(cors());
@@ -14,7 +15,13 @@ router.get('/catererInfo/:catererId', jwtAuth, customerController.getCaterer);
 router.get('/get-banners', jwtAuth, customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
 router.get('/picture', jwtAuth, customerController.getDP);
-router.put('/edit-profile',jwtAuth, customerController.editInfo);
+router.put('/edit-profile',jwtAuth,
+                                body('email').isEmail()
+                                .withMessage('Please enter a valid email address!')
+                                .normalizeEmail(),
+                                body('phone_number', 'Please Enter a mobile number!').isMobilePhone()
+                                , customerController.editInfo);
+
 router.get('/get-address', jwtAuth, customerController.getAddress);
 router.post('/add-address',jwtAuth,customerController.postAddress);
 router.put('/edit-address',jwtAuth, customerController.editAddress);

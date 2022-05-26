@@ -284,6 +284,13 @@ exports.getDP = async (req, res, next) => {
 }
 
 exports.editInfo = async (req, res, next) => {
+
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  }
+
   const name = req.body.name;
   const email = req.body.email;
   const country_code = req.body.country_code;
@@ -342,6 +349,8 @@ exports.editInfo = async (req, res, next) => {
         user.name = name || user.name;
         user.image = url || user.image
         user.email = email || user.email;
+        user.country_code = country_code || user.country_code;
+        user.phone_number = phone_number || user.phone_number;
         await user.save();
         const result = await User.findOne({ where: { id: req.user_id }, attributes: { exclude: ['password'] } });
         return res.status(200).json({ message: "Profile Updated!", data: result, status: 1 });
@@ -475,6 +484,11 @@ exports.postReview = async (req, res, next) => {
   const catererId = req.body.catererId;
   const orderId = req.body.orderId;
   try {
+
+    const test = await Order.findByPk(orderId)
+    if(test.is_reviewed == true){
+      return res.status(400).json({message: "Order is already reviewed!", status: 0})
+    }
     const rev = await Feedback.create({
       rating: req.body.rating,
       review: req.body.review,
@@ -859,6 +873,12 @@ exports.postFav = async (req, res, next) => {
   const catererId = req.body.catererId;
 
   try {
+
+    const test = User.findByPk(catererId);
+    const store = Store.findOne({ where: { catererId: catererId } })
+    if(test.role != 0 || store.is_approved != 1){
+      return res.status(400).json({message: "Caterer is not valid", status: 0})
+    }
     const fav = await Favourites.create({ userId: userId, catererId: catererId })
     return res.status(200).json({ message: "Added to Favourites!", result: fav, status: 1 })
   } catch (err) {
@@ -894,8 +914,16 @@ exports.deleteFav = async (req, res, next) => {
   const catererId = req.body.id;
   try {
 
-    await Favourites.destroy({ where: { catererId: catererId, userId: userId } })
-    return res.status(200).json({ message: "Removed from favourites!", status: 1 })
+    const favourite = Favourites.findOne({ where: { catererId: catererId, userId: userId } })
+    if(favourite){
+
+      await Favourites.destroy({ where: { catererId: catererId, userId: userId } })
+      return res.status(200).json({ message: "Removed from favourites!", status: 1 })
+      
+    } else {
+      return res.status(400).json({message: "Caterer is not present in favourites!", status: 0})
+    }
+
   } catch (err) {
     console.log(err);
     return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });

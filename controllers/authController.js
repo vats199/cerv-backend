@@ -13,6 +13,8 @@ const stripe = require('stripe')(process.env.STRIPE_SK);
 const request = require('request');
 const notifications = require('../util/notifications');
 
+const { validationResult } = require('express-validator/check');
+
 let refreshTokens = {};
 
 const User = require('../models/user');
@@ -22,6 +24,12 @@ const Token = require('../models/token');
 exports.postSignup = async (req, res, next) => {
   // console.log(JSON.stringify(req));
   // console.log()
+
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  }
   if (req.body === {}) {
     return console.log("Your Body is empty!")
   }
@@ -112,6 +120,11 @@ exports.postSignup = async (req, res, next) => {
 }
 
 exports.postLogin = async (req, res, next) => {
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  }
 
   try {
     const user = await User.findOne({
@@ -368,6 +381,13 @@ exports.refresh = async (req, res, next) => {
 }
 
 exports.forgotPassword = async (req, res, next) => {
+
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  }
+
   const user = await User.findOne({ where: { email: req.body.email } });
 
   if (!user) {
@@ -418,7 +438,14 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.changePassword = (req, res, body) => {
-  // const currentPassword = req.body.currentPassword;
+  
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()){
+    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  }
+
+  const currentPassword = req.body.currentPassword;
   const newPassword = req.body.newPassword;
 
   User.findOne({
