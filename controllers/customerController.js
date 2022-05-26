@@ -24,6 +24,7 @@ const fs = require('fs')
 const path = require('path');
 const { time } = require('console');
 const { TokenInstance } = require('twilio/lib/rest/api/v2010/account/token');
+const { privateDecrypt } = require('crypto');
 
 exports.getCaterers = async (req, res, next) => {
   const userId = req.user_id;
@@ -823,9 +824,12 @@ exports.cancelOrder = async (req, res, next) => {
 
     const order = await Order.findOne({ where: { userId: userId, id: orderId } })
 
+
     if (order) {
 
-      order.status = 5;
+      if(order.status == 0 || order.status == 1){
+
+        order.status = 5;
       const result = await order.save();
 
       const message_notification = {
@@ -857,9 +861,16 @@ exports.cancelOrder = async (req, res, next) => {
       });
       }
       return res.status(200).json({ message: "Order Cancelled!", result: result, status: 1 })
+
+      } else {
+        return res.status(400).json({message: "Order can't be cancelled!", status: 0})
+      }
+
+      
     } else {
       return res.status(400).json({ message: "No order found", status: 0 })
     }
+
 
 
   } catch (err) {
