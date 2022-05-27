@@ -185,9 +185,11 @@ db.sequelize
 
         if(newMessageRecieved.senderId == chat.catererId){
             socket.in(chat.userId).emit("message recieved", newMessageRecieved);
+            socket.in(chat.catererId).emit("message sent", newMessageRecieved);
             console.log('socket sent');
         }else if(newMessageRecieved.senderId == chat.userId){
             socket.in(chat.catererId).emit("message recieved", newMessageRecieved);
+            socket.in(chat.userId).emit("message sent", newMessageRecieved);
             console.log('socket sent');
         }
 
