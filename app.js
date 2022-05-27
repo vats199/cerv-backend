@@ -171,20 +171,24 @@ db.sequelize
       socket.on('join chat', (room)=>{
         // console.log();
         socket.join(room) 
+        console.log('joined chat');
       })
 
       socket.on('typing', (room)=>socket.in(room).emit("typing"))
       socket.on('stop typing', (room)=>socket.in(room).emit("stop typing"))
 
       socket.on('new message', (newMessageRecieved)=>{
+        console.log('message recieved');
         let chat = newMessageRecieved.chat;
         
         if(!chat.userId || !chat.catererId) return console.log('Users are not there!');
 
         if(newMessageRecieved.senderId == chat.catererId){
             socket.in(chat.userId).emit("message recieved", newMessageRecieved);
+            console.log('socket sent');
         }else if(newMessageRecieved.senderId == chat.userId){
             socket.in(chat.catererId).emit("message recieved", newMessageRecieved);
+            console.log('socket sent');
         }
 
       })
