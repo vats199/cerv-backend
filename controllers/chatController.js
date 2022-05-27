@@ -127,6 +127,8 @@ exports.sendMessage = async (req,res,next) => {
         chat.save();
 
         const response = await Message.findByPk(message.id,{ include: Chat })
+        response.content = decrypt(response.content);
+        response.chat.lastMessage = decrypt(response.chat.lastMessage)
                 
         return res.status(200).json({message: "Message sent Successfully!", data: response, status: 1});
         
