@@ -169,19 +169,21 @@ exports.filterCaterers = async (req, res, next) => {
         totalCaterers: totalCaterers, status: 1
       })
     }
-    if (filter === 'descPrice') {
+    else if (filter === 'descPrice') {
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
         caterer: caterers.sort((a, b) => (a.dataValues.averagePrice < b.dataValues.averagePrice) ? 1 : ((b.dataValues.averagePrice < a.dataValues.averagePrice) ? -1 : 0)),
         totalCaterers: totalCaterers, status: 1
       })
     }
-    if (filter === 'ascPrice') {
+    else if (filter === 'ascPrice') {
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
         caterer: caterers.sort((a, b) => (a.dataValues.averagePrice > b.dataValues.averagePrice) ? 1 : ((b.dataValues.averagePrice > a.dataValues.averagePrice) ? -1 : 0)),
         totalCaterers: totalCaterers, status: 1
       })
+    } else{
+      return res.status(400).json({message: "Wrong filter applied!", status: 0})
     }
   } catch (err) {
     if (!err.statusCode) {
