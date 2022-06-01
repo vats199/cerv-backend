@@ -90,21 +90,24 @@ exports.search = async (req,res,next) => {
       if(admin.role == 3){
 
         const customers = await User.findAll({ where: {name: { [Op.like]: '%'+ term + '%' }}});
-        const caterers = await Store.findAll({ where: {name: { [Op.like]: '%'+ term + '%' }},
-                                               include: {
-                                                        model: User,
-                                                        include: {
-                                                        model: Category,
-                                                        include: {
-                                                            model: Item
-                                                        }
-                                                        }
-                                                    } 
-                                                });
+        const caterers = await Store.findAll({
+          where: {name: { [Op.like]: '%'+ term + '%' }}, include: {
+            model: User,
+            as: 'caterer',
+            foreignKey: 'catererId',
+            attributes: { exclude: ['password'] },
+            include: {
+              model: Category,
+              include: {
+                model: Item
+              }
+            }
+          }
+        });
         return res.status(200).json({message: "Results for search", 
                                      totalResults: caterers.length + customers.length , 
                                      customers: customers, 
-                                     caterers: caterers, 
+                                     stores: caterers, 
                                      totalCustomers: customers.length, 
                                      totalCaterers: caterers.length, 
                                      status: 1});
