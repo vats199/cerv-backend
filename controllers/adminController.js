@@ -12,6 +12,7 @@ const Coupon = require('../models/coupon');
 const fs = require('fs')
 const path = require('path')
 const db = require('../util/database');
+const { Op } = require('sequelize');
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
