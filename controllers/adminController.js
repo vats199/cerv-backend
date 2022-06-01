@@ -96,7 +96,6 @@ exports.search = async (req,res,next) => {
           const customers = await User.findAll({ where: {name: { [Op.like]: '%'+ term + '%' }}});
           return res.status(200).json({message: "Results for search", 
                                       results: customers, 
-                                      stores: caterers, 
                                       totalCustomers: customers.length, 
                                       status: 1});
 
