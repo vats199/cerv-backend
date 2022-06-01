@@ -84,34 +84,47 @@ exports.getUsers = async (req,res,next) => {
 exports.search = async (req,res,next) => {
     const term = req.query.term;
     const adminId = req.user_id;
+    const key = req.query.key;
 
     try {
       const admin = await User.findByPk(adminId);
 
       if(admin.role == 3){
 
-        const customers = await User.findAll({ where: {name: { [Op.like]: '%'+ term + '%' }}});
-        const caterers = await Store.findAll({
-          where: {name: { [Op.like]: '%'+ term + '%' }}, include: {
-            model: User,
-            as: 'caterer',
-            foreignKey: 'catererId',
-            attributes: { exclude: ['password'] },
-            include: {
-              model: Category,
+        if(key == 1){
+
+          const customers = await User.findAll({ where: {name: { [Op.like]: '%'+ term + '%' }}});
+          return res.status(200).json({message: "Results for search", 
+                                      results: customers, 
+                                      stores: caterers, 
+                                      totalCustomers: customers.length, 
+                                      status: 1});
+
+        }else if(key == 2){
+
+          const caterers = await Store.findAll({
+            where: {name: { [Op.like]: '%'+ term + '%' }}, include: {
+              model: User,
+              as: 'caterer',
+              foreignKey: 'catererId',
+              attributes: { exclude: ['password'] },
               include: {
-                model: Item
+                model: Category,
+                include: {
+                  model: Item
+                }
               }
             }
-          }
-        });
-        return res.status(200).json({message: "Results for search", 
-                                     totalResults: caterers.length + customers.length , 
-                                     customers: customers, 
-                                     stores: caterers, 
-                                     totalCustomers: customers.length, 
-                                     totalCaterers: caterers.length, 
-                                     status: 1});
+          });
+          return res.status(200).json({message: "Results for search", 
+                                       results: caterers, 
+                                       totalStores: caterers.length, 
+                                       status: 1});
+
+        }else {
+          return res.status(404).json({message:"Invalid key entered!"})
+        }
+
         }else {
           return res.status(400).send({message: "You are not authorized to do this!", status: 0});
         } 
