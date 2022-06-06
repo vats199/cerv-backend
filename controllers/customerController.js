@@ -80,8 +80,8 @@ exports.getCaterers = async (req, res, next) => {
       }
       return res.status(200).json({
         message: 'Fetched Caterers Successfully!',
-        caterer: nearby,
-        totalCaterers: nearby.length, status: 1
+        caterer: caterers,
+        totalCaterers: caterers.length, status: 1
       })
 
     }
