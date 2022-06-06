@@ -30,6 +30,61 @@ exports.getCaterers = async (req, res, next) => {
   const userId = req.user_id;
   try {
     const activeAddress = await Address.findOne({ where:{ userId: userId, is_active: 1 } });
+
+    if(!activeAddress){
+      const totalCaterers = await Store.count()
+      const caterers = await Store.findAll({
+        where: { is_approved: 1 }, include: {
+          model: User,
+          as: 'caterer',
+          foreignKey: 'catererId',
+          attributes: { exclude: ['password'] },
+          include: {
+            model: Category,
+            include: {
+              model: Item
+            }
+          }
+        }
+      });
+
+      if (totalCaterers !== 0) {
+        for (let i = 0; i < caterers.length; i++) {
+  
+  
+            // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+            const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
+            const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
+            const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
+            let is_fav;
+            if(fav) {
+              is_fav = 1;
+            } else{
+              is_fav = 0;
+            }
+            const avgPrice = Math.floor(avgPri[0][0].avgPrice);
+            const decimal = (rating[0][0].rating) % 1;
+            let rate;
+            if (decimal < 0.25) {
+              rate = Math.floor(rating[0][0].rating)
+            } else if (decimal <= 0.75) {
+              rate = Math.floor(rating[0][0].rating) + 0.5;
+            } else {
+              rate = Math.floor(rating[0][0].rating) + 1;
+            }
+            caterers[i].dataValues.rating = rate;
+            caterers[i].dataValues.averagePrice = avgPrice;
+            caterers[i].dataValues.is_favourite = is_fav;
+  
+        }
+      }
+      return res.status(200).json({
+        message: 'Fetched Caterers Successfully!',
+        caterer: nearby,
+        totalCaterers: nearby.length, status: 1
+      })
+
+    }
     
     const lat1 = activeAddress.latitude,
           long1 = activeAddress.longitude;
@@ -97,6 +152,7 @@ exports.getCaterers = async (req, res, next) => {
           caterers[i].dataValues.rating = rate;
           caterers[i].dataValues.averagePrice = avgPrice;
           caterers[i].dataValues.is_favourite = is_fav;
+          caterers[i].dataValues.distance = d
 
           nearby.push(caterers[i].dataValues);
         }
@@ -105,7 +161,7 @@ exports.getCaterers = async (req, res, next) => {
     }
     return res.status(200).json({
       message: 'Fetched Caterers Successfully!',
-      caterer: nearby,
+      caterer: nearby.sort((a, b) => (a.distance > b.distance) ? 1 : ((b.distance > a.distance) ? -1 : 0)),
       totalCaterers: nearby.length, status: 1
     })
   } catch (err) {

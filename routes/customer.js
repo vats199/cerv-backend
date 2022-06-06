@@ -19,7 +19,7 @@ router.put('/edit-profile',jwtAuth,
                                 body('email').isEmail()
                                 .withMessage('Please enter a valid email address!')
                                 .normalizeEmail(),
-                                body('phone_number', 'Please Enter a mobile number!').isMobilePhone()
+                                body('phone_number', 'Please Enter a mobile number!').isMobilePhone('any')
                                 , customerController.editInfo);
 
 router.get('/get-address', jwtAuth, customerController.getAddress);
