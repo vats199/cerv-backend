@@ -100,7 +100,9 @@ exports.checkout_online = async (req, res, next) => {
                 return res.status(200).json({
                     message: 'Checkout data fetched successfully!',
                     data: {
-                        paymentIntent: payment_intent.id
+                        client_secret: payment_intent.client_secret,
+                        customerId: payment_intent.customer,
+                        status: 1
                     }
                 });
             })

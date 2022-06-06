@@ -41,7 +41,7 @@ router.post('/add-to-favourites', jwtAuth, customerController.postFav);
 router.get('/get-favourites', jwtAuth, customerController.getFav);
 router.delete('/delete-favourites', jwtAuth, customerController.deleteFav);
 router.get('/search/:key',jwtAuth, customerController.search)
-
+router.post('/checkout', jwtAuth, stripeController.checkout_online);
 
 
 module.exports = router;
