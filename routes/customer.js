@@ -10,7 +10,7 @@ const { check,body } = require('express-validator/check');
 router.use(cors());
 
 router.get('/caterers/:lat/:long', jwtAuth, customerController.getCaterers);
-router.get('/caterers/:filter', jwtAuth, customerController.filterCaterers);
+router.get('/caterers/:lat/:long/:filter', jwtAuth, customerController.filterCaterers);
 router.get('/catererInfo/:catererId', jwtAuth, customerController.getCaterer);
 router.get('/get-banners', jwtAuth, customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
