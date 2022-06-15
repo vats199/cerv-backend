@@ -49,7 +49,8 @@ exports.getCard = async (req, res, next) => {
                 { object: 'card' }
             );
             return res.status(200).json({
-                message: cards
+                message: cards,
+                status: 1
             });
 
         } catch (err) {
