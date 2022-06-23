@@ -16,6 +16,7 @@ const { Op } = require('sequelize');
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
+const s3 = require('./s3');
 
 exports.getUsers = async (req,res,next) => {
     const key = req.params.key;

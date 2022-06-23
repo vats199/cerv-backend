@@ -19,7 +19,7 @@ const { v4: uuidv4 } = require('uuid')
 const { Op } = require('sequelize');
 
 const db = require('../util/database');
-
+const S3 = require('./s3')
 const fs = require('fs')
 const path = require('path');
 
@@ -295,6 +295,7 @@ exports.getProfile = async (req, res, next) => {
       throw error;
     }
     else {
+
       const profileData = {
         name: user.name,
         image: user.image,
@@ -319,9 +320,9 @@ exports.getDP = async (req, res, next) => {
 
   try {
 
-    const dp = await User.findOne({ where: { id: userId } })
-
-    return res.status(200).json({ message: "Profile Picture fetched Successfully!", dp: dp.image, status: 1 })
+    const dp = await User.findOne({ where: { id: 1 } })
+    const key = dp.image;
+    return res.status(200).json({ message: "Profile Picture fetched Successfully!", dp: key, status: 1 })
 
   } catch (err) {
     console.log(err);
@@ -345,13 +346,8 @@ exports.editInfo = async (req, res, next) => {
   let url;
   if (image) {
 
-    const result = await cloudinary.uploader.upload(image, {
-      public_id: uuidv4() + ' _profile',
-      width: 500,
-      height: 500,
-      crop: 'fill',
-    })
-    url = result.url
+    const uploadFile = await S3.uploadFile(image);
+    url = uploadFile.Location;
   } else {
     url = null;
   }

@@ -15,6 +15,7 @@ const notifications = require('../util/notifications');
 
 const fs = require('fs')
 const path = require('path')
+const S3 = require('./s3')
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
@@ -65,12 +66,8 @@ exports.postCategory = async (req,res,next) => {
       return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
     }
     const title = req.body.title;
-    const image = await cloudinary.uploader.upload(req.file.path, {
-        public_id: uuidv4() + ' _profile',
-        width: 500,
-        height: 500,
-        crop: 'fill',
-      })
+    const uploadFile = await S3.uploadFile(req.file);
+    let url = uploadFile.Location;
     Category.findOne({
         where: {
             title: title,
@@ -81,7 +78,7 @@ exports.postCategory = async (req,res,next) => {
             const store = await Store.findOne({where: {userId: req.user_id}})
             Category.create({
                 title: title,
-                image: image.url,
+                image: url,
                 userId: req.user_id,
                 storeId: store.id
             })
@@ -111,13 +108,9 @@ exports.editCategory = async (req,res,next) => {
     let url;
     if(image){
   
-      const result = await cloudinary.uploader.upload(image, {
-        public_id: uuidv4() + ' _profile',
-        width: 500,
-        height: 500,
-        crop: 'fill',
-      })
-      url = result.url
+      const uploadFile = await S3.uploadFile(image);
+      url = uploadFile.Location;
+      
     } else {
       url = null;
     }
@@ -165,12 +158,8 @@ exports.postItems = async(req,res,next)=>{
     const title = req.body.title;
     const desc = req.body.description;
     try {
-        const image = await cloudinary.uploader.upload(req.file.path, {
-            public_id: uuidv4() + ' _profile',
-            width: 500,
-            height: 500,
-            crop: 'fill',
-          })
+      const uploadFile = await S3.uploadFile(image);
+      let url = uploadFile.Location;
         const store = await Store.findOne({where: {userId: req.user_id}})
         const categoryId = req.body.categoryId;
         const price = req.body.price;
@@ -186,7 +175,7 @@ exports.postItems = async(req,res,next)=>{
             }else{
                 Item.create({
                     title: title,
-                    image: image.url,
+                    image: url,
                     description: desc,
                     categoryName: cat.title,
                     price: price,
@@ -259,14 +248,10 @@ exports.postBanner = async (req,res,next)=>{
       return res.status(400).json({message: "You are not Authorized to do this!", status: 0})
     }
     const userId = req.user_id;
-    const image = await cloudinary.uploader.upload(req.file.path, {
-        public_id: uuidv4() + ' _profile',
-        width: 500,
-        height: 500,
-        crop: 'fill',
-      })
+    const uploadFile = await S3.uploadFile(image);
+    let url = uploadFile.Location;
     const data = {
-        image: image.url,
+        image: url,
         userId: userId
     }
     Banner.create(data)

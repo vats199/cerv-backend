@@ -3,15 +3,15 @@ const config = require('../util/config');
 const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid')
 const nodemailer = require('nodemailer');
-const mailjet = require('node-mailjet').connect(process.env.mjapi, process.env.mjsecret);
 const jwt = require('jsonwebtoken');
-const client = require('twilio')(process.env.accounSID, process.env.authToken);
+const client = require('twilio')(process.env.accounSID, process.env.authToken)
 const { Op } = require('@sequelize/core')
 const fs = require('fs');
 const cloudinary = require('../util/image');
 const stripe = require('stripe')(process.env.STRIPE_SK);
 const request = require('request');
 const notifications = require('../util/notifications');
+const S3 = require('./s3');
 
 const { validationResult } = require('express-validator/check');
 
@@ -34,7 +34,7 @@ exports.postSignup = async (req, res, next) => {
     return console.log("Your Body is empty!")
   }
 
-  const image = req.file?.path;
+  const image = req.file
   let url
 
   try {
@@ -42,14 +42,9 @@ exports.postSignup = async (req, res, next) => {
 
     if (image) {
 
-      const result = await cloudinary.uploader.upload(image, {
-        public_id: uuidv4() + ' _profile',
-        width: 500,
-        height: 500,
-        crop: 'fill',
-      })
+      const uploadFile = await S3.uploadFile(image);
+      url = uploadFile.Location;
 
-      url = result.url;
     } else {
       url = null
     }

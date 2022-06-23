@@ -14,7 +14,7 @@ router.get('/caterers/:lat/:long/:filter', jwtAuth, customerController.filterCat
 router.get('/catererInfo/:catererId', jwtAuth, customerController.getCaterer);
 router.get('/get-banners', jwtAuth, customerController.getBanner)
 router.get('/profile',jwtAuth, customerController.getProfile);
-router.get('/picture', jwtAuth, customerController.getDP);
+router.get('/picture', customerController.getDP);
 router.put('/edit-profile',jwtAuth,
                                 body('email').isEmail()
                                 .withMessage('Please enter a valid email address!')
