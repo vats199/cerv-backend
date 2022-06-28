@@ -81,6 +81,11 @@ exports.checkout_online = async (req, res, next) => {
             req.body.card_id
         );
 
+        const ephemeralKey = await stripe.ephemeralKeys.create(
+            {customer: user.stripe_id},
+            {apiVersion: '2020-08-27'}
+          );
+
         const payment_intent = await stripe.paymentIntents.create({
             payment_method_types: ['card'],
             description: 'Pay for CERV',
@@ -103,7 +108,7 @@ exports.checkout_online = async (req, res, next) => {
                     data: {
                         client_secret: payment_intent.client_secret,
                         customerId: payment_intent.customer,
-                        intent: payment_intent,
+                        ephemeralKey: ephemeralKey.secret,
                         status: 1
                     }
                 });
