@@ -157,10 +157,11 @@ exports.postItems = async(req,res,next)=>{
     }
     const title = req.body.title;
     const desc = req.body.description;
+    const image = req.file;
     try {
       const uploadFile = await S3.uploadFile(image);
       let url = uploadFile.Location;
-        const store = await Store.findOne({where: {userId: req.user_id}})
+        const store = await Store.findOne({where: {catererId: req.user_id}})
         const categoryId = req.body.categoryId;
         const price = req.body.price;
         Category.findOne({
