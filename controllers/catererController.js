@@ -30,7 +30,7 @@ exports.getCategories = async (req,res,next) => {
 
     try {
 
-        const categories = await Category.findAll({where: { userId: catererId }});
+        const categories = await Category.findAll({where: { userId: catererId }, include: [ Item ]});
 
         return res.status(200).json({message: "Categories fetched successfully!", categories: categories, length: categories.length , status:1})
         

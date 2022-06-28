@@ -133,7 +133,7 @@ exports.postLogin = async (req, res, next) => {
       return res.status(400).json({ error: 'User does not exist with the role or email selected!', status: 0 })
     }
     if (user.role == 0) {
-      const store = await Store.findOne({ where: { userId: user.id } });
+      const store = await Store.findOne({ where: { catererId: user.id } });
 
       if(!store){
         return res.status(400).json({message: "Register your store and get verified by admin!", userId: user.id, userName: user.name, status: 0})
