@@ -24,6 +24,9 @@ exports.handler = async (event) => {
                         statusCode: 200,
                         body: veri.sub
                     }
+                    // let response;
+                    // return response.statusCode(200).json({message: "User authorized!", id: veri.sub});
+
                     return response;
 
                 } catch (error) {

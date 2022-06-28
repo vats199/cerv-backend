@@ -103,6 +103,7 @@ exports.checkout_online = async (req, res, next) => {
                     data: {
                         client_secret: payment_intent.client_secret,
                         customerId: payment_intent.customer,
+                        intent: payment_intent,
                         status: 1
                     }
                 });
