@@ -320,9 +320,11 @@ exports.getDP = async (req, res, next) => {
 
   try {
 
-    const dp = await User.findOne({ where: { id: 1 } })
-    const key = dp.image;
-    return res.status(200).json({ message: "Profile Picture fetched Successfully!", dp: key, status: 1 })
+    // const dp = await User.findOne({ where: { id: 1 } })
+    // const key = dp.image;
+
+    const dp = S3.getFileStream('1e5a5ee0-8aed-41ba-b112-c09767fba5c3 _profile.jpg')
+    return res.status(200).json({ message: "Profile Picture fetched Successfully!", dp: dp, status: 1 })
 
   } catch (err) {
     console.log(err);

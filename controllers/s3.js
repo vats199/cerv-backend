@@ -27,10 +27,11 @@ exports.uploadFile = uploadFile;
 function getFileStream(fileKey) {
     const downloadParams = {
       Key: fileKey,
-      Bucket: bucketName
+      Bucket: bucketName,
+      Expires: 30 * 60
     }
   
-    return s3.getObject(downloadParams).createReadStream()
+    return s3.getSignedUrl('getObject',downloadParams)
   }
   exports.getFileStream = getFileStream
 
