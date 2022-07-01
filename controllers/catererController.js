@@ -295,6 +295,24 @@ exports.postCoupon = async (req, res, next) => {
   }
 }
 
+exports.getCoupons = async (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const catererId = req.user_id;
+
+  try {
+
+    const coupons = await Coupon.findAll({ where: { catererId: catererId } });
+    return res.status(200).json({ message: "Coupons Fetched!", status: 1, data: coupons })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 exports.getOrders = async (req, res, next) => {
   const role = req.user.role;
   if (role != 0) {
