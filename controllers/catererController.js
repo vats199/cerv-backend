@@ -334,6 +334,7 @@ exports.editCoupon = async (req, res, next) => {
     coupon.expiry = data.expiry || coupon.expiry;
     coupon.code = data.code || coupon.code;
     coupon.is_percent = data.is_percent || coupon.is_percent;
+    coupon.is_active = data.is_active || coupon.is_active;
     coupon.value = data.value || coupon.value;
 
     const resp = await coupon.save();
