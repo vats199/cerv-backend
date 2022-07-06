@@ -50,10 +50,10 @@ exports.getCategory = async (req, res, next) => {
   const catererId = req.user_id;
   try {
 
-    const category = await Category.findByPk(categoryId);
+    const category = await Category.findByPk(categoryId, { include: [Item] });
     const items = await Item.findAll({ where: { categoryId: categoryId, userId: catererId } })
 
-    return res.status(200).json({ message: "Items fetched successfully!", category: category, items: items, length: items.length, status: 1 })
+    return res.status(200).json({ message: "Items fetched successfully!", category: category, length: items.length, status: 1 })
 
   } catch (err) {
     console.log(err);
@@ -277,7 +277,7 @@ exports.postCoupon = async (req, res, next) => {
   const payLoad = {
     title: data.title,
     description: data.description,
-    expiry: Date.now(),
+    expiry: data.expiry,
     code: data.code,
     is_percent: data.is_percent,
     value: data.value,
@@ -306,6 +306,63 @@ exports.getCoupons = async (req, res, next) => {
 
     const coupons = await Coupon.findAll({ where: { catererId: catererId } });
     return res.status(200).json({ message: "Coupons Fetched!", status: 1, data: coupons })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+exports.editCoupon = async (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const catererId = req.user_id;
+  const couponId = req.query.couponId
+  const data = req.body;
+
+  try {
+
+    const coupon = await Coupon.findOne({ where: { id: couponId, catererId: catererId } })
+
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found!", status: 0 })
+    }
+
+    coupon.title = data.title || coupon.title;
+    coupon.description = data.description || coupon.description;
+    coupon.expiry = data.expiry || coupon.expiry;
+    coupon.code = data.code || coupon.code;
+    coupon.is_percent = data.is_percent || coupon.is_percent;
+    coupon.value = data.value || coupon.value;
+
+    const resp = await coupon.save();
+
+    return res.status(200).json({ message: "Coupon Updated!", status: 1, data: resp })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
+exports.deleteCoupon = async (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const couponId = req.body.couponId;
+  const catererId = req.user_id;
+
+  try {
+
+    const coupon = await Coupon.findOne({ where: { id: couponId, catererId: catererId } });
+    if (!coupon) {
+      return res.status(404).json({ message: "Coupon not found!", status: 0 })
+    }
+    await coupon.destroy();
+
+    return res.status(200).json({ message: "Coupon Deleted!", status: 1 })
 
   } catch (err) {
     console.log(err);

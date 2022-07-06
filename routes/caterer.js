@@ -17,6 +17,8 @@ router.delete('/delete-item/:itemId', jwtAuth, catererController.deleteItem)
 router.post('/add-banner', jwtAuth, catererController.postBanner);
 router.post('/addCoupon', jwtAuth, catererController.postCoupon);
 router.get('/getCoupons', jwtAuth, catererController.getCoupons);
+router.put('/editCoupon', jwtAuth, catererController.editCoupon);
+router.delete('/deleteCoupon', jwtAuth, catererController.deleteCoupon);
 router.get('/getOrders/:key', jwtAuth, catererController.getOrders);
 router.post('/accept-order/:orderId', jwtAuth, catererController.acceptOrder);
 router.post('/reject-order/:orderId', jwtAuth, catererController.rejectOrder);
