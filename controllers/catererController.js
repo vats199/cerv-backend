@@ -266,8 +266,8 @@ exports.editItem = (req, res, next) => {
 
         if (image) {
 
-          const uploadFile = await S3.uploadFile(image);
-          let url = uploadFile.Location;
+          const upload = await S3.uploadFile(image);
+          let url = upload.Location;
           item.image = url;
         }
         item.title = title || item.title;
