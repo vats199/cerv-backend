@@ -20,6 +20,7 @@ const { Op } = require('sequelize')
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
+const Driver = require('../models/driver');
 
 exports.getProfile = async (req, res, next) => {
   try {
@@ -38,6 +39,8 @@ exports.getProfile = async (req, res, next) => {
     }
     else {
 
+      const driver = await Driver.findOne({ where: { storeId: store.id } })
+
       const profileData = {
         name: user.name,
         image: user.image,
@@ -45,7 +48,8 @@ exports.getProfile = async (req, res, next) => {
         countryCode: user.country_code,
         phoneNumber: user.phone_number
       }
-      profileData.store = store
+      profileData.store = store;
+      profileData.driver = driver;
       return res.status(200).json({ message: "Found Profile!", data: profileData, status: 1 })
     }
 
