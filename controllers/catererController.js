@@ -253,16 +253,26 @@ exports.editItem = (req, res, next) => {
   }
   const itemId = req.params.itemId;
   const title = req.body.title;
-  const image = req.file.path;
+  const description = req.body.description;
+
+
+
   const price = req.body.price;
 
   Item.findOne({ where: { id: itemId } })
     .then(item => {
       if (item.userId === req.user_id) {
-        clearImage(item.image);
-        item.title = title;
-        item.image = image;
-        item.price = price;
+        const image = req.file
+
+        if (image) {
+
+          const uploadFile = await S3.uploadFile(image);
+          let url = uploadFile.Location;
+          item.image = url;
+        }
+        item.title = title || item.title;
+        item.price = price || item.price;
+        item.description = description || item.description;
         item.save();
         return res.status(200).json({ message: "Updated item successfully!", data: item, status: 1 })
       } else {
@@ -297,6 +307,7 @@ exports.postBanner = async (req, res, next) => {
     return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
   }
   const userId = req.user_id;
+  const image = req.file
   const uploadFile = await S3.uploadFile(image);
   let url = uploadFile.Location;
   const data = {
