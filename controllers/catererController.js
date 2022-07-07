@@ -260,7 +260,7 @@ exports.editItem = (req, res, next) => {
   const price = req.body.price;
 
   Item.findOne({ where: { id: itemId } })
-    .then(item => {
+    .then(async item => {
       if (item.userId === req.user_id) {
         const image = req.file
 
