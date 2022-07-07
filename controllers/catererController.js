@@ -21,6 +21,43 @@ const { Op } = require('sequelize')
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
 
+exports.getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ where: { id: req.user_id } });
+    const store = await Store.findOne({ where: { catererId: req.user_id } });
+
+    if (!user) {
+      const error = new Error("Couldn't Find the Profile!");
+      error.statusCode = 404;
+      throw error;
+    }
+    if (!store) {
+      const error = new Error("Couldn't Find the Store!");
+      error.statusCode = 404;
+      throw error;
+    }
+    else {
+
+      const profileData = {
+        name: user.name,
+        image: user.image,
+        email: user.email,
+        countryCode: user.country_code,
+        phoneNumber: user.phone_number
+      }
+      profileData.store = store
+      return res.status(200).json({ message: "Found Profile!", data: profileData, status: 1 })
+    }
+
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+
+}
+
 exports.getCategories = async (req, res, next) => {
 
   const role = req.user.role;
