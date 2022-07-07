@@ -24,6 +24,10 @@ const Driver = require('../models/driver');
 
 exports.getProfile = async (req, res, next) => {
   try {
+    const role = req.user.role;
+    if (role != 0) {
+      return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+    }
     const user = await User.findOne({ where: { id: req.user_id } });
     const store = await Store.findOne({ where: { catererId: req.user_id } });
 

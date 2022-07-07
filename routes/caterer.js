@@ -6,6 +6,7 @@ const router = express.Router();
 const jwtAuth = require('../middleware/jwtAuth')
 router.use(cors());
 
+router.get('/getProfile', jwtAuth, catererController.getProfile)
 router.get('/categories', jwtAuth, catererController.getCategories);
 router.get('/category/:catId', jwtAuth, catererController.getCategory);
 router.post('/add-category', jwtAuth, catererController.postCategory);
