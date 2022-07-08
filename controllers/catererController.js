@@ -151,7 +151,7 @@ exports.editCategory = async (req, res, next) => {
   }
   const categoryId = req.params.catId;
   const title = req.body.title;
-  const image = req.file?.path;
+  const image = req.file;
   let url;
   if (image) {
 
