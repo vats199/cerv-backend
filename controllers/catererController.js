@@ -262,8 +262,7 @@ exports.editItem = (req, res, next) => {
 
   Item.findOne({ where: { id: itemId } })
     .then(async item => {
-      console.log('------------------------->     User Authorized', item.userId, req.user_id)
-      if (item.userId === req.user_id) {
+      if (item.userId == req.user_id) {
         const image = req.file
 
         if (image) {
