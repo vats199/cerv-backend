@@ -21,6 +21,7 @@ const { Op } = require('sequelize')
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid');
 const Driver = require('../models/driver');
+const { log } = require('console');
 
 exports.getProfile = async (req, res, next) => {
   try {
@@ -261,6 +262,7 @@ exports.editItem = (req, res, next) => {
 
   Item.findOne({ where: { id: itemId } })
     .then(async item => {
+      console.log('------------------------->     User Authorized', item.userId, req.user_id)
       if (item.userId === req.user_id) {
         const image = req.file
 
