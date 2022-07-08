@@ -122,7 +122,7 @@ exports.postCategory = async (req, res, next) => {
     }
   }).then(async cat => {
     if (!cat) {
-      const store = await Store.findOne({ where: { userId: req.user_id } })
+      const store = await Store.findOne({ where: { catererId: req.user_id } })
       Category.create({
         title: title,
         image: url,
