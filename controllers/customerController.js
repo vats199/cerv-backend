@@ -26,7 +26,7 @@ const path = require('path');
 exports.getCaterers = async (req, res, next) => {
   const userId = req.user_id;
   const lat1 = req.params.lat,
-        long1 = req.params.long;
+    long1 = req.params.long;
   try {
 
     const totalCaterers = await Store.count()
@@ -52,31 +52,31 @@ exports.getCaterers = async (req, res, next) => {
       for (let i = 0; i < caterers.length; i++) {
 
         const lat2 = caterers[i].latitude,
-              long2 = caterers[i].longitude;
+          long2 = caterers[i].longitude;
 
         const R = 6371; // kms
         const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
         const φ2 = (lat2 * Math.PI) / 180;
         const Δφ = ((lat2 - lat1) * Math.PI) / 180;
         const Δλ = ((long2 - long1) * Math.PI) / 180;
-  
+
         const a =
           Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
           Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
+
         const d = R * c; // in km
 
-        if(d<25){
+        if (d < 25) {
 
           // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
           const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
           const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
           const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
           let is_fav;
-          if(fav) {
+          if (fav) {
             is_fav = 1;
-          } else{
+          } else {
             is_fav = 0;
           }
           const avgPrice = Math.floor(avgPri[0][0].avgPrice);
@@ -114,7 +114,7 @@ exports.getCaterers = async (req, res, next) => {
 exports.filterCaterers = async (req, res, next) => {
   const filter = req.params.filter;
   const lat1 = req.params.lat,
-        long1 = req.params.long;
+    long1 = req.params.long;
 
   try {
     const totalCaterers = await Store.count()
@@ -137,31 +137,31 @@ exports.filterCaterers = async (req, res, next) => {
       for (let i = 0; i < caterers.length; i++) {
 
         const lat2 = caterers[i].latitude,
-              long2 = caterers[i].longitude;
+          long2 = caterers[i].longitude;
 
         const R = 6371; // kms
         const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
         const φ2 = (lat2 * Math.PI) / 180;
         const Δφ = ((lat2 - lat1) * Math.PI) / 180;
         const Δλ = ((long2 - long1) * Math.PI) / 180;
-  
+
         const a =
           Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
           Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  
+
         const d = R * c; // in km
 
-        if(d<25){
+        if (d < 25) {
 
           // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
           const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
           const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
           const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterers[i].catererId } });
           let is_fav;
-          if(fav) {
+          if (fav) {
             is_fav = 1;
-          } else{
+          } else {
             is_fav = 0;
           }
           const avgPrice = Math.floor(avgPri[0][0].avgPrice);
@@ -205,8 +205,8 @@ exports.filterCaterers = async (req, res, next) => {
         caterer: nearby.sort((a, b) => (a.dataValues.averagePrice > b.dataValues.averagePrice) ? 1 : ((b.dataValues.averagePrice > a.dataValues.averagePrice) ? -1 : 0)),
         totalCaterers: totalCaterers, status: 1
       })
-    } else{
-      return res.status(400).json({message: "Wrong filter applied!", status: 0})
+    } else {
+      return res.status(400).json({ message: "Wrong filter applied!", status: 0 })
     }
   } catch (err) {
     if (!err.statusCode) {
@@ -245,9 +245,9 @@ exports.getCaterer = async (req, res, next) => {
     const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterer.catererId})`)
     const fav = await Favourites.findOne({ where: { userId: req.user_id, catererId: caterer.catererId } });
     let is_fav;
-    if(fav) {
+    if (fav) {
       is_fav = 1;
-    } else{
+    } else {
       is_fav = 0;
     }
     const avgPrice = Math.floor(avgPri[0][0].avgPrice);
@@ -336,8 +336,8 @@ exports.editInfo = async (req, res, next) => {
 
   const errors = validationResult(req);
 
-  if(!errors.isEmpty()){
-    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg, status: 0 })
   }
 
   const name = req.body.name;
@@ -380,15 +380,15 @@ exports.editInfo = async (req, res, next) => {
 
       const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
 
-      if(test){
+      if (test) {
 
-        return res.status(400).json({message: "E-mail already registered!", status: 0})
+        return res.status(400).json({ message: "E-mail already registered!", status: 0 })
 
-      } else if(test1){
+      } else if (test1) {
 
-        return res.status(400).json({message: "Phone number already registered!", status: 0})
+        return res.status(400).json({ message: "Phone number already registered!", status: 0 })
 
-      } else{
+      } else {
 
         user.name = name || user.name;
         user.image = url || user.image
@@ -530,8 +530,8 @@ exports.postReview = async (req, res, next) => {
   try {
 
     const test = await Order.findByPk(orderId)
-    if(test.is_reviewed == true){
-      return res.status(400).json({message: "Order is already reviewed!", status: 0})
+    if (test.is_reviewed == true) {
+      return res.status(400).json({ message: "Order is already reviewed!", status: 0 })
     }
     const rev = await Feedback.create({
       rating: req.body.rating,
@@ -562,7 +562,7 @@ exports.search = async (req, res, next) => {
   try {
     if (key == 1) {
       const totalResults = await Category.count({ where: { title: { [Op.like]: '%' + term + '%' } } })
-      const results = await Category.findAll({ include: [{model: Item}, {model: User,attributes: { exclude: ['password'] }}], where: { title: { [Op.like]: '%' + term + '%' } } });
+      const results = await Category.findAll({ include: [{ model: Item }, { model: User, attributes: { exclude: ['password'] } }], where: { title: { [Op.like]: '%' + term + '%' } } });
 
       return res.status(200).json({
         message: 'Fetched Categories Successfully!',
@@ -574,7 +574,7 @@ exports.search = async (req, res, next) => {
 
     else if (key == 2) {
       const totalResults = await Item.count({ where: { title: { [Op.like]: '%' + term + '%' } } })
-      const results = await Item.findAll({ include: [{model: Category}, {model: User,attributes: { exclude: ['password'] }}], where: { title: { [Op.like]: '%' + term + '%' } } });
+      const results = await Item.findAll({ include: [{ model: Category }, { model: User, attributes: { exclude: ['password'] } }], where: { title: { [Op.like]: '%' + term + '%' } } });
 
       return res.status(200).json({
         message: 'Fetched Items Successfully!',
@@ -586,44 +586,46 @@ exports.search = async (req, res, next) => {
 
     else if (key == 3) {
       const totalResults = await Store.count({ where: { name: { [Op.like]: '%' + term + '%' } } })
-      const caterers = await Store.findAll({ where: { name: { [Op.like]: '%' + term + '%' } },  include: {
-        model: User,
-        as: 'caterer',
-        foreignKey: 'catererId',
-        attributes: { exclude: ['password'] },
-        include: {
-          model: Category,
+      const caterers = await Store.findAll({
+        where: { name: { [Op.like]: '%' + term + '%' } }, include: {
+          model: User,
+          as: 'caterer',
+          foreignKey: 'catererId',
+          attributes: { exclude: ['password'] },
           include: {
-            model: Item
+            model: Category,
+            include: {
+              model: Item
+            }
           }
         }
-      } });
+      });
 
-for (let i = 0; i < caterers.length; i++) {
+      for (let i = 0; i < caterers.length; i++) {
 
-          // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
-          const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
-          const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
-          const fav = await Favourites.findOne({ where: { userId: userId, catererId: caterers[i].catererId } });
-          let is_fav;
-          if(fav) {
-            is_fav = 1;
-          } else{
-            is_fav = 0;
-          }
-          const avgPrice = Math.floor(avgPri[0][0].avgPrice);
-          const decimal = (rating[0][0].rating) % 1;
-          let rate;
-          if (decimal < 0.25) {
-            rate = Math.floor(rating[0][0].rating)
-          } else if (decimal <= 0.75) {
-            rate = Math.floor(rating[0][0].rating) + 0.5;
-          } else {
-            rate = Math.floor(rating[0][0].rating) + 1;
-          }
-          caterers[i].dataValues.rating = rate;
-          caterers[i].dataValues.averagePrice = avgPrice;
-          caterers[i].dataValues.is_favourite = is_fav;
+        // const rating = await Feedback.findOne({ where: { catererId: caterers[i].userId } ,attributes: [Sequelize.fn('AVG', Sequelize.col('rating'))], raw: true });
+        const rating = await db.sequelize.query(`SELECT AVG(rating) as rating FROM feedbacks WHERE catererId = ${caterers[i].catererId}`)
+        const avgPri = await db.sequelize.query(`SELECT AVG(price) as avgPrice FROM items WHERE categoryId IN ( SELECT id FROM categories WHERE userId = ${caterers[i].catererId})`)
+        const fav = await Favourites.findOne({ where: { userId: userId, catererId: caterers[i].catererId } });
+        let is_fav;
+        if (fav) {
+          is_fav = 1;
+        } else {
+          is_fav = 0;
+        }
+        const avgPrice = Math.floor(avgPri[0][0].avgPrice);
+        const decimal = (rating[0][0].rating) % 1;
+        let rate;
+        if (decimal < 0.25) {
+          rate = Math.floor(rating[0][0].rating)
+        } else if (decimal <= 0.75) {
+          rate = Math.floor(rating[0][0].rating) + 0.5;
+        } else {
+          rate = Math.floor(rating[0][0].rating) + 1;
+        }
+        caterers[i].dataValues.rating = rate;
+        caterers[i].dataValues.averagePrice = avgPrice;
+        caterers[i].dataValues.is_favourite = is_fav;
 
       }
       return res.status(200).json({
@@ -763,33 +765,33 @@ exports.postOrder = async (req, res, next) => {
       }
     }
 
-    const message_notification = {
-      notification: {
-        title: 'Order Placed',
-        body: 'Order placed successfully.'
-      }
-    };
+    // const message_notification = {
+    //   notification: {
+    //     title: 'Order Placed',
+    //     body: 'Order placed successfully.'
+    //   }
+    // };
 
     try {
 
       const store = await Store.findOne({ where: { userId: catererId } });
       const token = await Token.findOne({ where: { userId: userId } });
 
-      notifications.createNotification(token.device_token, message_notification);
+      // notifications.createNotification(token.device_token, message_notification);
 
       const data = {
         title: 'Order Placed',
         body: `You have placed order at ${store.name}`,
         type: 0
       }
-      await Notification.create(data);
-      
+      // await Notification.create(data);
+
     } catch (error) {
       console.log(error);
       return res.status(404).json({
         ErrorMessage: 'Device token not found or valid!',
         status: 0
-    });
+      });
     }
 
     return res.status(200).json({ message: "Order has been Placed!", order: order, status: 1 });
@@ -821,7 +823,7 @@ exports.getOrders = async (req, res, next) => {
           model: User,
           as: 'caterer',
           foreignKey: 'catererId',
-          include: { model: Store, as: 'store', foreignKey: 'catererId'}
+          include: { model: Store, as: 'store', foreignKey: 'catererId' }
         }]
       })
 
@@ -843,7 +845,7 @@ exports.getOrders = async (req, res, next) => {
           model: User,
           as: 'caterer',
           foreignKey: 'catererId',
-          include: { model: Store, as: 'store', foreignKey: 'catererId'}
+          include: { model: Store, as: 'store', foreignKey: 'catererId' }
         }]
       })
 
@@ -870,46 +872,46 @@ exports.cancelOrder = async (req, res, next) => {
 
     if (order) {
 
-      if(order.status == 0 || order.status == 1){
+      if (order.status == 0 || order.status == 1) {
 
         order.status = 5;
-      const result = await order.save();
+        const result = await order.save();
 
-      const message_notification = {
-        notification: {
-          title: 'Order Cancelled',
-          body: 'Order cancelled successfully.'
+        const message_notification = {
+          notification: {
+            title: 'Order Cancelled',
+            body: 'Order cancelled successfully.'
+          }
+        };
+
+        try {
+
+          const store = await Store.findOne({ where: { userId: catererId } });
+          const token = await Token.findOne({ where: { userId: userId } });
+
+          notifications.createNotification(token.device_token, message_notification);
+
+          const data = {
+            title: 'Order Cancelled',
+            body: `You have cancelled your order at ${store.name}`,
+            type: 5
+          }
+          await Notification.create(data);
+
+        } catch (error) {
+          console.log(error);
+          return res.status(404).json({
+            ErrorMessage: 'Device token not found or valid!',
+            status: 0
+          });
         }
-      };
-  
-      try {
-  
-        const store = await Store.findOne({ where: { userId: catererId } });
-        const token = await Token.findOne({ where: { userId: userId } });
-  
-        notifications.createNotification(token.device_token, message_notification);
-  
-        const data = {
-          title: 'Order Cancelled',
-          body: `You have cancelled your order at ${store.name}`,
-          type: 5
-        }
-        await Notification.create(data);
-        
-      } catch (error) {
-        console.log(error);
-        return res.status(404).json({
-          ErrorMessage: 'Device token not found or valid!',
-          status: 0
-      });
-      }
-      return res.status(200).json({ message: "Order Cancelled!", result: result, status: 1 })
+        return res.status(200).json({ message: "Order Cancelled!", result: result, status: 1 })
 
       } else {
-        return res.status(400).json({message: "Order can't be cancelled!", status: 0})
+        return res.status(400).json({ message: "Order can't be cancelled!", status: 0 })
       }
 
-      
+
     } else {
       return res.status(400).json({ message: "No order found", status: 0 })
     }
@@ -930,8 +932,8 @@ exports.postFav = async (req, res, next) => {
 
     const test = User.findByPk(catererId);
     const store = Store.findOne({ where: { catererId: catererId } })
-    if(test.role != 0 || store.is_approved != 1){
-      return res.status(400).json({message: "Caterer is not valid", status: 0})
+    if (test.role != 0 || store.is_approved != 1) {
+      return res.status(400).json({ message: "Caterer is not valid", status: 0 })
     }
     const fav = await Favourites.create({ userId: userId, catererId: catererId })
     return res.status(200).json({ message: "Added to Favourites!", result: fav, status: 1 })
@@ -969,13 +971,13 @@ exports.deleteFav = async (req, res, next) => {
   try {
 
     const favourite = Favourites.findOne({ where: { catererId: catererId, userId: userId } })
-    if(favourite){
+    if (favourite) {
 
       await Favourites.destroy({ where: { catererId: catererId, userId: userId } })
       return res.status(200).json({ message: "Removed from favourites!", status: 1 })
-      
+
     } else {
-      return res.status(400).json({message: "Caterer is not present in favourites!", status: 0})
+      return res.status(400).json({ message: "Caterer is not present in favourites!", status: 0 })
     }
 
   } catch (err) {
