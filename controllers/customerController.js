@@ -772,27 +772,27 @@ exports.postOrder = async (req, res, next) => {
     //   }
     // };
 
-    try {
+    // try {
 
-      const store = await Store.findOne({ where: { userId: catererId } });
-      const token = await Token.findOne({ where: { userId: userId } });
+    //   const store = await Store.findOne({ where: { userId: catererId } });
+    //   const token = await Token.findOne({ where: { userId: userId } });
 
-      // notifications.createNotification(token.device_token, message_notification);
+    //   // notifications.createNotification(token.device_token, message_notification);
 
-      const data = {
-        title: 'Order Placed',
-        body: `You have placed order at ${store.name}`,
-        type: 0
-      }
-      // await Notification.create(data);
+    //   const data = {
+    //     title: 'Order Placed',
+    //     body: `You have placed order at ${store.name}`,
+    //     type: 0
+    //   }
+    //   // await Notification.create(data);
 
-    } catch (error) {
-      console.log(error);
-      return res.status(404).json({
-        ErrorMessage: 'Device token not found or valid!',
-        status: 0
-      });
-    }
+    // } catch (error) {
+    //   console.log(error);
+    //   return res.status(404).json({
+    //     ErrorMessage: 'Device token not found or valid!',
+    //     status: 0
+    //   });
+    // }
 
     return res.status(200).json({ message: "Order has been Placed!", order: order, status: 1 });
   } catch (err) {
