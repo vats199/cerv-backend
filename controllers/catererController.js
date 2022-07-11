@@ -449,7 +449,7 @@ exports.getOrders = async (req, res, next) => {
           include: {
             model: Item
           }
-        }, Address, {
+        }, {
           model: User,
           as: 'user',
           foreignKey: 'userId'
