@@ -23,5 +23,8 @@ router.delete('/deleteCoupon', jwtAuth, catererController.deleteCoupon);
 router.get('/getOrders/:key', jwtAuth, catererController.getOrders);
 router.post('/accept-order/:orderId', jwtAuth, catererController.acceptOrder);
 router.post('/reject-order/:orderId', jwtAuth, catererController.rejectOrder);
+router.put('/order-preparing', jwtAuth, catererController.orderPreparing);
+router.put('/order-dispatched', jwtAuth, catererController.orderDispatched);
+router.put('/order-delivered', jwtAuth, catererController.orderDelivered);
 
 module.exports = router;

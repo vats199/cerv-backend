@@ -599,6 +599,83 @@ exports.rejectOrder = async (req, res, next) => {
   }
 }
 
+exports.orderPreparing = (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const catererId = req.user_id;
+  const orderId = req.body.orderId;
+
+  try {
+
+    const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+
+    if (order.status != 1) {
+      return res.status(400).json({ message: "Order is already preparing or invalid operation!", status: 0 })
+    }
+    order.status = 2;
+    const result = await order.save();
+
+    return res.status(200).json({ message: "Order Preparing!", result: result, status: 1 })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
+exports.orderDispatched = (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const catererId = req.user_id;
+  const orderId = req.body.orderId;
+
+  try {
+
+    const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+
+    if (order.status != 2) {
+      return res.status(400).json({ message: "Order is already dispatched or invalid operation!", status: 0 })
+    }
+    order.status = 3;
+    const result = await order.save();
+
+    return res.status(200).json({ message: "Order Dispatched!", result: result, status: 1 })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
+exports.orderDelivered = (req, res, next) => {
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+  const catererId = req.user_id;
+  const orderId = req.body.orderId;
+
+  try {
+
+    const order = await Order.findOne({ where: { catererId: catererId, id: orderId } })
+
+    if (order.status != 3) {
+      return res.status(400).json({ message: "Order is already delivered or invalid operation!", status: 0 })
+    }
+    order.status = 4;
+    const result = await order.save();
+
+    return res.status(200).json({ message: "Order Delivered!", result: result, status: 1 })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
 
 const clearImage = filePath => {
   filePath = path.join(__dirname, '..', filePath);

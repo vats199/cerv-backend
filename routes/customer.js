@@ -35,7 +35,6 @@ router.get('/getCoupons/:catererId', jwtAuth, customerController.getCoupons);
 router.post('/cancelOrder', jwtAuth, customerController.cancelOrder);
 router.get('/getOrders/:key', jwtAuth, customerController.getOrders);
 router.post('/applyToken', customerController.applyToken);
-// router.put('/order-status', jwtAuth, customerController.putOrderStatus);
 router.post('/add-to-favourites', jwtAuth, customerController.postFav);
 router.get('/get-favourites', jwtAuth, customerController.getFav);
 router.delete('/delete-favourites', jwtAuth, customerController.deleteFav);
