@@ -1023,6 +1023,24 @@ exports.applyToken = async (req, res, next) => {
 
 }
 
+exports.getCoupons = async (req, res, next) => {
+
+  const catererId = req.params.catererId;
+
+  try {
+
+    const coupons = await Coupon.findAll({ where: { catererId: catererId } });
+    let data = {};
+    data.coupons = coupons;
+    data.totalCoupons = coupons.length;
+    return res.status(200).json({ message: "Coupons Fetched!", status: 1, data: data })
+
+  } catch (err) {
+    console.log(err);
+    return res.status(500).send({ error: err || 'Something went wrong!', status: 0 });
+  }
+}
+
 const clearImage = filePath => {
   filePath = path.join(__dirname, '..', filePath);
   fs.unlink(filePath, err => console.log(err))

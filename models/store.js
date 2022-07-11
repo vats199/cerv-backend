@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../util/database');
 
-module.exports = db.sequelize.define('store' , {
+module.exports = db.sequelize.define('store', {
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -19,12 +19,12 @@ module.exports = db.sequelize.define('store' , {
     address: {
         type: Sequelize.STRING
     },
-    latitude : {
-          type : Sequelize.DECIMAL
-      },
-    longitude : {
-          type : Sequelize.DECIMAL
-      },
+    latitude: {
+        type: Sequelize.DECIMAL(10, 7)
+    },
+    longitude: {
+        type: Sequelize.DECIMAL(10, 7)
+    },
     bio: {
         type: Sequelize.STRING
     },
@@ -39,7 +39,7 @@ module.exports = db.sequelize.define('store' , {
         defaultValue: 0,
         comment: '0 = not approved, 1 = approved, 2 = rejected'
     },
-    order_type: { 
+    order_type: {
         type: Sequelize.TINYINT(1),
         allowNull: false,
         validate: {
