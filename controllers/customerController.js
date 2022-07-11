@@ -344,7 +344,7 @@ exports.editInfo = async (req, res, next) => {
   const email = req.body.email;
   const country_code = req.body.country_code;
   const phone_number = req.body.phone_number;
-  const image = req.file?.path;
+  const image = req.file;
   let url;
   if (image) {
 
