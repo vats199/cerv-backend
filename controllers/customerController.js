@@ -12,6 +12,7 @@ const Coupon = require('../models/coupon');
 const Token = require('../models/token')
 const Notification = require('../models/notifications');
 const notifications = require('../util/notifications');
+const { validationResult } = require('express-validator/check');
 
 const cloudinary = require('../util/image');
 const { v4: uuidv4 } = require('uuid')
