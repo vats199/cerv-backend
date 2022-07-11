@@ -343,8 +343,8 @@ exports.editInfo = async (req, res, next) => {
 
   const name = req.body.name;
   const email = req.body.email;
-  const country_code = req.body.country_code;
-  const phone_number = req.body.phone_number;
+  // const country_code = req.body.country_code;
+  // const phone_number = req.body.phone_number;
   const image = req.file;
   let url;
   if (image) {
@@ -379,23 +379,25 @@ exports.editInfo = async (req, res, next) => {
       //  console.log(name)
       const test = await User.findOne({ where: { email: req.body.email } })
 
-      const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+      // const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
 
       if (test) {
 
         return res.status(400).json({ message: "E-mail already registered!", status: 0 })
 
-      } else if (test1) {
+      }
+      // else if (test1) {
 
-        return res.status(400).json({ message: "Phone number already registered!", status: 0 })
+      //   return res.status(400).json({ message: "Phone number already registered!", status: 0 })
 
-      } else {
+      // } 
+      else {
 
         user.name = name || user.name;
         user.image = url || user.image
         user.email = email || user.email;
-        user.country_code = country_code || user.country_code;
-        user.phone_number = phone_number || user.phone_number;
+        // user.country_code = country_code || user.country_code;
+        // user.phone_number = phone_number || user.phone_number;
         await user.save();
         const result = await User.findOne({ where: { id: req.user_id }, attributes: { exclude: ['password'] } });
         return res.status(200).json({ message: "Profile Updated!", data: result, status: 1 });

@@ -18,8 +18,6 @@ router.get('/picture', customerController.getDP);
 router.put('/edit-profile', jwtAuth,
     body('email').isEmail()
         .withMessage('Please enter a valid email address!')
-    ,
-    body('phone_number', 'Please Enter a mobile number!').isMobilePhone('any')
     , customerController.editInfo);
 
 router.get('/get-address', jwtAuth, customerController.getAddress);
