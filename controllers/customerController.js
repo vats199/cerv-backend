@@ -380,8 +380,16 @@ exports.editInfo = async (req, res, next) => {
       const test = await User.findOne({ where: { email: req.body.email } })
 
       // const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
+      if (user.email == test.email) {
+        user.name = name || user.name;
+        user.image = url || user.image;
 
-      if (test) {
+        await user.save();
+        const result = await User.findOne({ where: { id: req.user_id }, attributes: { exclude: ['password'] } });
+        return res.status(200).json({ message: "Profile Updated!", data: result, status: 1 });
+      }
+
+      else if (user.email != test.email) {
 
         return res.status(400).json({ message: "E-mail already registered!", status: 0 })
 
