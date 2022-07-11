@@ -599,7 +599,7 @@ exports.rejectOrder = async (req, res, next) => {
   }
 }
 
-exports.orderPreparing = (req, res, next) => {
+exports.orderPreparing = async (req, res, next) => {
   const role = req.user.role;
   if (role != 0) {
     return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
@@ -625,7 +625,7 @@ exports.orderPreparing = (req, res, next) => {
   }
 }
 
-exports.orderDispatched = (req, res, next) => {
+exports.orderDispatched = async (req, res, next) => {
   const role = req.user.role;
   if (role != 0) {
     return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
@@ -651,7 +651,7 @@ exports.orderDispatched = (req, res, next) => {
   }
 }
 
-exports.orderDelivered = (req, res, next) => {
+exports.orderDelivered = async (req, res, next) => {
   const role = req.user.role;
   if (role != 0) {
     return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
