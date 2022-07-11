@@ -414,8 +414,8 @@ exports.postAddress = async (req, res, next) => {
     address: req.body.address,
     icon: req.body.icon,
     address_type: req.body.address_type || 0,
-    // latitude: req.body.latitude,
-    // longitude: req.body.longitude,
+    latitude: 21.1475640,
+    longitude: 72.7916070,
     userId: req.user_id
   }
   try {
