@@ -734,6 +734,12 @@ exports.postOrder = async (req, res, next) => {
     instructions = req.body.instructions;
   const netAmount = amount - discount;
   try {
+
+    const add = await Address.findByPk(addressId);
+
+    if (!add) {
+      return res.status(400).json({ message: "Address not found", status: 0 });
+    }
     const order = await Order.create({
       order_type: order_type,
       catererId: catererId,
@@ -741,6 +747,10 @@ exports.postOrder = async (req, res, next) => {
       amount: amount,
       date: date,
       time: time,
+      address: add.address,
+      address_icon: add.icon,
+      latitude: add.latitude,
+      longitude: add.longitude,
       discount: discount,
       netAmount: netAmount,
       addressId: addressId,

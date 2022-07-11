@@ -26,34 +26,34 @@ const Notification = require('./models/notifications');
 const app = express();
 
 const fileStorage = multer.diskStorage({
-  destination: (req,file,cb) => {
-      cb(null, path.join(__dirname, '/images'));
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, '/images'));
   },
   filename: (req, file, cb) => {
-      cb(null, new Date().toISOString() + '-' + file.originalname);
+    cb(null, new Date().toISOString() + '-' + file.originalname);
   }
 });
 
-const fileFilter = (req,file,cb) => {
-  if( file.mimetype == 'image/png' || 
-      file.mimetype == 'image/jpeg' || 
-      file.mimetype == 'image/jpg') {
-          cb(null, true);
-      } else {
-          cb(null, false);
-      }
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype == 'image/png' ||
+    file.mimetype == 'image/jpeg' ||
+    file.mimetype == 'image/jpg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
 }
 
 
 app.use(cors());
 
-app.use(express.json()); 
+app.use(express.json());
 
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.use(bodyParser.json());
 
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('image'));
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'));
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
@@ -61,14 +61,14 @@ const PORT = process.env.PORT || 5000;
 
 
 app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, PATCH, DELETE"
-    );
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
-    next();
-  });
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, PATCH, DELETE"
+  );
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept");
+  next();
+});
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -92,13 +92,13 @@ app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
-  res.status(status).json({message: message, data: data, statusCode:status , status: 0})
+  res.status(status).json({ message: message, data: data, statusCode: status, status: 0 })
 })
 
 const db = require('./util/database');
 
-Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'caterer' });
-User.hasOne(Store, { constraints: true, onDelete: 'CASCADE',foreignKey: "catererId", targetKey: "id", as: 'store' });
+Store.belongsTo(User, { constraints: true, onDelete: 'CASCADE', foreignKey: "catererId", targetKey: "id", as: 'caterer' });
+User.hasOne(Store, { constraints: true, onDelete: 'CASCADE', foreignKey: "catererId", targetKey: "id", as: 'store' });
 Driver.belongsTo(Store);
 Store.hasMany(Category);
 Category.belongsTo(Store);
@@ -129,12 +129,12 @@ Coupon.belongsTo(User, { foreignKey: "catererId", targetKey: "id" });
 OrderItem.belongsTo(Item);
 Item.hasMany(OrderItem);
 Order.belongsToMany(Item, { through: OrderItem });
-Order.belongsTo(Address);
-Address.hasMany(Order);
+// Order.belongsTo(Address);
+// Address.hasMany(Order);
 Chat.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
 User.hasMany(Chat, { foreignKey: "userId", targetKey: "id" });
-Chat.belongsTo(User, { foreignKey: "catererId", targetKey: "id", as: 'caterer'  });
-User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id"});
+Chat.belongsTo(User, { foreignKey: "catererId", targetKey: "id", as: 'caterer' });
+User.hasMany(Chat, { foreignKey: "catererId", targetKey: "id" });
 Message.belongsTo(User, { foreignKey: "senderId", targetKey: "id" });
 User.hasMany(Message, { foreignKey: "senderId", targetKey: "id" });
 Message.belongsTo(Chat, { foreignKey: "chatId", targetKey: "id" });
@@ -150,8 +150,8 @@ db.sequelize
   })
   .then((_result) => {
     const server = app.listen(PORT, (_port) => {
-                            console.log('Server running on port : ' + PORT);
-                        });
+      console.log('Server running on port : ' + PORT);
+    });
     const io = require('socket.io')(server, {
       pingTimeout: 60000,
       cors: {
@@ -159,42 +159,42 @@ db.sequelize
 
       }
     })
-    io.on("connection", (socket)=>{
+    io.on("connection", (socket) => {
       console.log('Connected to socket.io');
-      
-      socket.on('setup', (userData)=>{
+
+      socket.on('setup', (userData) => {
         socket.join(userData.id);
         console.log(userData);
         socket.emit("connected");
       })
 
-      socket.on('join chat', (room)=>{
+      socket.on('join chat', (room) => {
         // console.log();
-        socket.join(room) 
+        socket.join(room)
         console.log('joined chat');
       })
 
-      socket.on('typing', (room)=>socket.in(room).emit("typing"))
-      socket.on('stop typing', (room)=>socket.in(room).emit("stop typing"))
+      socket.on('typing', (room) => socket.in(room).emit("typing"))
+      socket.on('stop typing', (room) => socket.in(room).emit("stop typing"))
 
-      socket.on('new message', (newMessageRecieved)=>{
+      socket.on('new message', (newMessageRecieved) => {
         console.log('message recieved');
         let chat = newMessageRecieved.chat;
-        
-        if(!chat.userId || !chat.catererId) return console.log('Users are not there!');
 
-        if(newMessageRecieved.senderId == chat.catererId){
-            socket.in(chat.userId).emit("message recieved", newMessageRecieved);
-            socket.in(chat.catererId).emit("message sent", newMessageRecieved);
-            console.log('socket sent');
-        }else if(newMessageRecieved.senderId == chat.userId){
-            socket.in(chat.catererId).emit("message recieved", newMessageRecieved);
-            socket.in(chat.userId).emit("message sent", newMessageRecieved);
-            console.log('socket sent');
+        if (!chat.userId || !chat.catererId) return console.log('Users are not there!');
+
+        if (newMessageRecieved.senderId == chat.catererId) {
+          socket.in(chat.userId).emit("message recieved", newMessageRecieved);
+          socket.in(chat.catererId).emit("message sent", newMessageRecieved);
+          console.log('socket sent');
+        } else if (newMessageRecieved.senderId == chat.userId) {
+          socket.in(chat.catererId).emit("message recieved", newMessageRecieved);
+          socket.in(chat.userId).emit("message sent", newMessageRecieved);
+          console.log('socket sent');
         }
 
       })
-      socket.off('setup', ()=>{
+      socket.off('setup', () => {
         socket.leave(userData.id);
       })
 
