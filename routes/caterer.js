@@ -26,5 +26,6 @@ router.post('/reject-order/:orderId', jwtAuth, catererController.rejectOrder);
 router.put('/order-preparing', jwtAuth, catererController.orderPreparing);
 router.put('/order-dispatched', jwtAuth, catererController.orderDispatched);
 router.put('/order-delivered', jwtAuth, catererController.orderDelivered);
+router.get('/get-invoice/:orderId', jwtAuth, catererController.getInvoice);
 
 module.exports = router;

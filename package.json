@@ -36,6 +36,7 @@
     "nodemailer-sendgrid-transport": "^0.2.0",
     "nodemon": "^2.0.15",
     "path": "^0.12.7",
+    "pdfkit": "^0.13.0",
     "rand-token": "^1.0.1",
     "request": "^2.88.2",
     "sequelize": "^6.17.0",

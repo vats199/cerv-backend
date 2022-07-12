@@ -12,7 +12,7 @@ const Token = require('../models/token')
 const Coupon = require('../models/coupon');
 const Notification = require('../models/notifications');
 const notifications = require('../util/notifications');
-
+const PDF = require('pdfkit')
 const fs = require('fs')
 const path = require('path')
 const S3 = require('./s3')
@@ -676,6 +676,148 @@ exports.orderDelivered = async (req, res, next) => {
     return res.status(500).json({ error: err || 'Something went wrong!', status: 0 });
   }
 }
+
+exports.getInvoice = async (req, res, next) => {
+
+  const role = req.user.role;
+  if (role != 0) {
+    return res.status(400).json({ message: "You are not Authorized to do this!", status: 0 })
+  }
+
+  const orderId = req.params.orderId;
+  const invoiceName = "Order #" + orderId + " Invoice" + ".pdf";
+  const invoicePath = path.join("data", "invoices", invoiceName);
+
+  try {
+    const ord = await Order.findOne({
+      where: { id: orderId },
+      include: Item,
+    });
+    const user = await User.findByPk(ord.userId)
+    // console.log(user);
+    const pdfDoc = new PDF();
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      'inline; filename="' + invoicePath + '"'
+    );
+
+    // pdfDoc.pipe(fs.createWriteStream(invoicePath));
+    pdfDoc.pipe(res);
+    pdfDoc.fontSize(27).text("CERV ORDER#" + orderId, {
+      align: "center",
+    });
+    pdfDoc.fontSize(22).text("Invoice", {
+      underline: true,
+    });
+    pdfDoc.fontSize(10).text("  ");
+    pdfDoc.fontSize(12).text("Ordered By " + user.name);
+    pdfDoc.fontSize(5).text("  ");
+    if (ord.address) {
+      pdfDoc.fontSize(12).text("Delivered At " + ord.address);
+    } else {
+      pdfDoc.fontSize(12).text("Picked up from the store");
+    }
+
+    pdfDoc.text("  ");
+    // console.log(ord.dataValues.items);
+    let total = 0;
+    ord.items.forEach(
+      item => {
+        total += item.price * item.orderItem.quantity;
+      }
+    );
+    total -= ord.discount;
+    let i;
+    total = total.toFixed(3)
+    // console.log(total);
+
+    let invoiceTableTop = 200;
+    pdfDoc.font("Helvetica-Bold");
+    generateTableRowHeader(
+      pdfDoc,
+      200,
+      "Name",
+      "Unit Price",
+      "Quantity",
+      "Item Total"
+    );
+    generateHr(pdfDoc, invoiceTableTop + 20);
+    pdfDoc.font("Helvetica");
+
+    for (i = 0; i < ord.items.length; i++) {
+      const item = ord.items[i];
+      const position = invoiceTableTop + (i + 1) * 30;
+      generateTableRow(
+        pdfDoc,
+        position,
+        item.title,
+        item.price,
+        item.orderItem.quantity,
+        item.price * item.orderItem.quantity
+      );
+    }
+    pdfDoc.text(" ");
+    pdfDoc.text(" ");
+    pdfDoc.text(" ");
+    pdfDoc.text("Service Charges                       " + "1.00", { align: "right" });
+    pdfDoc.text("Delivery Fee                              " + "5.00", { align: "right" });
+    pdfDoc.text("Discount Amount                         - " + ord.discount, { align: "right" });
+    pdfDoc.text("Tax                                            " + "5.10", { align: "right" });
+    pdfDoc.text("_____________________________", { align: "right" });
+    pdfDoc.text("  ");
+    pdfDoc.fontSize(16).text("Net Amount:       $" + ord.netAmount, { align: "right" });
+    pdfDoc.text("  ");
+    pdfDoc
+      .fontSize(10)
+      .text("--------Thanks for ordering at CERV--------", {
+        align: "center",
+      });
+
+    pdfDoc.end();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Serverside-Error!", status: 0 })
+  }
+};
+
+function generateTableRow(
+  doc,
+  y,
+  c2,
+  c3,
+  c4,
+  c5
+) {
+  doc
+    .fontSize(10)
+    .text(c2, 150, y)
+    .text(c3, 280, y, { width: 90, align: "right" })
+    .text(c4, 370, y, { width: 90, align: "right" })
+    .text(c5, 0, y, { align: "right" });
+}
+
+function generateTableRowHeader(
+  doc,
+  y,
+  c2,
+  c3,
+  c4,
+  c5
+) {
+  doc
+    .fontSize(10)
+    .text(c2, 150, y)
+    .text(c3, 280, y, { width: 90, align: "right" })
+    .text(c4, 370, y, { width: 90, align: "right" })
+    .text(c5, 0, y, { align: "right" });
+}
+
+function generateHr(doc, y) {
+  doc.strokeColor("#aaaaaa").lineWidth(1).moveTo(50, y).lineTo(550, y).stroke();
+}
+
 
 const clearImage = filePath => {
   filePath = path.join(__dirname, '..', filePath);
