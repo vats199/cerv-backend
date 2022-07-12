@@ -29,7 +29,7 @@ router.post('/post-review', jwtAuth, customerController.postReview);
 router.post('/addCard', jwtAuth, stripeController.addCard);
 router.get('/getCards', jwtAuth, stripeController.getCard);
 router.post('/checkout_online', jwtAuth, stripeController.checkout_online);
-router.get('/fee', jwtAuth, customerController.getDeliveryFee);
+// router.get('/fee/:catererId/:addressId', jwtAuth, customerController.getDeliveryFee);
 router.post('/postOrder', jwtAuth, customerController.postOrder);
 router.get('/getCoupons/:catererId', jwtAuth, customerController.getCoupons);
 router.post('/cancelOrder', jwtAuth, customerController.cancelOrder);
