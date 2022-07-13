@@ -182,7 +182,15 @@ exports.postLogin = async (req, res, next) => {
       loadedUser.is_active = 1;
       await loadedUser.save();
 
-      const resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password', 'resetToken', 'resetTokenExpiration'] }, include: Store })
+      let resp;
+
+      if (user.role == 0) {
+
+        resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password', 'resetToken', 'resetTokenExpiration'] }, include: { model: Store, foreignKey: 'catererId', as: 'store' } })
+      } else {
+        resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password', 'resetToken', 'resetTokenExpiration'] } })
+      }
+
 
       try {
 
