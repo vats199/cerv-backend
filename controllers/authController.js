@@ -485,9 +485,21 @@ exports.changePassword = (req, res, body) => {
     })
 }
 
-exports.postStore = (req, res, next) => {
+exports.postStore = async (req, res, next) => {
 
   const userId = req.body.catererId;
+  const image = req.file
+  let url
+
+  if (image) {
+
+    const uploadFile = await S3.uploadFile(image);
+    url = uploadFile.Location;
+
+  } else {
+    url = null
+  }
+
 
   User.findOne({
     where: {
@@ -497,7 +509,7 @@ exports.postStore = (req, res, next) => {
     if (user.role == 0) {
       const storeData = {
         license_num: req.body.license_num,
-        license_image: req.body.license_image,
+        license_image: url,
         address: req.body.address,
         bio: req.body.bio,
         order_type: req.body.order_type,
