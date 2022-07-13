@@ -501,7 +501,7 @@ exports.postStore = (req, res, next) => {
         address: req.body.address,
         bio: req.body.bio,
         order_type: req.body.order_type,
-        userId: userId,
+        catererId: userId,
         name: user.name,
         category: req.body.category
       }
