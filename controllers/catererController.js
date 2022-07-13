@@ -456,6 +456,16 @@ exports.getOrders = async (req, res, next) => {
         }]
       })
 
+      for (let i = 0; i < currentOrders.length; i++) {
+        if (currentOrders[i].is_reviewed == true) {
+          const rev = await Feedback.findOne({ where: { orderId: currentOrders[i].id, catererId: catererId } });
+
+          currentOrders[i].dataValues.feedback = rev
+        } else {
+          currentOrders[i].dataValues.feedback = null
+        }
+      }
+
       return res.status(200).json({ message: "Orders Fetched!", length: currentOrders.length, orders: currentOrders, status: 1 })
     }
     else if (key == 2) {
