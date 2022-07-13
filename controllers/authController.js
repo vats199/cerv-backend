@@ -515,6 +515,8 @@ exports.postStore = async (req, res, next) => {
         order_type: req.body.order_type,
         catererId: userId,
         name: user.name,
+        longitude: req.body.longitude,
+        latitude: req.body.latitude,
         category: req.body.category
       }
       Store.findOne({
