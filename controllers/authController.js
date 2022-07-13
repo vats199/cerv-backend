@@ -33,7 +33,6 @@ exports.postSignup = async (req, res, next) => {
   if (req.body === {}) {
     return console.log("Your Body is empty!")
   }
-
   const image = req.file
   let url
 
@@ -70,7 +69,6 @@ exports.postSignup = async (req, res, next) => {
           name: req.body.name
         }
       }
-
       request(options, async (error, response, body) => {
         if (error) {
           console.log(error);
@@ -101,7 +99,6 @@ exports.postSignup = async (req, res, next) => {
         user.phone_number = req.body.phone_number;
         user.is_verify = 1;
         await user.save();
-
         const resp = await User.findByPk(user.id, { attributes: { exclude: ['password'] } });
         return res.status(200).json({ message: 'Registeration Successfull!', user: resp, status: 1 })
       })
