@@ -27,8 +27,8 @@ exports.postSignup = async (req, res, next) => {
 
   const errors = validationResult(req);
 
-  if(!errors.isEmpty()){
-    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg, status: 0 })
   }
   if (req.body === {}) {
     return console.log("Your Body is empty!")
@@ -53,7 +53,7 @@ exports.postSignup = async (req, res, next) => {
 
     const test1 = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
 
-    if(test1){
+    if (test1) {
       return res.json({ error: "USER ALREADY EXISTS WITH ENTERED PHONE NUMBER", status: 0 })
     }
 
@@ -102,7 +102,7 @@ exports.postSignup = async (req, res, next) => {
         user.is_verify = 1;
         await user.save();
 
-        const resp = await User.findByPk(user.id, { attributes:  { exclude: ['password'] } });
+        const resp = await User.findByPk(user.id, { attributes: { exclude: ['password'] } });
         return res.status(200).json({ message: 'Registeration Successfull!', user: resp, status: 1 })
       })
     } else {
@@ -117,8 +117,8 @@ exports.postSignup = async (req, res, next) => {
 exports.postLogin = async (req, res, next) => {
   const errors = validationResult(req);
 
-  if(!errors.isEmpty()){
-    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg, status: 0 })
   }
 
   try {
@@ -135,8 +135,8 @@ exports.postLogin = async (req, res, next) => {
     if (user.role == 0) {
       const store = await Store.findOne({ where: { catererId: user.id } });
 
-      if(!store){
-        return res.status(400).json({message: "Register your store and get verified by admin!", userId: user.id, userName: user.name, status: 0})
+      if (!store) {
+        return res.status(400).json({ message: "Register your store and get verified by admin!", userId: user.id, userName: user.name, status: 0 })
       }
 
       if (store.is_approved == 0) {
@@ -175,14 +175,14 @@ exports.postLogin = async (req, res, next) => {
       // Check whether any logical error is occurd or not.
       let json_body = JSON.parse(body);
       if (json_body.error) {
-        return res.status(401).json({message: 'Invalid email or password!', status: 0})
+        return res.status(401).json({ message: 'Invalid email or password!', status: 0 })
       }
       let loadedUser = user;
 
       loadedUser.is_active = 1;
       await loadedUser.save();
 
-      const resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password'] } })
+      const resp = await User.findByPk(loadedUser.id, { attributes: { exclude: ['password', 'resetToken', 'resetTokenExpiration'] }, include: Store })
 
       try {
 
@@ -224,7 +224,7 @@ exports.postLogin = async (req, res, next) => {
         }
       } catch (err) {
         // console.log(err);
-        return res.status(401).json({message: 'Invalid email or password!', status: 0})
+        return res.status(401).json({ message: 'Invalid email or password!', status: 0 })
       }
 
     })
@@ -274,8 +274,8 @@ exports.generateOTP = async (req, res, next) => {
   const number = req.body.phone_number;
   try {
     const test = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
-    if(test){
-      return res.status(400).json({message: "PHONE NUMBER IS ALREADY IN USE!", status: 0})
+    if (test) {
+      return res.status(400).json({ message: "PHONE NUMBER IS ALREADY IN USE!", status: 0 })
     }
     const otp = await client
       .verify
@@ -301,8 +301,8 @@ exports.verifyOTP = async (req, res, next) => {
 
   try {
     const test = await User.findOne({ where: { country_code: req.body.country_code, phone_number: req.body.phone_number } });
-    if(test){
-      return res.status(400).json({message: "PHONE NUMBER IS ALREADY IN USE!", status: 0})
+    if (test) {
+      return res.status(400).json({ message: "PHONE NUMBER IS ALREADY IN USE!", status: 0 })
     }
     const otp = await client
       .verify
@@ -379,8 +379,8 @@ exports.forgotPassword = async (req, res, next) => {
 
   const errors = validationResult(req);
 
-  if(!errors.isEmpty()){
-    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg, status: 0 })
   }
 
   const user = await User.findOne({ where: { email: req.body.email } });
@@ -433,11 +433,11 @@ exports.forgotPassword = async (req, res, next) => {
 }
 
 exports.changePassword = (req, res, body) => {
-  
+
   const errors = validationResult(req);
 
-  if(!errors.isEmpty()){
-    return res.status(400).json({message: errors.array()[0].msg, status: 0})
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ message: errors.array()[0].msg, status: 0 })
   }
 
   const currentPassword = req.body.currentPassword;
@@ -503,13 +503,13 @@ exports.postStore = (req, res, next) => {
       Store.findOne({
         where: {
           [Op.or]: [{
-                  license_num: req.body.license_num
-              },
-              {
-                  catererId: userId
-              }
+            license_num: req.body.license_num
+          },
+          {
+            catererId: userId
+          }
           ]
-      }
+        }
       })
         .then(store => {
           if (!store) {
@@ -546,7 +546,7 @@ exports.sendNot = async (req, res, next) => {
       }
     };
     notifications.createNotification('cllBuIZGSjiLhmCj2cNQv4:APA91bHOzLSk64JSU04P-2LQupP1vHqe4wGNKd2ppS2xpXOz3iH98HtD1g-zH6yXKz8Ul7WSE1N6uUuYu7jT1S3LqTq9g5thooKmq97X7P-PsNZDip4Oikv20FJZDz1ChohYk7Y9vgfm', message_notification);
-  return res.status(200).json({message: "Notification sent successfully!"})
+    return res.status(200).json({ message: "Notification sent successfully!" })
 
   } catch (error) {
     next(error);
